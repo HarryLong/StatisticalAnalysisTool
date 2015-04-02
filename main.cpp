@@ -4,13 +4,17 @@
 #include "utils.h"
 #include "radial_distribution.h"
 #include "radial_distribution_producer.h"
+#include "main_window.h"
 
 #include <iostream>
 #include <string>
+#include <QApplication>
 
 #define CREATOR_BIN "RadialDistributionFileCreator"
 #define REPRODUCER_BIN "RadialDistributionReproducer"
 #define ANALYSER_BIN "RadialDistributionFileAnalyzer"
+#define GUI_BIN "RadialDistributionToolGUI"
+
 
 static void print_file_production_usage()
 {
@@ -333,6 +337,16 @@ int main(int argc, char *argv[])
         radial_distribution.writeToCSV(output_csv_file);
 
         std::cout << "Distribution written to: " << output_csv_file << std::endl;
+    }
+    else if(bin.find(GUI_BIN) != std::string::npos) // GUI
+    {
+        std::cout << "Starting GUI..." << std::endl;
+        QApplication app(argc, argv);
+        MainWindow w;
+        w.resize(w.sizeHint());
+        w.showMaximized();
+
+        return app.exec();
     }
     else // Should never come here
     {

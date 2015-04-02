@@ -30,12 +30,13 @@ RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector
 
     // initialize the histogram and calculate different annular shell areas
     RadialDistribution::Histogram results;
-    for(int r (r_min); r <= r_max; r += r_diff)
+    for(int r (r_min); r < r_max; r += r_diff)
     {
         results.insert(std::pair<int,int>(r,0.0));
     }
 
-    double constant_normalization_factor((1.0f / reference_points.size()) / avg_density);
+//    double constant_normalization_factor((1.0f / reference_points.size()) / avg_density);
+    double constant_normalization_factor(((float)width*height) / (reference_points.size()*target_points.size()));
 
     // Set histogram values
     QLineF line;
@@ -49,7 +50,7 @@ RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector
                 line.setP2(target_point);
                 float length(line.length());
 
-                if(length > r_min && length <= r_max)
+                if(length > r_min && length < r_max)
                 {
                     int r_bracket(RadialDistributionUtils::getRBracket(line.length(), r_min, r_diff));
 

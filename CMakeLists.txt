@@ -19,11 +19,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCC_GL_DEBUG_ -DDEBUG_ON -Wall -g -std=
 #SET(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE} "-O2")
 #SET(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG} "-O0 -g")
 
-add_executable(RadialDistributionFileCreator dice_roller unit_tests radial_distribution_producer main distribution_factory radial_distribution radial_distribution_analyzer utils)
-add_executable(RadialDistributionFileAnalyzer dice_roller unit_tests radial_distribution_producer main distribution_factory radial_distribution radial_distribution_analyzer utils)
-add_executable(RadialDistributionReproducer dice_roller unit_tests radial_distribution_producer main distribution_factory radial_distribution radial_distribution_analyzer utils)
+add_executable(RadialDistributionFileCreator dialogs central_widget constants main_window input_widget spatial_hashmap dice_roller unit_tests radial_distribution_producer main distribution_factory radial_distribution radial_distribution_analyzer utils)
+add_executable(RadialDistributionFileAnalyzer dialogs central_widget constants main_window input_widget spatial_hashmap dice_roller unit_tests radial_distribution_producer main distribution_factory radial_distribution radial_distribution_analyzer utils)
+add_executable(RadialDistributionReproducer dialogs central_widget constants main_window input_widget spatial_hashmap dice_roller unit_tests radial_distribution_producer main distribution_factory radial_distribution radial_distribution_analyzer utils)
+add_executable(RadialDistributionToolGUI dialogs central_widget constants main_window input_widget spatial_hashmap dice_roller unit_tests radial_distribution_producer main distribution_factory radial_distribution radial_distribution_analyzer utils)
+
 target_link_libraries(RadialDistributionFileCreator Qt5::Widgets Qt5::Core Qt5::Gui)
 target_link_libraries(RadialDistributionFileAnalyzer Qt5::Widgets Qt5::Core Qt5::Gui)
 target_link_libraries(RadialDistributionReproducer Qt5::Widgets Qt5::Core Qt5::Gui)
+target_link_libraries(RadialDistributionToolGUI Qt5::Widgets Qt5::Core Qt5::Gui)
 
 # Use the Widgets module from Qt 5.

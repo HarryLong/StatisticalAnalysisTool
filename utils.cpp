@@ -163,3 +163,20 @@ void FileUtils::printPointsToImg(std::string image_file, const std::vector<QPoin
     output_img.save(QString(image_file.c_str()));
 }
 
+//int main(int argc, char *argv[])
+//{
+//    int total(500000);
+//    int trues(0);
+
+//    DiceRoller roller(0,1000);
+
+//    for(int i = 0; i < total; i++)
+//    {
+//        if(ProbabilisticUtils::returnTrueWithProbability(0.5f, roller))
+//            trues++;
+//    }
+//    std::cout << "Trues: " << trues << " / " << total << std::endl;
+//    return 0;
+//}
+
+
