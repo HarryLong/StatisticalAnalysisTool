@@ -5,6 +5,9 @@
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QRadioButton>
+#include <QButtonGroup>
+#include <QCheckBox>
 
 /****************************************
  * RADIAL DISTSRIBUTION PRODUCER DIALOG *
@@ -20,7 +23,13 @@ public:
             int n_iterations,
             QString output_rad_file_location,
             QString output_csv_file_location,
-            QString output_img_file_location
+            QString output_img_file_location,
+            QString output_size_properties_file_location,
+            QString output_size_properties_csv_file_location,
+            bool init_two_points,
+            bool init_match_distribution,
+            bool use_birth_and_death_genaration_algo,
+            bool use_random_moves_generation_algo
             ) :
         r_min(r_min),
         r_max(r_max),
@@ -30,7 +39,13 @@ public:
         n_iterations(n_iterations),
         output_rad_file_location(output_rad_file_location),
         output_csv_file_location(output_csv_file_location),
-        output_img_file_location(output_img_file_location) {}
+        output_img_file_location(output_img_file_location),
+        output_size_properties_file_location(output_size_properties_file_location),
+        output_size_properties_csv_file_location(output_size_properties_csv_file_location),
+        init_two_points(init_two_points),
+        init_match_distribution(init_match_distribution),
+        use_birth_and_death_genaration_algo(use_birth_and_death_genaration_algo),
+        use_random_moves_generation_algo(use_random_moves_generation_algo)    {}
 
     const int r_min;
     const int r_max;
@@ -43,7 +58,15 @@ public:
 
     const QString output_rad_file_location;
     const QString output_csv_file_location;
+    const QString output_size_properties_file_location;
+    const QString output_size_properties_csv_file_location;
     const QString output_img_file_location;
+
+    bool init_two_points;
+    bool init_match_distribution;
+
+    bool use_birth_and_death_genaration_algo;
+    bool use_random_moves_generation_algo;
 };
 
 class RadialDistributionProducerDialog : public QDialog
@@ -58,8 +81,11 @@ public:
 
 private slots:
     void change_rad_file_location();
-    void change_csv_file_location();
+    void change_rad_csv_file_location();
     void change_img_file_location();
+    void change_size_properties_file_location();
+    void change_size_properties_csv_file_location();
+    void generation_algo_changed();
 
 private:
     void init_layout();
@@ -73,12 +99,25 @@ private:
     QLineEdit * m_n_iterations_te;
 
     QLineEdit * m_output_rad_file_te;
-    QLineEdit * m_output_csv_file_te;
+    QLineEdit * m_output_rad_csv_file_te;
+    QLineEdit * m_output_point_size_file_te;
+    QLineEdit * m_output_point_size_csv_file_te;
     QLineEdit * m_output_img_file_te;
 
     QPushButton * m_change_rad_file_btn;
-    QPushButton * m_change_csv_file_btn;
+    QPushButton * m_change_rad_csv_file_btn;
+    QPushButton * m_change_point_size_file_btn;
+    QPushButton * m_change_point_size_csv_file_btn;
+
     QPushButton * m_change_img_file_btn;
+
+    QButtonGroup * m_init_type_btn_group;
+    QRadioButton * m_init_two_point_rb;
+    QRadioButton * m_init_match_density_rb;
+
+    QButtonGroup * m_generation_algo_btn_group;
+    QRadioButton * m_birth_and_deaths_generation_algo_rb;
+    QRadioButton * m_random_moves_generation_algo_rb;
 
     QPushButton * m_ok_btn;
 };
@@ -92,11 +131,16 @@ public:
     RandomDistributionProducerDialog();
     ~RandomDistributionProducerDialog();
     int getNPoints();
+    int getMinimumRadius();
+    int getMaximumRadius();
 
 private:
     void init_layout();
 
     QLineEdit * m_n_points;
+
+    QLineEdit * m_size_min_le;
+    QLineEdit * m_size_max_le;
 
     QPushButton * m_ok_btn;
 };
@@ -113,6 +157,9 @@ public:
     int getNSeedPoints();
     int getNSeedingIterations();
     int getMaxSeedingDistance();
+    bool equidistantSeeding();
+    int getMinimumRadius();
+    int getMaximumRadius();
 
 private:
     void init_layout();
@@ -120,6 +167,11 @@ private:
     QLineEdit * m_n_seed_points;
     QLineEdit * m_n_seeding_iterations;
     QLineEdit * m_max_seeding_distance;
+
+    QCheckBox * m_equidistant_cb;
+
+    QLineEdit * m_size_min_le;
+    QLineEdit * m_size_max_le;
 
     QPushButton * m_ok_btn;
 };

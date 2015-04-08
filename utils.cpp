@@ -3,7 +3,8 @@
 #include <algorithm>
 #include <iostream>
 #include <QImage>
-
+#include "analysis_point.h"
+#include <QPainter>
 #define MAX_8_BITS 256
 #define MAX_16_BITS 65536
 
@@ -136,6 +137,10 @@ float Binutils::readFloat32(unsigned char * data, int n_bytes)
  *****************************/
 int RadialDistributionUtils::getRBracket(double distance, int r_min, int r_diff)
 {
+//    if(distance < 1)
+//        return 0;
+//    if(r_min == 0)
+//        return 1 + ((int)((distance-1)/r_diff)) * r_diff;
     return r_min + ((int)((distance-r_min)/r_diff)) * r_diff;
 }
 
@@ -153,13 +158,20 @@ bool ProbabilisticUtils::returnTrueWithProbability(float probability, DiceRoller
 /**************
  * FILE UTILS *
  **************/
-void FileUtils::printPointsToImg(std::string image_file, const std::vector<QPoint> & points, int width, int height)
+void FileUtils::printPointsToImg(std::string image_file, const std::vector<AnalysisPoint*> & points, int width, int height)
 {
     QImage output_img(width, height, QImage::Format_RGB32);
-    output_img.fill(qRgb(0,0,0));
+    output_img.fill(Qt::black);
 
-    for(QPoint p : points)
-        output_img.setPixel(p.x(), p.y(), qRgb(255,255,255));
+    for(AnalysisPoint* p : points)
+    {
+        QPainter painter(&output_img);
+        painter.setPen(Qt::white);
+        painter.setBrush( Qt::white );
+        painter.drawEllipse(p->getCenter(), p->getRadius(), p->getRadius());
+        painter.end();
+    }
+
     output_img.save(QString(image_file.c_str()));
 }
 

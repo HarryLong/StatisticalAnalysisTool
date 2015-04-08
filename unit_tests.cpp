@@ -1,10 +1,12 @@
 #include "unit_tests.h"
 #include "radial_distribution_analyzer.h"
+#include "distribution_factory.h"
 #include <cassert>
 #include <iostream>
 #include "utils.h"
 #include <iostream>
 #include <fstream>
+#include "point_analyzer.h"
 
 TestClass::TestClass()
 {
@@ -16,6 +18,9 @@ void TestClass::runTests()
     test1();
     test2();
     test3();
+    test4();
+    test5();
+    test6();
 }
 
 void TestClass::test1()
@@ -344,10 +349,132 @@ void TestClass::test3()
     }
 }
 
-//int main(int argc, char *argv[])
-//{
-//    TestClass tc;
-//    tc.runTests();
-//    return 0;
-//}
+// Test writing and loading from a radial distribution file
+void TestClass::test4()
+{
+    std::cout << "*****************************************" << std::endl;
+    std::cout << "READ/WRITE TO RADIAL DISTRIBUTION FILE" << std::endl;
 
+    DistributionFactory factory;
+    std::vector<AnalysisPoint*> points(factory.generateRandomDistribution(0,1000, 500, 500));
+
+    RadialDistribution::Histogram original_data;
+    RadialDistributionProperties original_properties;
+
+    // Original
+    {
+        RadialDistributionAnalyzer analyzer(0, 200, 10);
+        RadialDistribution distribution(analyzer.getRadialDistribution(points, points, 500, 500));
+        original_data = distribution.m_data;
+        original_properties = distribution.m_properties;
+
+        // Write to test file
+        distribution.write(TEST_FILE);
+    }
+
+
+    RadialDistribution::Histogram loaded_data;
+    RadialDistributionProperties loaded_properties;
+    {
+        RadialDistribution distribution(TEST_FILE);
+        loaded_data = distribution.m_data;
+        loaded_properties = distribution.m_properties;
+    }
+
+    {
+        std::cout << "Expected size: " << original_data.size() << std::flush;
+        std::cout << "Size: " << loaded_data.size() << std::flush;
+        assert(original_data.size() == loaded_data.size());
+        std::cout << "\tPassed!"<< std::endl;
+
+        for(auto it(original_data.begin()); it != original_data.end(); it++)
+        {
+            std::cout << "Bracket: " << it->first << " | Expected: " << it->second <<std::flush;
+
+            float loaded_value(loaded_data[it->first]);
+            std::cout << " | Loaded: " << loaded_value << std::endl;
+            assert(loaded_value > it->second-.01f && loaded_value < it->second+.01f);
+            std::cout << "\tPassed!"<< std::endl;
+        }
+    }
+}
+
+void TestClass::test5()
+{
+    std::cout << "*****************************************" << std::endl;
+    std::cout << "READ/WRITE TO SIZE PROPERTIES FILE" << std::endl;
+
+    DistributionFactory factory;
+    std::vector<AnalysisPoint*> points(factory.generateRandomDistribution(0, 1000, 500, 500));
+
+    PointSizeProperties::Histogram original_data;
+    PointSizePropertiesHeader original_header;
+
+    // Original
+    {
+        PointSizeProperties properties( PointSizeAnalyzer::getSizeProperties(points, 5) );
+        original_data = properties.m_data;
+        original_header = properties.m_header;
+
+        // Write to test file
+        properties.write(TEST_FILE);
+    }
+
+
+    PointSizeProperties::Histogram loaded_data;
+    PointSizePropertiesHeader loaded_header;
+    {
+        PointSizeProperties properties(TEST_FILE);
+        loaded_data = properties.m_data;
+        loaded_header = properties.m_header;
+    }
+
+    {
+        std::cout << "Expected size: " << original_data.size() << std::flush;
+        std::cout << "Size: " << loaded_data.size() << std::flush;
+        assert(original_data.size() == loaded_data.size());
+        std::cout << "\tPassed!"<< std::endl;
+
+        for(auto it(original_data.begin()); it != original_data.end(); it++)
+        {
+            std::cout << "Bracket: " << it->first << " | Expected: " << it->second <<std::flush;
+
+            float loaded_value(loaded_data[it->first]);
+            std::cout << " | Loaded: " << loaded_value << std::endl;
+            assert(loaded_value > it->second-.01f && loaded_value < it->second+.01f);
+            std::cout << "\tPassed!"<< std::endl;
+        }
+    }
+}
+
+void TestClass::test6()
+{
+    std::cout << "*****************************************" << std::endl;
+    std::cout << "SIZE PROPERTIES ANALYZER TEST" << std::endl;
+
+    std::vector<AnalysisPoint*> points;
+    for(int i(1); i < 11; i++)
+        points.push_back(new AnalysisPoint(0, QPoint(i,i), i));
+
+    PointSizeProperties properties = PointSizeAnalyzer::getSizeProperties(points,1, 55);
+
+    // Header
+    assert(properties.m_header.diff == 1);
+    assert(properties.m_header.min == 1);
+    assert(properties.m_header.diff == 1);
+    assert(properties.m_header.max == 10);
+    assert(properties.m_header.n_points == 10);
+    assert(properties.m_header.points_id == 55);
+
+    // Data
+    assert(properties.m_data.size() == 10);
+    for(int i(1); i < 11; i++)
+    {
+        std::cout << "Radius: " << i << " | Expected: 0.1 | Received: " << properties.m_data[i] << "..." << std::flush;
+        assert(properties.m_data[i] > 0.09 && properties.m_data[i] < 0.11);
+        std::cout << "OK!" << std::endl;
+    }
+
+    for(AnalysisPoint * p : points)
+        delete p;
+}

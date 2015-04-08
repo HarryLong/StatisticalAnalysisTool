@@ -4,8 +4,8 @@
 #include <fstream>
 #include <cstring>
 
-RadialDistribution::RadialDistribution(RadialDistributionPorperties properties, Histogram data) :
-    m_properties(properties), m_data(data)
+RadialDistribution::RadialDistribution(RadialDistributionProperties properties, float within_radius_distribution, Histogram data) :
+    m_properties(properties), m_data(data), m_within_radius_distribution(within_radius_distribution)
 {
 
 }
@@ -35,6 +35,8 @@ void RadialDistribution::write(std::string filename)
     file.write((char*) Binutils::toBin(m_properties.r_min,4),4);
     file.write((char*) Binutils::toBin(m_properties.r_max,4),4);
     file.write((char*) Binutils::toBin(m_properties.r_diff,4),4);
+
+    file.write((char*) Binutils::toBin(m_within_radius_distribution,4),4);
 
     for(std::pair<int,float> point : m_data)
     {
@@ -117,6 +119,10 @@ bool RadialDistribution::load(std::string filename)
             unsigned int r;
             float distribution;
 
+            // First the within radius distribution
+            file.read(memblock, 4);
+            m_within_radius_distribution = Binutils::readFloat32((unsigned char*) memblock,4);
+
             while(file.tellg() < size)
             {
                 // R
@@ -152,6 +158,7 @@ void RadialDistribution::printToConsole()
     std::cout << "R max: " << m_properties.r_max << std::endl;
     std::cout << "R diff: " << m_properties.r_diff << std::endl;
     std::cout << "************DATA******************" << std::endl;
+    std::cout << "Within radius: " << m_within_radius_distribution << std::endl;
     for(std::pair<int,float> point : m_data)
         std::cout << "R: " << point.first << " | Variance: " << point.second << std::endl;
 }
@@ -174,6 +181,7 @@ void RadialDistribution::writeToCSV(std::string filename)
         file << "R max," << m_properties.r_max << "\n";
         file << "R diff," << m_properties.r_diff << "\n";
         file << "\n";
+        file << "Within radius," << m_within_radius_distribution << "\n";
         for(std::pair<int,float> point : m_data)
             file << point.first << "," << point.second << "\n";
     }

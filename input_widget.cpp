@@ -52,47 +52,54 @@ PixelData::PixelData(int width, int height) : m_image(width, height, QImage::For
 
 PixelData::~PixelData()
 {
+    for(AnalysisPoint * p : m_points)
+        delete p;
 }
 
-void PixelData::addCircle(Circle circle)
+void PixelData::addPoint(AnalysisPoint * point)
 {
-    m_circles.push_back(circle);
-    drawCircle(circle);
+    m_points.push_back(point);
+    drawPoint(point);
 }
 
-void PixelData::addCircles(std::vector<Circle> circles)
+void PixelData::addPoints(std::vector<AnalysisPoint *> points)
 {
-    for(Circle c : circles)
-        addCircle(c);
+    for(AnalysisPoint * p : points)
+        addPoint(p);
 }
 
-void PixelData::drawCircle(const Circle& c)
+void PixelData::drawPoint(const AnalysisPoint * p)
 {
     QPainter painter(&m_image);
     painter.setPen(Qt::white);
     painter.setBrush( Qt::white );
-    painter.drawEllipse(c.center, c.radius, c.radius);
+    painter.drawEllipse(p->getCenter(), p->getRadius(), p->getRadius());
     painter.end();
 }
 
 void PixelData::setSize(int width, int height)
 {
-    for(Circle & c : m_circles)
+    for(AnalysisPoint * p : m_points)
     {
-        c.center.setX((((float)c.center.x())/m_image.width()) * width);
-        c.center.setY((((float)c.center.y())/m_image.height()) * height);
+        QPoint new_center(
+                    (((float)p->getCenter().x())/m_image.width()) * width, //x
+                    (((float)p->getCenter().y())/m_image.height()) * height
+                    );
+        p->setCenter(new_center);
     }
 
     m_image = QImage(width,height, QImage::Format_ARGB32);
     m_image.fill(Qt::black);
 
-    for(Circle c : m_circles)
-        drawCircle(c);
+    for(AnalysisPoint * p : m_points)
+        drawPoint(p);
 }
 
 void PixelData::reset()
 {
-    m_circles.clear();
+    for(AnalysisPoint* p : m_points)
+        delete p;
+    m_points.clear();
     m_image.fill(Qt::black);
 }
 
@@ -111,15 +118,16 @@ int PixelData::getHeight() const
     return m_image.height();
 }
 
-std::vector<Circle> & PixelData::getCircles()
+std::vector<AnalysisPoint*> & PixelData::getPoints()
 {
-    return m_circles;
+    return m_points;
 }
 
 /****************
  * INPUT WIDGET *
  ****************/
-InputWidget::InputWidget(int width, int height, QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f), m_pixel_data(width, height), m_container_lbl(width, height)
+InputWidget::InputWidget(int width, int height, QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f), m_pixel_data(width, height), m_container_lbl(width, height),
+    m_point_size(1), m_active_category(1)
 {
     connect(&m_container_lbl, SIGNAL(mousePressed(QMouseEvent*)), this, SLOT(mouse_pressed(QMouseEvent*)));
 
@@ -156,7 +164,7 @@ void InputWidget::refresh()
 void InputWidget::mouse_pressed(QMouseEvent * event)
 {
     if (event->button() == Qt::LeftButton) {
-        m_pixel_data.addCircle(event->pos());
+        m_pixel_data.addPoint(new AnalysisPoint(m_active_category, event->pos(), m_point_size));
         refresh();
     }
 }
@@ -167,11 +175,11 @@ void InputWidget::clear()
     refresh();
 }
 
-void InputWidget::setPoints(std::vector<QPoint> &points)
+void InputWidget::setPoints(std::vector<AnalysisPoint*> &points)
 {
     m_pixel_data.reset();
-    for(QPoint p : points)
-        m_pixel_data.addCircle(Circle(p));
+    for(AnalysisPoint* p : points)
+        m_pixel_data.addPoint(p);
 
     refresh();
 }
@@ -186,7 +194,12 @@ int InputWidget::getHeight() const
     return m_pixel_data.getHeight();
 }
 
-std::vector<Circle> & InputWidget::getCircles()
+std::vector<AnalysisPoint*> & InputWidget::getPoints()
 {
-    return m_pixel_data.getCircles();
+    return m_pixel_data.getPoints();
+}
+
+void InputWidget::setPointSize(int size)
+{
+    m_point_size = size;
 }

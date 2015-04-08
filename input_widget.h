@@ -6,15 +6,9 @@
 #include <QPoint>
 #include <vector>
 #include <QImage>
+#include "analysis_point.h"
 
 #define DEFAULT_CIRCLE_RADIUS 1
-struct Circle
-{
-public:
-    Circle(QPoint center, int radius = DEFAULT_CIRCLE_RADIUS) : center(center), radius(radius) {}
-    QPoint center;
-    int radius;
-};
 
 /******************
  * SIGNALED LABEL *
@@ -49,9 +43,9 @@ public:
     PixelData(int width, int height);
     ~PixelData();
 
-    void addCircle(Circle center);
-    void addCircles(std::vector<Circle> points);
-    void drawCircle(const Circle & c);
+    void addPoint(AnalysisPoint * center);
+    void addPoints(std::vector<AnalysisPoint*> points);
+    void drawPoint(const AnalysisPoint * c);
     void reset();
 
     int getWidth() const;
@@ -59,10 +53,10 @@ public:
 
     void setSize(int width, int height);
     QImage& toImage();
-    std::vector<Circle> & getCircles();
+    std::vector<AnalysisPoint*> & getPoints();
 
 private:
-    std::vector<Circle> m_circles;
+    std::vector<AnalysisPoint*> m_points;
     QImage m_image;
 };
 
@@ -73,18 +67,21 @@ public:
     ~InputWidget();
     int getWidth() const;
     int getHeight() const;
-    void setPoints(std::vector<QPoint> & points);
-    std::vector<Circle> & getCircles();
+    void setPoints(std::vector<AnalysisPoint*> & points);
+    std::vector<AnalysisPoint*> & getPoints();
 
 public slots:
     void setSize(int width, int height);
     void mouse_pressed(QMouseEvent * event);
+    void setPointSize(int size);
     void clear();
 
 private:
     void refresh();
     void init_layout();
 
+    int m_point_size;
+    int m_active_category;
     PixelData m_pixel_data;
     MySignaledLabel m_container_lbl;
 };

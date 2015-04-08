@@ -3,6 +3,7 @@
 
 #include "dice_roller.h"
 #include <QPoint>
+
 /*************
  * BIN UTILS *
  *************/
@@ -33,8 +34,9 @@ namespace ProbabilisticUtils{
 /**************
  * FILE UTILS *
  **************/
+class AnalysisPoint;
 namespace FileUtils{
-    void printPointsToImg(std::string image_file, const std::vector<QPoint> & points, int width, int height);
+    void printPointsToImg(std::string image_file, const std::vector<AnalysisPoint*> & points, int width, int height);
 }
 
 #endif //UTILS_H

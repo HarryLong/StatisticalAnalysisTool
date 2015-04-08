@@ -2,6 +2,7 @@
 #include <QBoxLayout>
 #include "constants.h"
 #include <QMenuBar>
+#include "analysis_point.h"
 
 MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) : QMainWindow(parent, flags), m_central_widget(new CentralWidget(this)),
     m_random_distribution_producer_dlg(new RandomDistributionProducerDialog),
@@ -90,7 +91,11 @@ void MainWindow::refresh_input_widget_size()
 void MainWindow::generate_random_distribution()
 {
     int n_points(m_random_distribution_producer_dlg->getNPoints());
-    std::vector<QPoint> generated_points( m_distribution_factory.generateRandomDistribution(n_points, m_input_widget_width, m_input_widget_height) );
+    int min_point_radius( m_random_distribution_producer_dlg->getMinimumRadius() );
+    int max_point_radius( m_random_distribution_producer_dlg->getMaximumRadius() );
+
+    std::vector<AnalysisPoint*> generated_points( m_distribution_factory.generateRandomDistribution(1, n_points, m_input_widget_width, m_input_widget_height,
+                                                                                                    min_point_radius, max_point_radius) );
     m_central_widget->setInputWidgetPoints( generated_points );
 }
 
@@ -99,9 +104,13 @@ void MainWindow::generate_clustered_distribution()
     int n_seed_points( m_clustered_distribution_producer_dlg->getNSeedPoints() );
     int n_seeding_iterations( m_clustered_distribution_producer_dlg->getNSeedingIterations() );
     int max_seeding_distance( m_clustered_distribution_producer_dlg->getMaxSeedingDistance() );
+    bool equidistant_seeds( m_clustered_distribution_producer_dlg->equidistantSeeding() );
+    int min_point_radius( m_clustered_distribution_producer_dlg->getMinimumRadius() );
+    int max_point_radius( m_clustered_distribution_producer_dlg->getMaximumRadius() );
 
-    std::vector<QPoint> generated_points( m_distribution_factory.generateSeededDistribution(n_seed_points, n_seeding_iterations, max_seeding_distance,
-                                                                                            m_input_widget_width, m_input_widget_height)  );
+    std::vector<AnalysisPoint*> generated_points( m_distribution_factory.generateSeededDistribution(1, n_seed_points, n_seeding_iterations, max_seeding_distance,
+                                                                                            m_input_widget_width, m_input_widget_height,
+                                                                                            min_point_radius, max_point_radius, equidistant_seeds)  );
 
     m_central_widget->setInputWidgetPoints( generated_points );
 }
