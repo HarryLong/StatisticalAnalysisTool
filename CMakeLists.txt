@@ -8,6 +8,10 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 
+# Link directories
+include_directories("/home/harry/workspaces/qt-workspace/spatial-hashmap/")
+link_directories("/home/harry/workspaces/qt-workspace/spatial-hashmap/")
+
 set(CMAKE_AUTOMOC ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCC_GL_DEBUG_ -DDEBUG_ON -Wall -g -std=c++11 -Wno-reorder -Wno-unused-variable") #DEBUG
@@ -19,14 +23,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCC_GL_DEBUG_ -DDEBUG_ON -Wall -g -std=
 #SET(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE} "-O2")
 #SET(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG} "-O0 -g")
 
-add_executable(RadialDistributionFileCreator point_factory categorized_distribution_analyzer categorized_distribution_reproducer point_properties point_analyzer point_map analysis_point dialogs central_widget constants main_window input_widget spatial_hashmap dice_roller unit_tests radial_distribution_reproducer main distribution_factory radial_distribution radial_distribution_analyzer utils)
-add_executable(RadialDistributionFileAnalyzer point_factory categorized_distribution_analyzer categorized_distribution_reproducer point_properties point_analyzer point_map analysis_point dialogs central_widget constants main_window input_widget spatial_hashmap dice_roller unit_tests radial_distribution_reproducer main distribution_factory radial_distribution radial_distribution_analyzer utils)
-add_executable(RadialDistributionReproducer point_factory categorized_distribution_analyzer categorized_distribution_reproducer point_properties point_analyzer point_map analysis_point dialogs central_widget constants main_window input_widget spatial_hashmap dice_roller unit_tests radial_distribution_reproducer main distribution_factory radial_distribution radial_distribution_analyzer utils)
-add_executable(RadialDistributionToolGUI point_factory categorized_distribution_analyzer categorized_distribution_reproducer point_properties point_analyzer point_map analysis_point dialogs central_widget constants main_window input_widget spatial_hashmap dice_roller unit_tests radial_distribution_reproducer main distribution_factory radial_distribution radial_distribution_analyzer utils)
+#add_executable(RadialDistributionFileCreator point_drawer point_factory category_properties category_analyzer point_map analysis_point dialogs central_widget constants main_window input_widget spatial_hashmap dice_roller unit_tests reproducer main distribution_factory radial_distribution radial_distribution_analyzer utils)
+#add_executable(RadialDistributionFileAnalyzer point_drawer point_factory category_properties category_analyzer point_map analysis_point dialogs central_widget constants main_window input_widget spatial_hashmap dice_roller unit_tests reproducer main distribution_factory radial_distribution radial_distribution_analyzer utils)
+#add_executable(RadialDistributionReproducer point_drawer point_factory category_properties category_analyzer point_map analysis_point dialogs central_widget constants main_window input_widget spatial_hashmap dice_roller unit_tests reproducer main distribution_factory radial_distribution radial_distribution_analyzer utils)
+add_executable(RadialDistributionToolGUI reproduction_configuration analyzer analysis_configuration point_spatial_hashmap point_drawer point_factory category_properties category_analyzer point_map analysis_point dialogs central_widget
+constants main_window input_widget dice_roller unit_tests reproducer main distribution_factory radial_distribution radial_distribution_analyzer utils)
 
-target_link_libraries(RadialDistributionFileCreator Qt5::Widgets Qt5::Core Qt5::Gui)
-target_link_libraries(RadialDistributionFileAnalyzer Qt5::Widgets Qt5::Core Qt5::Gui)
-target_link_libraries(RadialDistributionReproducer Qt5::Widgets Qt5::Core Qt5::Gui)
+#target_link_libraries(RadialDistributionFileCreator Qt5::Widgets Qt5::Core Qt5::Gui)
+#target_link_libraries(RadialDistributionFileAnalyzer Qt5::Widgets Qt5::Core Qt5::Gui)
+#target_link_libraries(RadialDistributionReproducer Qt5::Widgets Qt5::Core Qt5::Gui)
 target_link_libraries(RadialDistributionToolGUI Qt5::Widgets Qt5::Core Qt5::Gui)
 
 # Use the Widgets module from Qt 5.

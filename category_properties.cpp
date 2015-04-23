@@ -1,16 +1,16 @@
-#include "point_properties.h"
+#include "category_properties.h"
 #include "utils.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
 
-PointSizeProperties::PointSizeProperties(PointSizePropertiesHeader header, Histogram data) :
+CategoryProperties::CategoryProperties(CategoryPropertiesHeader header, Histogram data) :
     m_header(header), m_data(data)
 {
 
 }
 
-PointSizeProperties::PointSizeProperties(std::string filename)
+CategoryProperties::CategoryProperties(std::string filename)
 {
     if(!load_data(filename))
     {
@@ -19,7 +19,7 @@ PointSizeProperties::PointSizeProperties(std::string filename)
     }
 }
 
-bool PointSizeProperties::load_data(std::string filename)
+bool CategoryProperties::load_data(std::string filename)
 {
     std::ifstream file;
     file.open(filename, std::ios_base::binary | std::ios_base::ate);
@@ -33,10 +33,10 @@ bool PointSizeProperties::load_data(std::string filename)
 
         // Check the signature
         {
-            char * memblock = new char[SIGNATURE_LENGTH];
-            file.read(memblock, SIGNATURE_LENGTH);
+            char * memblock = new char[CATEGORY_PROPERTIES_SIGNATURE_LENGTH];
+            file.read(memblock, CATEGORY_PROPERTIES_SIGNATURE_LENGTH);
 
-            if(strcmp(memblock, SIGNATURE) != 0)
+            if(strcmp(memblock, CATEGORY_PROPERTIES_SIGNATURE) != 0)
             {
                 std::cerr << "File signature (" << memblock << ") is invalid!" << std::endl;
                 delete [] memblock;
@@ -52,23 +52,27 @@ bool PointSizeProperties::load_data(std::string filename)
 
             // Points id
             file.read(memblock, 4);
-            m_header.points_id = Binutils::readInt32((unsigned char*) memblock);
+            m_header.category_id = Binutils::readInt32((unsigned char*) memblock);
 
             // Min
             file.read(memblock, 4);
-            m_header.min = Binutils::readInt32((unsigned char*) memblock);
+            m_header.min_size = Binutils::readInt32((unsigned char*) memblock);
 
             // Max
             file.read(memblock, 4);
-            m_header.max = Binutils::readInt32((unsigned char*) memblock);
+            m_header.max_size = Binutils::readInt32((unsigned char*) memblock);
 
             // Diff
             file.read(memblock, 4);
-            m_header.diff = Binutils::readInt32((unsigned char*) memblock);
+            m_header.bin_size = Binutils::readInt32((unsigned char*) memblock);
 
             // N points
             file.read(memblock, 4);
             m_header.n_points = Binutils::readInt32((unsigned char*) memblock);
+
+            // Priority
+            file.read(memblock, 4);
+            m_header.priority = Binutils::readInt32((unsigned char*) memblock);
 
             delete [] memblock;
         }
@@ -76,20 +80,20 @@ bool PointSizeProperties::load_data(std::string filename)
         // Data
         {
             char * memblock = new char[4];
-            unsigned int size;
+            unsigned int point_size;
             float ratio;
 
             while(file.tellg() < size)
             {
                 // size
                 file.read(memblock, 4);
-                size = Binutils::readInt32((unsigned char*) memblock,4);
+                point_size = Binutils::readInt32((unsigned char*) memblock,4);
 
                 // Distribution
                 file.read(memblock, 4);
                 ratio = Binutils::readFloat32((unsigned char*) memblock,4);
 
-                m_data.insert(std::pair<int,float>(size, ratio));
+                m_data.insert(std::pair<int,float>(point_size, ratio));
             }
 
             delete [] memblock;
@@ -102,20 +106,20 @@ bool PointSizeProperties::load_data(std::string filename)
     return false;
 }
 
-void PointSizeProperties::write(std::string filename)
+void CategoryProperties::write(std::string filename)
 {
     std::ofstream file;
     file.open(filename, std::ios_base::binary );
 
     // First write the header
-    char * header (SIGNATURE);
-    file.write(header, SIGNATURE_LENGTH);
-    file.write((char*) Binutils::toBin((unsigned int)m_header.points_id,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)m_header.min,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)m_header.max,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)m_header.diff,4),4);
+    char * header (CATEGORY_PROPERTIES_SIGNATURE);
+    file.write(header, CATEGORY_PROPERTIES_SIGNATURE_LENGTH);
+    file.write((char*) Binutils::toBin((unsigned int)m_header.category_id,4),4);
+    file.write((char*) Binutils::toBin((unsigned int)m_header.min_size,4),4);
+    file.write((char*) Binutils::toBin((unsigned int)m_header.max_size,4),4);
+    file.write((char*) Binutils::toBin((unsigned int)m_header.bin_size,4),4);
     file.write((char*) Binutils::toBin((unsigned int)m_header.n_points,4),4);
-
+    file.write((char*) Binutils::toBin((unsigned int)m_header.priority,4),4);
 
     for(std::pair<int,float> size_data : m_data)
     {
@@ -126,7 +130,7 @@ void PointSizeProperties::write(std::string filename)
     file.close();
 }
 
-void PointSizeProperties::writeToCSV(std::string filename)
+void CategoryProperties::writeToCSV(std::string filename)
 {
     std::ofstream file;
     file.open(filename);
@@ -134,10 +138,10 @@ void PointSizeProperties::writeToCSV(std::string filename)
     if(file.is_open())
     {
         // First write the header
-        file << "Points id," << m_header.points_id << "\n";
-        file << "Min," << m_header.min << "\n";
-        file << "Max," << m_header.max << "\n";
-        file << "diff," << m_header.diff << "\n";
+        file << "Points id," << m_header.category_id << "\n";
+        file << "Min," << m_header.min_size << "\n";
+        file << "Max," << m_header.max_size << "\n";
+        file << "diff," << m_header.bin_size << "\n";
         file << "# points," << m_header.n_points << "\n";
         file << "\n";
         for(std::pair<int,float> point : m_data)

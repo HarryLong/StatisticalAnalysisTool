@@ -3,7 +3,7 @@
 #include "distribution_factory.h"
 #include "utils.h"
 #include "radial_distribution.h"
-#include "radial_distribution_reproducer.h"
+#include "reproducer.h"
 #include "main_window.h"
 #include "unit_tests.h"
 

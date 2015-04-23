@@ -100,7 +100,7 @@ int DistributionFactory::get_random_radius(int min, int max)
 {
     int diff(max - min);
     if(diff > 0)
-        return (min + (m_dice_roller.generate()%diff));
+        return (min + (m_dice_roller.generate()%(diff+1)));
 
     return min;
 }

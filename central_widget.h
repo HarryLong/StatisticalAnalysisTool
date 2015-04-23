@@ -15,20 +15,24 @@ public:
     ~CentralWidget();
     void setInputWidgetSize(int width, int height);
     void setInputWidgetPoints(std::vector<AnalysisPoint*>& points);
+    int getActiveCategoryId();
 
 private slots:
-    void launch_reproduction_dialog();
-    void reproduce();
+    void launch_analysis_configuration_producer_dialog();
+    void analyse();
 
 private:
     void init_layout();
 
     InputWidget m_input_widget;
     QSpinBox * m_point_size_sb;
-    QPushButton * m_reproduce_btn;
+    QSpinBox * m_category_sb;
+
+    QPushButton * m_analyze_btn;
+
     QPushButton * m_clear_btn;
 
-    RadialDistributionProducerDialog * m_producer_dialog;
+    AnalysisConfigurationProducerDialog * m_analysis_configuration_producer_dialog;
 };
 
 #endif // CENTRAL_WIDGET_H

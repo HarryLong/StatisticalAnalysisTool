@@ -4,7 +4,11 @@
 #include <iostream>
 #include <QImage>
 #include "analysis_point.h"
+#include "point_drawer.h"
+#include "constants.h"
+
 #include <QPainter>
+#include <QDir>
 #define MAX_8_BITS 256
 #define MAX_16_BITS 65536
 
@@ -158,21 +162,170 @@ bool ProbabilisticUtils::returnTrueWithProbability(float probability, DiceRoller
 /**************
  * FILE UTILS *
  **************/
-void FileUtils::printPointsToImg(std::string image_file, const std::vector<AnalysisPoint*> & points, int width, int height)
+bool FileUtils::init_directory_structure(QString directory, QString & radial_distribution_folder, QString & category_properties_folder,
+                                        QString & csv_files_folder)
 {
-    QImage output_img(width, height, QImage::Format_RGB32);
-    output_img.fill(Qt::black);
+    if(!directory.endsWith("/"))
+        directory.append("/");
+    // Transform to OS directory format
+    directory = QDir::toNativeSeparators(directory);
 
-    for(AnalysisPoint* p : points)
+    if(!QDir(directory).exists())
     {
-        QPainter painter(&output_img);
-        painter.setPen(Qt::white);
-        painter.setBrush( Qt::white );
-        painter.drawEllipse(p->getCenter(), p->getRadius(), p->getRadius());
-        painter.end();
+        std::cerr << "Folder: " << directory.toStdString() << " doesn't exist!" << std::endl;
+        return false;
     }
 
-    output_img.save(QString(image_file.c_str()));
+    // Init radial distribution subdirectory
+    {
+        radial_distribution_folder = directory;
+        radial_distribution_folder.append(RADIAL_DISTRIBUTION_SUBFOLDER).append(QDir::separator());
+        QDir radial_distribution_dir( radial_distribution_folder );
+        if(!radial_distribution_dir.exists() && !radial_distribution_dir.mkpath("."))
+            return false;
+    }
+    // Init category properties subdirectory
+    {
+        category_properties_folder = directory;
+        category_properties_folder.append(CATEGORY_PROPERTIES_SUBFOLDER).append(QDir::separator());
+        QDir category_properties_dir( category_properties_folder );
+        if(!category_properties_dir.exists() && !category_properties_dir.mkpath("."))
+            return false;
+    }
+    // Init csv descriptors subdirectory
+    {
+        csv_files_folder = directory;
+        csv_files_folder.append(CSV_FILES_SUBFOLDER).append(QDir::separator());
+        QDir csv_dir( csv_files_folder );
+        if(!csv_dir.exists() && !csv_dir.mkpath("."))
+            return false;
+    }
+
+    return true;
+}
+
+bool FileUtils::check_directory_structure(QString directory)
+{
+    if(!directory.endsWith("/"))
+        directory.append("/");
+    // Transform to OS directory format
+    directory = QDir::toNativeSeparators(directory);
+
+    // Ensure directory exists
+    if(!QDir(directory).exists())
+    {
+        std::cout << "Directory: " << directory.toStdString() << " doesn't exist!" << std::endl;
+        return false;
+    }
+
+    // Check radial distribution subdirectory exists
+    {
+        QString radial_distribution_folder(directory);
+        radial_distribution_folder.append(RADIAL_DISTRIBUTION_SUBFOLDER);
+        if(!QDir(radial_distribution_folder).exists())
+        {
+            std::cout << "Directory: " << directory.toStdString() << " doesn't exist!" << std::endl;
+            return false;
+        }
+    }
+
+    // Check size properties subdirectory exists
+    {
+        QString category_properties_folder(directory);
+        category_properties_folder.append(CATEGORY_PROPERTIES_SUBFOLDER);
+        if(!QDir(category_properties_folder).exists())
+        {
+            std::cout << "Directory: " << directory.toStdString() << " doesn't exist!" << std::endl;
+            return false;
+        }
+    }
+
+    // Ensure the configuration file exists
+    {
+        QString configuration_file(directory);
+        configuration_file.append(CONFIGURATION_FILE_NAME);
+        if(!QFile(configuration_file).exists())
+        {
+            std::cout << "Configuration file: " << configuration_file.toStdString() << " doesn't exist!" << std::endl;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+std::vector<QString> FileUtils::get_radial_distribution_files(QString directory)
+{
+    if(!directory.endsWith("/"))
+        directory.append("/");
+    // Transform to OS directory format
+    directory.append(RADIAL_DISTRIBUTION_SUBFOLDER);
+    directory = QDir::toNativeSeparators(directory);
+
+    QDir dir(directory);
+    QStringList name_filter("*");
+    name_filter.append(RADIAL_DISTRIBUTION_FILE_EXTENSION);
+
+    std::vector<QString> ret;
+    for(QString radial_distribution_file : dir.entryList(name_filter, QDir::Files))
+    {
+        QString full_path(directory);
+        full_path.append(QDir::separator()).append(radial_distribution_file);
+        ret.push_back(full_path);
+    }
+
+    return ret;
+}
+
+std::vector<QString> FileUtils::get_category_properties_files(QString directory)
+{
+    if(!directory.endsWith("/"))
+        directory.append("/");
+    // Transform to OS directory format
+    directory.append(CATEGORY_PROPERTIES_SUBFOLDER);
+    directory = QDir::toNativeSeparators(directory);
+
+    QDir dir(directory);
+    QStringList name_filter("*");
+    name_filter.append(CATEGORY_PROPERTIES_FILE_EXTENSION);
+
+    std::vector<QString> ret;
+    for(QString category_file : dir.entryList(name_filter, QDir::Files))
+    {
+        QString full_path(directory);
+        full_path.append(QDir::separator()).append(category_file);
+        ret.push_back(full_path);
+    }
+
+    return ret;
+}
+
+QString FileUtils::get_configuration_file(QString directory)
+{
+    if(!directory.endsWith("/"))
+        directory.append("/");
+    // Transform to OS directory format
+    directory = QDir::toNativeSeparators(directory);
+
+    return directory.append(CONFIGURATION_FILE_NAME);
+}
+
+/***************
+ * IMAGE UTILS *
+ ***************/
+void ImageUtils::printPointsToImg(std::string image_file, const std::map<int,std::vector<AnalysisPoint*> > & points, int width, int height)
+{
+    PointDrawer drawer(width, height);
+
+    for(auto category_it( points.rbegin() ); category_it != points.rend(); category_it++) // Draw higher priority first to ensure no overlap
+    {
+        for(auto point_it(category_it->second.begin()); point_it != category_it->second.end(); point_it++)
+        {
+            drawer.drawPoint(*point_it);
+        }
+    }
+
+    drawer.toImage().save(QString(image_file.c_str()));
 }
 
 //int main(int argc, char *argv[])

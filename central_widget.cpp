@@ -1,29 +1,46 @@
 #include "central_widget.h"
 #include "constants.h"
 #include "radial_distribution_analyzer.h"
-#include "radial_distribution_reproducer.h"
 #include "utils.h"
-#include "point_analyzer.h"
+#include "category_analyzer.h"
+#include "analyzer.h"
 
 #include <QBoxLayout>
 #include <iostream>
 
 CentralWidget::CentralWidget(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f), m_input_widget(DEFAULT_INPUT_WIDGET_DIMENSION, DEFAULT_INPUT_WIDGET_DIMENSION, this),
-    m_producer_dialog(new RadialDistributionProducerDialog)
+    m_analysis_configuration_producer_dialog(new AnalysisConfigurationProducerDialog)
 {
-    connect(m_producer_dialog, SIGNAL(accepted()), this, SLOT(reproduce()));
+    connect(m_analysis_configuration_producer_dialog, SIGNAL(accepted()), this, SLOT(analyse()));
+    setInputWidgetSize(DEFAULT_INPUT_WIDGET_DIMENSION, DEFAULT_INPUT_WIDGET_DIMENSION);
 
     init_layout();
 }
 
 CentralWidget::~CentralWidget()
 {
-    delete m_producer_dialog;
+    delete m_analysis_configuration_producer_dialog;
 }
 
 void CentralWidget::setInputWidgetSize(int width, int height)
 {
+    m_analysis_configuration_producer_dialog->setAnalysisWindowDimensions(width, height);
     m_input_widget.setSize(width, height);
+}
+
+void CentralWidget::launch_analysis_configuration_producer_dialog()
+{
+    m_analysis_configuration_producer_dialog->exec();
+}
+
+void CentralWidget::setInputWidgetPoints(std::vector<AnalysisPoint*> &points)
+{
+    m_input_widget.setPoints(points);
+}
+
+int CentralWidget::getActiveCategoryId()
+{
+    return m_category_sb->value();
 }
 
 void CentralWidget::init_layout()
@@ -37,113 +54,63 @@ void CentralWidget::init_layout()
         layout->addLayout(input_widget_layout,1);
     }
 
-
-    // Clear, point size & reproduce button
+    // Point size & category
     {
-        m_clear_btn = new QPushButton("Clear");
-        m_reproduce_btn = new QPushButton("Reproduce");
         m_point_size_sb = new QSpinBox;
         m_point_size_sb->setRange(1,15);
+        m_category_sb = new QSpinBox;
+        m_category_sb->setRange(1,15);
+        m_category_sb->setValue(1);
+
+        connect(m_point_size_sb, SIGNAL(valueChanged(int)), &m_input_widget, SLOT(setPointSize(int)));
+        connect(m_category_sb, SIGNAL(valueChanged(int)), &m_input_widget, SLOT(setAciveCategoryId(int)));
+
+        QHBoxLayout * ps_and_category_id_layout = new QHBoxLayout;
+        ps_and_category_id_layout->addWidget(new QLabel(""),1,Qt::AlignCenter); // Padding
+
+        ps_and_category_id_layout->addWidget(new QLabel("Point size: "), 0, Qt::AlignCenter);
+        ps_and_category_id_layout->addWidget(m_point_size_sb, 0, Qt::AlignCenter);
+        ps_and_category_id_layout->addWidget(new QLabel("Category: "), 0, Qt::AlignCenter);
+        ps_and_category_id_layout->addWidget(m_category_sb, 0, Qt::AlignCenter);
+
+        ps_and_category_id_layout->addWidget(new QLabel(""),1,Qt::AlignCenter); // Padding
+        layout->addLayout(ps_and_category_id_layout,0);
+    }
+
+    // Clear, point size , category & reproduce button
+    {
+        m_clear_btn = new QPushButton("Clear");
+        m_analyze_btn = new QPushButton("Analyse");
 
         connect(m_clear_btn, SIGNAL(clicked()), &m_input_widget, SLOT(clear()));
-        connect(m_reproduce_btn, SIGNAL(clicked()), this, SLOT(launch_reproduction_dialog()));
-        connect(m_point_size_sb, SIGNAL(valueChanged(int)), &m_input_widget, SLOT(setPointSize(int)));
+        connect(m_analyze_btn, SIGNAL(clicked()), this, SLOT(launch_analysis_configuration_producer_dialog()));
 
-        QHBoxLayout * reproduce_button_layout = new QHBoxLayout;
-        reproduce_button_layout->addWidget(new QLabel(""),1,Qt::AlignCenter); // Padding
-        reproduce_button_layout->addWidget(m_clear_btn, 0, Qt::AlignCenter);
-        reproduce_button_layout->addWidget(m_point_size_sb, 0, Qt::AlignCenter);
-        reproduce_button_layout->addWidget(m_reproduce_btn, 0, Qt::AlignCenter);
-        reproduce_button_layout->addWidget(new QLabel(""),1,Qt::AlignCenter); // Padding
-        layout->addLayout(reproduce_button_layout,0);
+        QHBoxLayout * clear_and_reproduce_button_layout = new QHBoxLayout;
+        clear_and_reproduce_button_layout->addWidget(new QLabel(""),1,Qt::AlignCenter); // Padding
+
+        clear_and_reproduce_button_layout->addWidget(m_clear_btn, 0, Qt::AlignCenter);
+        clear_and_reproduce_button_layout->addWidget(m_analyze_btn, 0, Qt::AlignCenter);
+
+        clear_and_reproduce_button_layout->addWidget(new QLabel(""),1,Qt::AlignCenter); // Padding
+        layout->addLayout(clear_and_reproduce_button_layout,0);
     }
 
     setLayout(layout);
 }
 
-void CentralWidget::reproduce()
+void CentralWidget::analyse()
 {
-    // Get the reproduction settings
-    ReproductionSettings reproduction_settings(m_producer_dialog->getReproductionSettings());
+    // Get analysis configuration
+    AnalysisConfiguration analysis_configuration( m_analysis_configuration_producer_dialog->getConfiguration() );
 
-//    // Get the circles
-    std::vector<AnalysisPoint*> points(m_input_widget.getPoints());
+    // Get analysis points
+    std::map<int,std::vector<AnalysisPoint*> > categorised_points(m_input_widget.getPoints());
 
-//    // Create the Analyzer
-    RadialDistributionAnalyzer analyzer(reproduction_settings.r_min, reproduction_settings.r_max, reproduction_settings.r_diff);
-    RadialDistribution radial_distribution(analyzer.getRadialDistribution(points, points, m_input_widget.getWidth(), m_input_widget.getHeight(), 1, 1));
+    // Build vector of categories sorted by priority. Here, we simply use the category id as priority (1 higher than 2)
+    for(auto it(categorised_points.begin()); it != categorised_points.end(); it++)
+        analysis_configuration.priority_sorted_category_ids.push_back(it->first);
 
-//    // Write rad file
-    radial_distribution.write(reproduction_settings.output_rad_file_location.toStdString());
-    std::cout << "Radial distribution file written: " << reproduction_settings.output_rad_file_location.toStdString() << std::endl;
-
-//    // Write rad csv file
-    radial_distribution.writeToCSV(reproduction_settings.output_csv_file_location.toStdString());
-    std::cout << "RAD CSV file written: " << reproduction_settings.output_csv_file_location.toStdString() << std::endl;
-
-    PointSizeProperties point_size_property(PointSizeAnalyzer::getSizeProperties(points, 1, 1));
-//    // Write size properties file
-    point_size_property.write(reproduction_settings.output_size_properties_file_location.toStdString());
-    std::cout << "Size properties file written: " << reproduction_settings.output_size_properties_file_location.toStdString() << std::endl;
-
-//    // Write point size csv file
-    point_size_property.writeToCSV(reproduction_settings.output_size_properties_csv_file_location.toStdString());
-    std::cout << "Size properties CSV file written: " << reproduction_settings.output_size_properties_csv_file_location.toStdString() << std::endl;
-
-    RadialDistributionReproducer::Settings::InitializationType init_type;
-    if(reproduction_settings.init_two_points)
-        init_type = RadialDistributionReproducer::Settings::InitializationType::TwoPoints;
-    else if(reproduction_settings.init_match_distribution)
-        init_type = RadialDistributionReproducer::Settings::InitializationType::MatchDensity;
-
-    RadialDistributionReproducer::Settings::GenerationAlgorithm generation_algorithm;
-    if(reproduction_settings.use_birth_and_death_genaration_algo)
-        generation_algorithm = RadialDistributionReproducer::Settings::GenerationAlgorithm::BirthsAndDeaths;
-    else if(reproduction_settings.use_random_moves_generation_algo)
-        generation_algorithm = RadialDistributionReproducer::Settings::GenerationAlgorithm::RandomMoves;
-
-//    // The magic happens
-//    RadialDistributionReproducer(std::vector<RadialDistribution> radial_distributions, std::vector<PointSizeProperties> point_size_properties,
-//                                 PriorityToCategoryMapper category_priorities, Settings reproduction_settings);
-
-    std::vector<RadialDistribution> radial_distributions;
-    radial_distributions.push_back(radial_distribution);
-
-    std::vector<PointSizeProperties> point_size_properties;
-    point_size_properties.push_back(point_size_property);
-
-    RadialDistributionReproducer::PriorityToCategoryMapper category_priorities;
-    category_priorities.insert(std::pair<int,int>(1,1));
-
-    RadialDistributionReproducer::Settings settings(reproduction_settings.output_img_w, reproduction_settings.output_img_h,
-                                                    reproduction_settings.n_iterations, init_type, generation_algorithm);
-
-    RadialDistributionReproducer producer(radial_distributions, point_size_properties, category_priorities, settings);
-
-    producer.startPointGeneration();
-    std::vector<AnalysisPoint*> generated_points( producer.getGeneratedPoints() );
-
-    FileUtils::printPointsToImg(reproduction_settings.output_img_file_location.toStdString(),
-                                generated_points,
-                                reproduction_settings.output_img_w,
-                                reproduction_settings.output_img_h);
-    std::cout << "Image file written: " << reproduction_settings.output_img_file_location.toStdString() << std::endl;
-
-    std::string cmd("eog ");
-    cmd.append(reproduction_settings.output_img_file_location.toStdString());
-    cmd.append(" &");
-
-    system(cmd.c_str());
-}
-
-void CentralWidget::launch_reproduction_dialog()
-{
-    m_producer_dialog->setAnalysisArea(m_input_widget.getWidth(), m_input_widget.getHeight());
-    m_producer_dialog->exec();
-}
-
-void CentralWidget::setInputWidgetPoints(std::vector<AnalysisPoint*> &points)
-{
-    m_input_widget.setPoints(points);
+    Analyzer::generate_statistical_data(m_analysis_configuration_producer_dialog->getOutputDir(), categorised_points,
+                                        analysis_configuration, true);
 }
 

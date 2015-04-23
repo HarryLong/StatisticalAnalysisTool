@@ -4,79 +4,42 @@
 #include <QLabel>
 #include <QFileDialog>
 
-#define R_MIN_DEFAULT 0
-#define R_DIFF_DEFAULT 5
-#define R_ITERATIONS_DEFAULT 10000
-#define R_OUTPUT_WIDTH_DEFAULT 500
-#define R_OUTPUT_HEIGHT_DEFAULT 500
-
-#define R_MIN_RANGE_MIN 0
-#define R_MIN_RANGE_MAX 100
-
-#define R_MAX_RANGE_MIN 10
-
-#define R_DIFF_RANGE_MIN 1
-#define R_DIFF_RANGE_MAX 200
-
-#define DEFAULT_RAD_FILE_LOCATION "/home/harry/radial_distribution_app/output_distribution.rad"
-#define DEFAULT_RAD_CSV_FILE_LOCATION "/home/harry/radial_distribution_app/output_distribution.csv"
-#define DEFAULT_POINT_SIZE_FILE_LOCATION "/home/harry/radial_distribution_app/output_distribution.point_size"
-#define DEFAULT_POINT_SIZE_CSV_FILE_LOCATION "/home/harry/radial_distribution_app/output_distribution_point_size.csv"
-#define DEFAULT_IMG_FILE_LOCATION "/home/harry/radial_distribution_app/output_distribution.jpg"
-
-/****************************************
- * RADIAL DISTSRIBUTION PRODUCER DIALOG *
- ****************************************/
-RadialDistributionProducerDialog::RadialDistributionProducerDialog()
+/**********************************************
+ * REPRODUCTION CONFIGURATION PRODUCER DIALOG *
+ **********************************************/
+#define N_ITERATIONS_DEFAULT 10000
+#define OUTPUT_WIDTH_DEFAULT 500
+#define OUTPUT_HEIGHT_DEFAULT 500
+#define DEFAULT_OUTPUT_FILE "/home/harry/Pictures/radial_distribution_out.jpg"
+#define DEFAULT_ACTIVE_DIR "/home/harry/radial_distribution_app/"
+ReproductionConfigurationProducerDialog::ReproductionConfigurationProducerDialog()
 {
     setModal(true);
 
-    // R
-    m_r_min_sb = new QSpinBox;
-    m_r_min_sb->setRange(R_MIN_RANGE_MIN, R_MIN_RANGE_MAX);
-    m_r_min_sb->setValue(R_MIN_DEFAULT);
-
-    m_r_max_sb = new QSpinBox;
-
-    m_r_diff_sb = new QSpinBox;
-    m_r_diff_sb->setRange(R_DIFF_RANGE_MIN, R_DIFF_RANGE_MAX);
-    m_r_diff_sb->setValue(R_DIFF_DEFAULT);
-
     // Iterations
     m_n_iterations_te = new QLineEdit;
-    m_n_iterations_te->setText(QString::number(R_ITERATIONS_DEFAULT));
+    m_n_iterations_te->setText(QString::number(N_ITERATIONS_DEFAULT));
 
     // Output size
     m_output_w_te = new QLineEdit;
-    m_output_w_te->setText(QString::number(R_OUTPUT_WIDTH_DEFAULT));
+    m_output_w_te->setText(QString::number(OUTPUT_WIDTH_DEFAULT));
 
     m_output_h_te = new QLineEdit;
-    m_output_h_te->setText(QString::number(R_OUTPUT_HEIGHT_DEFAULT));
+    m_output_h_te->setText(QString::number(OUTPUT_HEIGHT_DEFAULT));
 
-    // Output rad file
-    m_output_rad_file_te = new QLineEdit;
-    m_output_rad_file_te->setEnabled(false);
-    m_output_rad_file_te->setText(DEFAULT_RAD_FILE_LOCATION);
+    // Active directory
+    m_active_directory_te = new QLineEdit;
+    m_active_directory_te->setEnabled(false);
+    m_active_directory_te->setText(DEFAULT_ACTIVE_DIR);
+    m_change_active_directory_btn = new QPushButton("...", this);
+    connect(m_change_active_directory_btn, SIGNAL(clicked()), this, SLOT(change_active_directory()));
 
-    // Output CSV file
-    m_output_rad_csv_file_te = new QLineEdit;
-    m_output_rad_csv_file_te->setEnabled(false);
-    m_output_rad_csv_file_te->setText(DEFAULT_RAD_CSV_FILE_LOCATION);
-
-    // Output point size file
-    m_output_point_size_file_te = new QLineEdit;
-    m_output_point_size_file_te->setEnabled(false);
-    m_output_point_size_file_te->setText(DEFAULT_POINT_SIZE_FILE_LOCATION);
-
-    // Output point size csv file
-    m_output_point_size_csv_file_te = new QLineEdit;
-    m_output_point_size_csv_file_te->setEnabled(false);
-    m_output_point_size_csv_file_te->setText(DEFAULT_POINT_SIZE_CSV_FILE_LOCATION);
-
-    // Output img file
-    m_output_img_file_te = new QLineEdit;
-    m_output_img_file_te->setEnabled(false);
-    m_output_img_file_te->setText(DEFAULT_IMG_FILE_LOCATION);
+    // Output file
+    m_output_file_te = new QLineEdit;
+    m_output_file_te->setEnabled(false);
+    m_output_file_te->setText(DEFAULT_OUTPUT_FILE);
+    m_change_output_file_btn = new QPushButton("...", this);
+    connect(m_change_output_file_btn, SIGNAL(clicked()), this, SLOT(change_output_file()));
 
     // Initialization types
     m_init_type_btn_group = new QButtonGroup;
@@ -89,44 +52,26 @@ RadialDistributionProducerDialog::RadialDistributionProducerDialog()
 
     // Generation algo
     m_generation_algo_btn_group = new QButtonGroup;
-
     m_birth_and_deaths_generation_algo_rb = new QRadioButton;
     m_generation_algo_btn_group->addButton(m_birth_and_deaths_generation_algo_rb);
     m_random_moves_generation_algo_rb = new QRadioButton;
     m_generation_algo_btn_group->addButton(m_random_moves_generation_algo_rb);
     m_birth_and_deaths_generation_algo_rb->setChecked(true);
-
     connect(m_generation_algo_btn_group, SIGNAL(buttonClicked(int)), this, SLOT(generation_algo_changed()));
 
     // OK button
     m_ok_btn = new QPushButton("Start");
     connect(m_ok_btn, SIGNAL(clicked()), this, SLOT(accept()));
 
-    // Actions
-    m_change_rad_file_btn = new QPushButton("...");
-    connect(m_change_rad_file_btn, SIGNAL(clicked()), this, SLOT(change_rad_file_location()));
-
-    m_change_rad_csv_file_btn = new QPushButton("...");
-    connect(m_change_rad_csv_file_btn, SIGNAL(clicked()), this, SLOT(change_rad_csv_file_location()));
-
-    m_change_img_file_btn = new QPushButton("...");
-    connect(m_change_img_file_btn, SIGNAL(clicked()), this, SLOT(change_img_file_location()));
-
-    m_change_point_size_file_btn = new QPushButton("...");
-    connect(m_change_point_size_file_btn, SIGNAL(clicked()), this, SLOT(change_size_properties_file_location()));
-
-    m_change_point_size_csv_file_btn = new QPushButton("...");
-    connect(m_change_point_size_csv_file_btn, SIGNAL(clicked()), this, SLOT(change_size_properties_csv_file_location()));
-
     init_layout();
 }
 
-RadialDistributionProducerDialog::~RadialDistributionProducerDialog()
+ReproductionConfigurationProducerDialog::~ReproductionConfigurationProducerDialog()
 {
     delete m_init_type_btn_group;
 }
 
-void RadialDistributionProducerDialog::generation_algo_changed()
+void ReproductionConfigurationProducerDialog::generation_algo_changed()
 {
     if(m_random_moves_generation_algo_rb->isChecked())
     {
@@ -141,33 +86,9 @@ void RadialDistributionProducerDialog::generation_algo_changed()
     }
 }
 
-void RadialDistributionProducerDialog::setAnalysisArea(int width, int height)
-{
-    m_r_max_sb->setRange(R_MAX_RANGE_MIN, std::max(width, height));
-    m_r_max_sb->setValue(std::max(width, width)/4.0f);
-}
-
-void RadialDistributionProducerDialog::init_layout()
+void ReproductionConfigurationProducerDialog::init_layout()
 {
     QVBoxLayout * layout = new QVBoxLayout;
-
-    // R settings
-    {
-        QHBoxLayout * r_layout = new QHBoxLayout;
-        // Rmin
-        r_layout->addWidget(new QLabel("R min: "),0);
-        r_layout->addWidget(m_r_min_sb,0);
-        // Rmax
-        r_layout->addWidget(new QLabel("   |   R max: "),0);
-        r_layout->addWidget(m_r_max_sb, 0);
-        // Rdiff
-        r_layout->addWidget(new QLabel("   |   R diff: "),0);
-        r_layout->addWidget(m_r_diff_sb, 0);
-        // Padding
-        r_layout->addWidget(new QLabel(""),1);
-
-        layout->addLayout(r_layout,0);
-    }
 
     // Output dimension
     {
@@ -188,9 +109,9 @@ void RadialDistributionProducerDialog::init_layout()
     {
         QHBoxLayout * iterations_layout = new QHBoxLayout;
         iterations_layout->addWidget(new QLabel("Iterations: "),0);
-        iterations_layout->addWidget(m_n_iterations_te,1);
-//        // Padding
-//        iterations_layout->addWidget(new QLabel(""));
+        iterations_layout->addWidget(m_n_iterations_te,0);
+        // Padding
+        iterations_layout->addWidget(new QLabel("")),1;
 
         layout->addLayout(iterations_layout,0);
     }
@@ -230,49 +151,22 @@ void RadialDistributionProducerDialog::init_layout()
         layout->addLayout(generation_algo_layout,0);
     }
 
-    // Output rad file
+    // Active directory
     {
-        QHBoxLayout * output_rad_file_layout = new QHBoxLayout;
-        output_rad_file_layout->addWidget(new QLabel("Output rad file: "),0);
-        output_rad_file_layout->addWidget(m_output_rad_file_te,1);
-        output_rad_file_layout->addWidget(m_change_rad_file_btn,0);
-        layout->addLayout(output_rad_file_layout,0);
+        QHBoxLayout * active_directory_layout = new QHBoxLayout;
+        active_directory_layout->addWidget(new QLabel("Active directory: "),0);
+        active_directory_layout->addWidget(m_active_directory_te,1);
+        active_directory_layout->addWidget(m_change_active_directory_btn,0);
+        layout->addLayout(active_directory_layout,0);
     }
 
-    // Output csv file
+    // Output file
     {
-        QHBoxLayout * output_csv_file_layout = new QHBoxLayout;
-        output_csv_file_layout->addWidget(new QLabel("Output rad CSV file: "),0);
-        output_csv_file_layout->addWidget(m_output_rad_csv_file_te,1);
-        output_csv_file_layout->addWidget(m_change_rad_csv_file_btn,0);
-        layout->addLayout(output_csv_file_layout,0);
-    }
-
-    // Output size properties file
-    {
-        QHBoxLayout * size_properties_file_layout = new QHBoxLayout;
-        size_properties_file_layout->addWidget(new QLabel("Output size properties file: "),0);
-        size_properties_file_layout->addWidget(m_output_point_size_file_te,1);
-        size_properties_file_layout->addWidget(m_change_point_size_file_btn,0);
-        layout->addLayout(size_properties_file_layout,0);
-    }
-
-    // Output size properties csv file
-    {
-        QHBoxLayout * output_size_properties_csv_file_layout = new QHBoxLayout;
-        output_size_properties_csv_file_layout->addWidget(new QLabel("Output size properties CSV file: "),0);
-        output_size_properties_csv_file_layout->addWidget(m_output_point_size_csv_file_te,1);
-        output_size_properties_csv_file_layout->addWidget(m_change_point_size_csv_file_btn,0);
-        layout->addLayout(output_size_properties_csv_file_layout,0);
-    }
-
-    // Output img file
-    {
-        QHBoxLayout * output_img_file_layout = new QHBoxLayout;
-        output_img_file_layout->addWidget(new QLabel("Output image file: "),0);
-        output_img_file_layout->addWidget(m_output_img_file_te,1);
-        output_img_file_layout->addWidget(m_change_img_file_btn,0);
-        layout->addLayout(output_img_file_layout,0);
+        QHBoxLayout * output_file_layout = new QHBoxLayout;
+        output_file_layout->addWidget(new QLabel("Output file: "),0);
+        output_file_layout->addWidget(m_output_file_te,1);
+        output_file_layout->addWidget(m_change_output_file_btn,0);
+        layout->addLayout(output_file_layout,0);
     }
 
     // Padding
@@ -286,94 +180,176 @@ void RadialDistributionProducerDialog::init_layout()
         padding_layout->addWidget(m_ok_btn,0, Qt::AlignCenter);
         layout->addLayout(padding_layout,0);
     }
+    setLayout(layout);
+}
+
+void ReproductionConfigurationProducerDialog::change_active_directory()
+{
+    QString active_dir = QFileDialog::getExistingDirectory(this,
+        tr("Set active directory"), m_active_directory_te->text());
+
+    if(active_dir != QString::null)
+        m_active_directory_te->setText(active_dir);
+}
+
+void ReproductionConfigurationProducerDialog::change_output_file()
+{
+    QString current_output_dir ( QFileInfo(m_output_file_te->text()).absoluteDir().absolutePath() ) ;
+
+    QString output_file ( QFileDialog::getSaveFileName(this,
+        tr("Set output file"), current_output_dir, tr("Images (*.jpg)")) );
+
+    if(output_file != QString::null)
+        m_output_file_te->setText(output_file);
+}
+
+QString ReproductionConfigurationProducerDialog::getOutputFile()
+{
+    return m_output_file_te->text();
+}
+
+ReproductionConfiguration ReproductionConfigurationProducerDialog::getConfiguration()
+{
+    ReproductionConfiguration::InitializationType init_type;
+    if(m_init_match_density_rb->isChecked())
+        init_type = ReproductionConfiguration::InitializationType::MatchDensity;
+    else if(m_init_two_point_rb->isChecked())
+        init_type = ReproductionConfiguration::InitializationType::TwoPoints;
+
+    ReproductionConfiguration::GenerationAlgorithm generation_algo;
+    if(m_birth_and_deaths_generation_algo_rb->isChecked())
+        generation_algo = ReproductionConfiguration::GenerationAlgorithm::BirthsAndDeaths;
+    else if(m_random_moves_generation_algo_rb->isChecked())
+        generation_algo = ReproductionConfiguration::GenerationAlgorithm::RandomMoves;
+
+    return ReproductionConfiguration(
+                m_active_directory_te->text(),
+                m_output_w_te->text().toInt(),
+                m_output_h_te->text().toInt(),
+                m_n_iterations_te->text().toInt(),
+                init_type,
+                generation_algo);
+}
+
+/******************************************
+ * ANALYSIS CONFIGURATION PRODUCER DIALOG *
+ ******************************************/
+#define R_MIN_RANGE_MIN 0
+#define R_MIN_RANGE_MAX 100
+#define R_MIN_DEFAULT 0
+
+#define R_MAX_RANGE_MIN 10
+
+#define R_DIFF_RANGE_MIN 1
+#define R_DIFF_RANGE_MAX 200
+#define R_DIFF_DEFAULT 5
+AnalysisConfigurationProducerDialog::AnalysisConfigurationProducerDialog()
+{
+    setModal(true);
+
+    // R
+    m_r_min_sb = new QSpinBox;
+    m_r_min_sb->setRange(R_MIN_RANGE_MIN, R_MIN_RANGE_MAX);
+    m_r_min_sb->setValue(R_MIN_DEFAULT);
+
+    m_r_max_sb = new QSpinBox;
+
+    m_r_diff_sb = new QSpinBox;
+    m_r_diff_sb->setRange(R_DIFF_RANGE_MIN, R_DIFF_RANGE_MAX);
+    m_r_diff_sb->setValue(R_DIFF_DEFAULT);
+
+    // Output dir
+    m_output_dir_te = new QLineEdit;
+    m_output_dir_te->setEnabled(false);
+    m_output_dir_te->setText(DEFAULT_ACTIVE_DIR);
+
+    // Change output dir button
+    m_change_output_dir_btn = new QPushButton("...", this);
+    connect(m_change_output_dir_btn, SIGNAL(clicked()), this, SLOT(change_output_directory()));
+
+    // OK button
+    m_ok_btn = new QPushButton("Start");
+    connect(m_ok_btn, SIGNAL(clicked()), this, SLOT(accept()));
+
+    init_layout();
+}
+
+AnalysisConfigurationProducerDialog::~AnalysisConfigurationProducerDialog()
+{
+
+}
+
+void AnalysisConfigurationProducerDialog::init_layout()
+{
+    QVBoxLayout * layout = new QVBoxLayout;
+
+    // R settings
+    {
+        QHBoxLayout * r_layout = new QHBoxLayout;
+        // Rmin
+        r_layout->addWidget(new QLabel("R min: "),0);
+        r_layout->addWidget(m_r_min_sb,0);
+        // Rmax
+        r_layout->addWidget(new QLabel("   |   R max: "),0);
+        r_layout->addWidget(m_r_max_sb, 0);
+        // Rdiff
+        r_layout->addWidget(new QLabel("   |   R diff: "),0);
+        r_layout->addWidget(m_r_diff_sb, 0);
+        // Padding
+        r_layout->addWidget(new QLabel(""),1);
+
+        layout->addLayout(r_layout,0);
+    }
+
+    // Output dir
+    {
+        QHBoxLayout * output_dir_layout = new QHBoxLayout;
+        output_dir_layout->addWidget(new QLabel("Output directory: "),0);
+        output_dir_layout->addWidget(m_output_dir_te,1);
+        output_dir_layout->addWidget(m_change_output_dir_btn,0);
+        layout->addLayout(output_dir_layout,0);
+    }
+
+    // Padding
+    QHBoxLayout * padding_layout = new QHBoxLayout;
+    padding_layout->addWidget(new QLabel(""),1, Qt::AlignCenter);
+    layout->addLayout(padding_layout,1);
+
+    // OK button
+    {
+        QHBoxLayout * padding_layout = new QHBoxLayout;
+        padding_layout->addWidget(m_ok_btn,0, Qt::AlignCenter);
+        layout->addLayout(padding_layout,0);
+    }
 
     setLayout(layout);
 }
 
-void RadialDistributionProducerDialog::change_rad_file_location()
+void AnalysisConfigurationProducerDialog::change_output_directory()
 {
-    QString rad_file_name = QFileDialog::getSaveFileName(this,
-        tr("Set output radial distribution file"), m_output_rad_file_te->text(), tr("Rad files(*.rad)"));
+    QString output_dir = QFileDialog::getExistingDirectory(this,
+        tr("Set output folder"), m_output_dir_te->text());
 
-    if(rad_file_name != QString::null)
-    {
-        if(!rad_file_name.endsWith(".rad"))
-            rad_file_name.append(".rad");
-        m_output_rad_file_te->setText(rad_file_name);
-    }
+    if(output_dir != QString::null)
+        m_output_dir_te->setText(output_dir);
 }
 
-void RadialDistributionProducerDialog::change_rad_csv_file_location()
+QString AnalysisConfigurationProducerDialog::getOutputDir()
 {
-    QString csv_file_name = QFileDialog::getSaveFileName(this,
-        tr("Set output csv file"), m_output_rad_csv_file_te->text(), tr("CSV files(*.csv)"));
-
-    if(csv_file_name != QString::null)
-    {
-        if(!csv_file_name.endsWith(".csv"))
-            csv_file_name.append(".csv");
-        m_output_rad_csv_file_te->setText(csv_file_name);
-    }
+    return m_output_dir_te->text();
 }
 
-void RadialDistributionProducerDialog::change_size_properties_file_location()
+void AnalysisConfigurationProducerDialog::setAnalysisWindowDimensions(int width, int height)
 {
-    QString size_properties_file_name = QFileDialog::getSaveFileName(this,
-        tr("Set output point size file"), m_output_rad_csv_file_te->text(), tr("point size files(*.point_size)"));
-
-    if(size_properties_file_name != QString::null)
-    {
-        if(!size_properties_file_name.endsWith(".point_size"))
-            size_properties_file_name.append(".point_size");
-        m_output_point_size_file_te->setText(size_properties_file_name);
-    }
+    m_analysis_window_width = width;
+    m_analysis_window_height = height;
+    m_r_max_sb->setRange(R_MAX_RANGE_MIN, std::max(width, height));
+    m_r_max_sb->setValue(std::max(width, width)/4.0f);
 }
 
-void RadialDistributionProducerDialog::change_size_properties_csv_file_location()
+AnalysisConfiguration AnalysisConfigurationProducerDialog::getConfiguration()
 {
-    QString size_properties_csv_file_name = QFileDialog::getSaveFileName(this,
-        tr("Set output point size csv file"), m_output_rad_csv_file_te->text(), tr("csv files(*.csv)"));
-
-    if(size_properties_csv_file_name != QString::null)
-    {
-        if(!size_properties_csv_file_name.endsWith(".csv"))
-            size_properties_csv_file_name.append(".csv");
-        m_output_point_size_csv_file_te->setText(size_properties_csv_file_name);
-    }
-}
-
-void RadialDistributionProducerDialog::change_img_file_location()
-{
-    QString img_file_name = QFileDialog::getSaveFileName(this,
-        tr("Set output img file"), m_output_img_file_te->text(), tr("JPG files(*.jpg)"));
-
-    if(img_file_name != QString::null)
-    {
-        if(!img_file_name.endsWith(".jpg"))
-            img_file_name.append(".jpg");
-        m_output_img_file_te->setText(img_file_name);
-    }
-}
-
-ReproductionSettings RadialDistributionProducerDialog::getReproductionSettings()
-{
-    return ReproductionSettings(
-                m_r_min_sb->value(),
-                m_r_max_sb->value(),
-                m_r_diff_sb->value(),
-                m_output_w_te->text().toInt(),
-                m_output_h_te->text().toInt(),
-                m_n_iterations_te->text().toInt(),
-                m_output_rad_file_te->text(),
-                m_output_rad_csv_file_te->text(),
-                m_output_img_file_te->text(),
-                m_output_point_size_file_te->text(),
-                m_output_point_size_csv_file_te->text(),
-                m_init_two_point_rb->isChecked(),
-                m_init_match_density_rb->isChecked(),
-                m_birth_and_deaths_generation_algo_rb->isChecked(),
-                m_random_moves_generation_algo_rb->isChecked()
-                );
+    return AnalysisConfiguration(m_r_min_sb->value(), m_r_max_sb->value(), m_r_diff_sb->value(), m_analysis_window_width, m_analysis_window_height);
 }
 
 /****************************************

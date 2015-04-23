@@ -3,7 +3,7 @@
 
 #include <map>
 #include <QPoint>
-#include "point_properties.h"
+#include "category_properties.h"
 #include "dice_roller.h"
 #include "point_map.h"
 
@@ -17,16 +17,16 @@ public:
 
     AnalysisPoint* getPoint();
     void setPositionStatus(QPoint point, bool available);
-    void setPointSizeProperties(PointSizeProperties properties);
+    void setCategoryProperties(CategoryProperties properties);
     int getActiveCategoryId();
 
 private:
     DiceRoller m_dice_roller;
-    std::map<int, int> m_point_percentages;
     int m_max_width;
     int m_max_height;
     int m_point_size_diffs;
     int m_active_category_id;
+    std::map<int,int> m_probability_to_bin_size_pairs;
     PointMap m_taken_points;
 };
 

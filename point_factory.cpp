@@ -15,21 +15,25 @@ PointFactory::~PointFactory()
 
 }
 
-void PointFactory::setPointSizeProperties(PointSizeProperties properties)
+void PointFactory::setCategoryProperties(CategoryProperties properties)
 {
-    m_point_percentages.clear();
-    auto it(properties.m_data.begin());
-    for(int p(0); p < 1000;it++)
-    {
-        int r(it->first);
-        float ratio_over_thousand(it->second*1000);
-        for(int i(0); i < ratio_over_thousand; i++)
-            m_point_percentages[p+i] = r;
+    int current_percentage(0);
+    m_probability_to_bin_size_pairs.clear();
 
-        p += ratio_over_thousand;
+    int i(0);
+    for(std::pair<int,float> size_percentage_pair : properties.m_data)
+    {
+        if(size_percentage_pair.second > 0)
+        {
+            if(++i == properties.m_data.size())
+                current_percentage = 1000;
+            else
+                current_percentage += (size_percentage_pair.second*1000);
+            m_probability_to_bin_size_pairs.insert(std::pair<int,int>(current_percentage, size_percentage_pair.first));
+        }
     }
-    m_point_size_diffs = properties.m_header.diff;
-    m_active_category_id = properties.m_header.points_id;
+    m_point_size_diffs = properties.m_header.bin_size;
+    m_active_category_id = properties.m_header.category_id;
 }
 
 void PointFactory::setPositionStatus(QPoint point, bool available)
@@ -54,7 +58,19 @@ AnalysisPoint* PointFactory::getPoint()
                           m_dice_roller.generate()%m_max_height);
     }while(m_taken_points.containsPoint(position));
 
-    AnalysisPoint * ret (new AnalysisPoint(m_active_category_id, position, m_point_percentages[m_dice_roller.generate()%1000] + (m_dice_roller.generate()%m_point_size_diffs)));
+    int size;
+    {
+        int random_number(m_dice_roller.generate()%1000);
+        auto it(m_probability_to_bin_size_pairs.begin());
+        for(; it != m_probability_to_bin_size_pairs.end(); it++)
+        {
+            if(random_number < it->first)
+                break;
+        }
+        size = (it->second + (m_dice_roller.generate()%m_point_size_diffs));
+    }
+
+    AnalysisPoint * ret (new AnalysisPoint(m_active_category_id, position, size));
 
     return ret;
 }

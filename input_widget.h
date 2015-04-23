@@ -7,6 +7,7 @@
 #include <vector>
 #include <QImage>
 #include "analysis_point.h"
+#include "point_drawer.h"
 
 #define DEFAULT_CIRCLE_RADIUS 1
 
@@ -38,28 +39,6 @@ protected:
     void mouseReleaseEvent(QMouseEvent *e);
 };
 
-class PixelData{
-public:
-    PixelData(int width, int height);
-    ~PixelData();
-
-    void addPoint(AnalysisPoint * center);
-    void addPoints(std::vector<AnalysisPoint*> points);
-    void drawPoint(const AnalysisPoint * c);
-    void reset();
-
-    int getWidth() const;
-    int getHeight() const;
-
-    void setSize(int width, int height);
-    QImage& toImage();
-    std::vector<AnalysisPoint*> & getPoints();
-
-private:
-    std::vector<AnalysisPoint*> m_points;
-    QImage m_image;
-};
-
 class InputWidget : public QWidget{
 Q_OBJECT
 public:
@@ -68,22 +47,28 @@ public:
     int getWidth() const;
     int getHeight() const;
     void setPoints(std::vector<AnalysisPoint*> & points);
-    std::vector<AnalysisPoint*> & getPoints();
+    std::map<int,std::vector<AnalysisPoint*> > & getPoints();
+    void addPoint(AnalysisPoint * point);
 
 public slots:
     void setSize(int width, int height);
     void mouse_pressed(QMouseEvent * event);
     void setPointSize(int size);
     void clear();
+    void setAciveCategoryId(int category_id);
 
 private:
     void refresh();
     void init_layout();
+    void delete_points();
 
     int m_point_size;
     int m_active_category;
-    PixelData m_pixel_data;
+    int m_width, m_height;
+    PointDrawer m_point_drawer;
     MySignaledLabel m_container_lbl;
+
+    std::map<int,std::vector<AnalysisPoint*> > m_points;
 };
 
 #endif // INPUT_WIDGET_H

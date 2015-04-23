@@ -23,6 +23,8 @@ private slots:
     void show_clustered_distribution_dialog();
     void generate_random_distribution();
     void generate_clustered_distribution();
+    void launch_reproduction_configuration_producer_dialog();
+    void reproduce();
 
 private:
     void init_layout();
@@ -37,12 +39,17 @@ private:
     // Menu elements
     QMenu * m_size_menu;
     QMenu * m_distributions_menu;
+    QMenu * m_reproduction_menu;
+
     QAction * m_generate_random_distribution_action;
     QAction * m_generate_clustered_action;
+    QAction * m_launch_reproduction_dialog_action;
 
     CentralWidget * m_central_widget;
     RandomDistributionProducerDialog * m_random_distribution_producer_dlg;
     ClusteredDistributionProducerDialog * m_clustered_distribution_producer_dlg;
+
+    ReproductionConfigurationProducerDialog * m_reproduction_configuration_producer_dlg;
 
     DistributionFactory m_distribution_factory;
 };

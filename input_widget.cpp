@@ -42,92 +42,12 @@ void MySignaledLabel::mouseReleaseEvent(QMouseEvent *e)
     emit mouseReleased(e);
 }
 
-/**************
- * PIXEL DATA *
- **************/
-PixelData::PixelData(int width, int height) : m_image(width, height, QImage::Format_ARGB32)
-{
-    reset();
-}
-
-PixelData::~PixelData()
-{
-    for(AnalysisPoint * p : m_points)
-        delete p;
-}
-
-void PixelData::addPoint(AnalysisPoint * point)
-{
-    m_points.push_back(point);
-    drawPoint(point);
-}
-
-void PixelData::addPoints(std::vector<AnalysisPoint *> points)
-{
-    for(AnalysisPoint * p : points)
-        addPoint(p);
-}
-
-void PixelData::drawPoint(const AnalysisPoint * p)
-{
-    QPainter painter(&m_image);
-    painter.setPen(Qt::white);
-    painter.setBrush( Qt::white );
-    painter.drawEllipse(p->getCenter(), p->getRadius(), p->getRadius());
-    painter.end();
-}
-
-void PixelData::setSize(int width, int height)
-{
-    for(AnalysisPoint * p : m_points)
-    {
-        QPoint new_center(
-                    (((float)p->getCenter().x())/m_image.width()) * width, //x
-                    (((float)p->getCenter().y())/m_image.height()) * height
-                    );
-        p->setCenter(new_center);
-    }
-
-    m_image = QImage(width,height, QImage::Format_ARGB32);
-    m_image.fill(Qt::black);
-
-    for(AnalysisPoint * p : m_points)
-        drawPoint(p);
-}
-
-void PixelData::reset()
-{
-    for(AnalysisPoint* p : m_points)
-        delete p;
-    m_points.clear();
-    m_image.fill(Qt::black);
-}
-
-QImage& PixelData::toImage()
-{
-    return m_image;
-}
-
-int PixelData::getWidth() const
-{
-    return m_image.width();
-}
-
-int PixelData::getHeight() const
-{
-    return m_image.height();
-}
-
-std::vector<AnalysisPoint*> & PixelData::getPoints()
-{
-    return m_points;
-}
-
 /****************
  * INPUT WIDGET *
  ****************/
-InputWidget::InputWidget(int width, int height, QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f), m_pixel_data(width, height), m_container_lbl(width, height),
-    m_point_size(1), m_active_category(1)
+InputWidget::InputWidget(int width, int height, QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f), m_width(width), m_height(height),
+    m_point_drawer(width, height), m_container_lbl(width, height),
+    m_point_size(1), m_active_category(1), m_points()
 {
     connect(&m_container_lbl, SIGNAL(mousePressed(QMouseEvent*)), this, SLOT(mouse_pressed(QMouseEvent*)));
 
@@ -149,57 +69,97 @@ void InputWidget::init_layout()
     setLayout(layout);
 }
 
+void InputWidget::addPoint(AnalysisPoint * point)
+{
+    if(m_points.find(m_active_category) == m_points.end())
+        m_points.insert(std::pair<int, std::vector<AnalysisPoint*> >(m_active_category, std::vector<AnalysisPoint*>()));
+    m_points[m_active_category].push_back(point);
+    m_point_drawer.drawPoint(point);
+    refresh();
+}
+
 void InputWidget::setSize(int width, int height)
 {
     m_container_lbl.setFixedSize(width, height);
-    m_pixel_data.setSize(width, height);
+    m_point_drawer.setSize(width, height);
+    // Iterate through each point and reset their center coordinate
+    for(auto categories_it(m_points.begin()); categories_it != m_points.end(); categories_it++)
+    {
+        for(auto points_it(categories_it->second.begin()); points_it != categories_it->second.end(); points_it++)
+        {
+            AnalysisPoint * point (*points_it);
+            QPoint new_center(
+                        (((float)point->getCenter().x())/m_width) * width, //x
+                        (((float)point->getCenter().y())/m_height) * height
+                        );
+            point->setCenter(new_center);
+
+            m_point_drawer.drawPoint(point);
+        }
+    }
+    m_width = width;
+    m_height = height;
     refresh();
 }
 
 void InputWidget::refresh()
 {
-    m_container_lbl.setPixmap(QPixmap::fromImage(m_pixel_data.toImage()));
+    m_container_lbl.setPixmap(QPixmap::fromImage(m_point_drawer.toImage()));
 }
 
 void InputWidget::mouse_pressed(QMouseEvent * event)
 {
-    if (event->button() == Qt::LeftButton) {
-        m_pixel_data.addPoint(new AnalysisPoint(m_active_category, event->pos(), m_point_size));
-        refresh();
-    }
+    if (event->button() == Qt::LeftButton)
+        addPoint(new AnalysisPoint(m_active_category, event->pos(), m_point_size));
 }
 
 void InputWidget::clear()
 {
-    m_pixel_data.reset();
+    delete_points();;
+    m_points.clear();
+    m_point_drawer.reset();
     refresh();
 }
 
 void InputWidget::setPoints(std::vector<AnalysisPoint*> &points)
 {
-    m_pixel_data.reset();
+    delete_points();
+    m_points.clear();
+    m_point_drawer.reset();
     for(AnalysisPoint* p : points)
-        m_pixel_data.addPoint(p);
+        addPoint(p);
 
     refresh();
 }
 
 int InputWidget::getWidth() const
 {
-    return m_pixel_data.getWidth();
+    return m_width;
 }
 
 int InputWidget::getHeight() const
 {
-    return m_pixel_data.getHeight();
+    return m_height;
 }
 
-std::vector<AnalysisPoint*> & InputWidget::getPoints()
+std::map<int,std::vector<AnalysisPoint*> > & InputWidget::getPoints()
 {
-    return m_pixel_data.getPoints();
+    return m_points;
 }
 
 void InputWidget::setPointSize(int size)
 {
     m_point_size = size;
+}
+
+void InputWidget::setAciveCategoryId(int category_id)
+{
+    m_active_category = category_id;
+}
+
+void InputWidget::delete_points()
+{
+    for(auto it(m_points.begin()); it != m_points.end(); it++)
+        for(auto it2(it->second.begin()); it2 != it->second.end(); it2++)
+            delete *it2;
 }
