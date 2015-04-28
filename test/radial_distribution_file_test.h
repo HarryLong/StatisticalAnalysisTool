@@ -3,7 +3,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 //class RadialDistributionFileTest : public CppUnit::TestFixture
-{
+//{
 //    CPPUNIT_TEST_SUITE( RadialDistributionFileTest );
 //    CPPUNIT_TEST( testDiceRolls );
 //    CPPUNIT_TEST_SUITE_END();
