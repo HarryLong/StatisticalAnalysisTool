@@ -1,10 +1,10 @@
 #include "radial_distribution_file_test.h"
 #include "../radial_distribution.h"
-#include "../analysis_configuration.h"
+#include "test_data_factory.h"
 
 void RadialDistributionFileTest::setUp()
 {
-//    m_analysis_config = new AnalysisConfiguration()
+//    m_radial_distribution = TestDataFactory::generateSingleCategoryRadialDistribution();
 }
 
 void RadialDistributionFileTest::tearDown()

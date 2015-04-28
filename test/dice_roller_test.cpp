@@ -1,5 +1,6 @@
 #include "dice_roller_test.h"
 #include "../dice_roller.h"
+#include <string>
 
 void DiceRollerTest::setUp()
 {
@@ -13,16 +14,17 @@ void DiceRollerTest::tearDown()
 
 void DiceRollerTest::testDiceRolls()
 {
-    int count [] = {0,0,0,0,0,0};
-    for(int i (0); i < 6000; i++ )
-    {
-        count[m_dice_roller->generate()]++;
-    }
+    double ratios [] = {.0,.0,.0,.0,.0,.0};
+    for(int i (0); i < 20000; i++ )
+        ratios[m_dice_roller->generate()-1] += (1.0/20000);
 
-    CPPUNIT_ASSERT( count[0] > 990 && count[0] < 990);
-    CPPUNIT_ASSERT( count[1] > 990 && count[1] < 990);
-    CPPUNIT_ASSERT( count[2] > 990 && count[2] < 990);
-    CPPUNIT_ASSERT( count[3] > 990 && count[3] < 990);
-    CPPUNIT_ASSERT( count[4] > 990 && count[4] < 990);
-    CPPUNIT_ASSERT( count[5] > 990 && count[5] < 990);
+    double expected (1.0/6);
+    double delta(0.01);
+
+    for(int i (0); i < 6; i++)
+    {
+        // "Value " + std::to_string(i+1) + " occured with frequency " + std::to_string((ratios[i]*100)) + "%. Required: " +
+        // std::to_string((expected*100)) + "% (delta: " + std::to_string((delta*100)) + ")",
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, ratios[i], delta);
+    }
 }
