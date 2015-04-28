@@ -4,8 +4,10 @@ compiler:
   - gcc
 
 install:
+  - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
   - sudo apt-get update
-  - sudo apt-get install libqt5core5a libqt5gui5 libqt5widgets5 libcppunit-dev libcppunit-1.12-1
+  - sudo apt-get install libcppunit-dev libcppunit-1.12-1
+  - sudo apt-get install qt5-qmake qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev
   - ./build.sh
 script:
   - ./build/test/runTests
