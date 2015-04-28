@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(STATISTICAL-ANALYSIS-TOOL)
 
 # QT Imports
-find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
-find_package(Qt5Gui REQUIRED)
 find_package(CppUnit REQUIRED)
 
 # Link directories
@@ -33,6 +31,6 @@ add_executable(runTests main ../dice_roller unit_tests dice_roller_test category
 #target_link_libraries(RadialDistributionFileCreator Qt5::Widgets Qt5::Core Qt5::Gui)
 #target_link_libraries(RadialDistributionFileAnalyzer Qt5::Widgets Qt5::Core Qt5::Gui)
 #target_link_libraries(RadialDistributionReproducer Qt5::Widgets Qt5::Core Qt5::Gui)
-target_link_libraries(runTests cppunit Qt5::Widgets Qt5::Core Qt5::Gui)
+target_link_libraries(runTests cppunit Qt5::Core)
 
 # Use the Widgets module from Qt 5.
