@@ -24,7 +24,6 @@ public:
 private:
     AnalysisConfiguration m_analysis_configuration;
     std::map<int,double> m_annular_shell_areas;
-    friend class TestClass;
 };
 
 #endif // RADIAL_DISTRIBUTION_ANALYZER_H

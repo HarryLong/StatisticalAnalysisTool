@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(STATISTICAL-ANALYSIS-TOOL)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/opt/Qt/5.3/gcc_64/")
 
 # QT Imports
 find_package(Qt5Widgets REQUIRED)

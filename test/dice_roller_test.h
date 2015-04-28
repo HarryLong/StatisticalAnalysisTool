@@ -1,7 +1,7 @@
-#include "../dice_roller.h"
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
+class DiceRoller;
 class DiceRollerTest : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE( DiceRollerTest );
