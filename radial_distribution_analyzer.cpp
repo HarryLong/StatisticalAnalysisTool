@@ -29,8 +29,10 @@ RadialDistributionAnalyzer::~RadialDistributionAnalyzer()
 }
 
 RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector<AnalysisPoint*> & reference_points, std::vector<AnalysisPoint*> & target_points,
-                                                                     int reference_points_id, int destination_points_id)
+                                                                     int reference_points_id, int destination_points_id, bool & dependent)
 {
+    dependent = true;
+
     // Optimization: build a spatial hashmap
     PointSpatialHashmap spatial_point_storage(m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height);
 
@@ -53,43 +55,61 @@ RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector
     double constant_normalization_factor(((float)total_area) / (reference_points.size()*target_points.size()));
     // Set histogram values
     QLineF line;
+
+    int n_pairs_processed(0);
+    int reference_points_processed(0);
     for(AnalysisPoint * reference_point : reference_points)
     {
-        line.setP1(reference_point->getCenter());
-        int reference_point_normalization_length(reference_point->getRadius()-1); // Perform analysis for each point normalized to a length of 1
+        if(reference_points_processed++ % 100 == 0)
+            std::cout << "Points processed: " << reference_points_processed << " / " << reference_points.size() << std::endl;
 
         std::vector<AnalysisPoint*> possible_reachable_points(spatial_point_storage.getPossibleReachablePoints(reference_point, m_analysis_configuration.r_max));
 
-        for(AnalysisPoint* target_point : possible_reachable_points)
+        if(possible_reachable_points.size() > 0)
         {
-            line.setP2(target_point->getCenter());
-            int target_point_normalization_length(target_point->getRadius()-1);
-            float length(std::max(0.0,line.length()-reference_point_normalization_length-target_point_normalization_length));
+            n_pairs_processed += possible_reachable_points.size();
+            line.setP1(reference_point->getCenter());
+            int reference_point_normalization_length(reference_point->getRadius()-1); // Perform analysis for each point normalized to a length of 1
 
-            if(length >= m_analysis_configuration.r_min && length < m_analysis_configuration.r_max)
+            bool reference_point_dependent = false;
+
+            for(AnalysisPoint* target_point : possible_reachable_points)
             {
-                int r_bracket(RadialDistributionUtils::getRBracket(length, m_analysis_configuration.r_min, m_analysis_configuration.r_diff));
+                line.setP2(target_point->getCenter());
+                int target_point_normalization_length(target_point->getRadius()-1);
+                float length(std::max(0.0,line.length()-reference_point_normalization_length-target_point_normalization_length));
 
-                if(RadialDistributionAnalyzer::overflows_border(reference_point->getCenter(), r_bracket, m_analysis_configuration.r_diff, m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height))
+                if(length >= m_analysis_configuration.r_min && length < m_analysis_configuration.r_max)
                 {
-                    double small_circle_area(RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), r_bracket, m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height));
-                    double large_circle_area(RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), r_bracket+m_analysis_configuration.r_diff, m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height));
+                    int r_bracket(RadialDistributionUtils::getRBracket(length, m_analysis_configuration.r_min, m_analysis_configuration.r_diff));
 
-                    double annular_shell_area (large_circle_area - small_circle_area);
+                    if(RadialDistributionAnalyzer::overflows_border(reference_point->getCenter(), r_bracket, m_analysis_configuration.r_diff, m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height))
+                    {
+                        double small_circle_area(RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), r_bracket, m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height));
+                        double large_circle_area(RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), r_bracket+m_analysis_configuration.r_diff, m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height));
 
-                    results[r_bracket] += (constant_normalization_factor / annular_shell_area);
+                        double annular_shell_area (large_circle_area - small_circle_area);
+
+                        results[r_bracket] += (constant_normalization_factor / annular_shell_area);
+                    }
+                    else
+                    {
+                        results[r_bracket] += (constant_normalization_factor / m_annular_shell_areas[r_bracket]);
+                    }
+
+                    if(length == 0)
+                    {
+                        within_radius_distribution += (constant_normalization_factor / M_PI);
+                        reference_point_dependent = true;
+                    }
                 }
-                else
-                {
-                    results[r_bracket] += (constant_normalization_factor / m_annular_shell_areas[r_bracket]);
-                }
-
-                if(length == 0)
-                    within_radius_distribution += (constant_normalization_factor / M_PI);
             }
+            if(dependent)
+                dependent = reference_point_dependent;
         }
     }
 
+    dependent = (dependent && (n_pairs_processed > 0));
     // Exponential difference
 //    std::cout << "***** ANALYSIS SUMMARY *****" << std::endl;
 //    std::cout << "# Reference points: " << reference_points.size() << std::endl;

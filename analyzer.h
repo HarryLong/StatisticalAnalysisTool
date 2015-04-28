@@ -9,7 +9,7 @@
 
 class AnalysisPoint;
 namespace Analyzer{
-    void generate_statistical_data(QString directory, std::map<int, std::vector<AnalysisPoint*> > points, AnalysisConfiguration configuration,
+    void generate_statistical_data(QString directory, std::map<int, std::vector<AnalysisPoint*> > & points, AnalysisConfiguration configuration,
                                    bool write_human_readable_files = false);
 }
 

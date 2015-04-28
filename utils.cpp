@@ -317,7 +317,7 @@ void ImageUtils::printPointsToImg(std::string image_file, const std::map<int,std
 {
     PointDrawer drawer(width, height);
 
-    for(auto category_it( points.rbegin() ); category_it != points.rend(); category_it++) // Draw higher priority first to ensure no overlap
+    for(auto category_it( points.begin() ); category_it != points.end(); category_it++) // Draw higher priority first to ensure no overlap
     {
         for(auto point_it(category_it->second.begin()); point_it != category_it->second.end(); point_it++)
         {

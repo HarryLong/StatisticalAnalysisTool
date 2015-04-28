@@ -8,12 +8,12 @@ public:
     AnalysisPoint(int category_id, QPoint center, int radius = 1);
     virtual ~AnalysisPoint();
 
-    int getRadius() const;
-    QPoint getCenter() const;
+    virtual int getRadius() const;
+    virtual QPoint getCenter() const;
+    virtual int getCategoryId() const;
 
     void setCenter(QPoint center);
     void setRadius(int radius);
-    int getCategoryId() const;
 
 private:
     int r;

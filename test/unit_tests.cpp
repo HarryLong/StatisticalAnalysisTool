@@ -1,12 +1,13 @@
 #include "unit_tests.h"
-#include "radial_distribution_analyzer.h"
-#include "distribution_factory.h"
+#include "../radial_distribution_analyzer.h"
+#include "../distribution_factory.h"
+#include "../category_analyzer.h"
+#include "../utils.h"
+
 #include <cassert>
 #include <iostream>
-#include "utils.h"
 #include <iostream>
 #include <fstream>
-#include "category_analyzer.h"
 
 TestClass::TestClass()
 {

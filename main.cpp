@@ -5,7 +5,6 @@
 #include "radial_distribution.h"
 #include "reproducer.h"
 #include "main_window.h"
-#include "unit_tests.h"
 
 #include <iostream>
 #include <string>
@@ -62,25 +61,15 @@ static void print_radial_distribution_file_analyzer_usage()
 
 
 #define TMP_IMAGE_FILE "/home/harry/radial_distributions/tmp.jpg"
-#define RUN_UNIT_TESTS false
 int main(int argc, char *argv[])
 {
-    if(RUN_UNIT_TESTS)
-    {
-        TestClass tc;
-        tc.runTests();
-        return 0;
-    }
-    else
-    {
-        std::cout << "Starting GUI..." << std::endl;
-        QApplication app(argc, argv);
-        MainWindow w;
-        w.resize(w.sizeHint());
-        w.showMaximized();
+    std::cout << "Starting GUI..." << std::endl;
+    QApplication app(argc, argv);
+    MainWindow w;
+    w.resize(w.sizeHint());
+    w.showMaximized();
 
-        return app.exec();
-    }
+    return app.exec();
 }
 ////    std::string bin(argv[0]);
 ////    if(bin.find(CREATOR_BIN) != std::string::npos)

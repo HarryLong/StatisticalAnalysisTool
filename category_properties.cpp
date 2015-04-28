@@ -74,6 +74,17 @@ bool CategoryProperties::load_data(std::string filename)
             file.read(memblock, 4);
             m_header.priority = Binutils::readInt32((unsigned char*) memblock);
 
+            // Dependent category ids
+            {
+                file.read(memblock, 4);
+                int n_dependent_category_ids (Binutils::readInt32((unsigned char*) memblock) );
+                for(int i (0); i < n_dependent_category_ids; i++)
+                {
+                    file.read(memblock, 4);
+                    m_header.category_dependent_ids.push_back( Binutils::readInt32((unsigned char*) memblock) );
+                }
+            }
+
             delete [] memblock;
         }
 
@@ -121,6 +132,11 @@ void CategoryProperties::write(std::string filename)
     file.write((char*) Binutils::toBin((unsigned int)m_header.n_points,4),4);
     file.write((char*) Binutils::toBin((unsigned int)m_header.priority,4),4);
 
+    // Dependent category ids
+    file.write((char*) Binutils::toBin((unsigned int)m_header.category_dependent_ids.size(),4),4);
+    for(int category_dependent_id : m_header.category_dependent_ids)
+        file.write((char*) Binutils::toBin((unsigned int)category_dependent_id,4),4);
+
     for(std::pair<int,float> size_data : m_data)
     {
         file.write((char*) Binutils::toBin((unsigned int) size_data.first,4),4);
@@ -143,7 +159,11 @@ void CategoryProperties::writeToCSV(std::string filename)
         file << "Max," << m_header.max_size << "\n";
         file << "diff," << m_header.bin_size << "\n";
         file << "# points," << m_header.n_points << "\n";
-        file << "\n";
+        // Dependent category ids
+        file << "Dependent category ids, ";
+        for(int category_dependent_id : m_header.category_dependent_ids)
+            file << category_dependent_id << ", ";
+        file << "\n\n";
         for(std::pair<int,float> point : m_data)
             file << point.first << "," << point.second << "\n";
     }

@@ -1,0 +1,17 @@
+language: cpp
+
+compiler:
+  - gcc
+
+install:
+  - sudo apt-get update
+  - sudo apt-get install libcppunit-dev libcppunit-1.13-0
+  - ./build.sh
+script:
+  - ./build/runTests
+notifications:
+  recipients:
+    - hjlong1@gmail.com
+  email:
+    on_success: change
+    on_failure: always

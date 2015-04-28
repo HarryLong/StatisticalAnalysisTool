@@ -27,7 +27,7 @@ std::map<int,std::vector<AnalysisPoint*> > RadialDistributionReproducer::reprodu
         std::vector<QString> category_properties_files(FileUtils::get_category_properties_files(reproduction_configuration.active_directory));
         for(QString category_property_file : category_properties_files)
         {
-            CategoryProperties category_property(CategoryProperties(category_property_file.toStdString()));
+            CategoryProperties category_property(category_property_file.toStdString());
             loaded_category_properties.insert(std::pair<int, CategoryProperties>(category_property.m_header.category_id, category_property));
         }
 
@@ -43,10 +43,10 @@ std::map<int,std::vector<AnalysisPoint*> > RadialDistributionReproducer::reprodu
     }
 
     std::vector<std::pair<int,int> > required_pair_correlations;
-    for(auto category_1(analysis_configuration.priority_sorted_category_ids.begin()); category_1 != analysis_configuration.priority_sorted_category_ids.end(); category_1++)
+    for(auto category_2(analysis_configuration.priority_sorted_category_ids.begin()); category_2 != analysis_configuration.priority_sorted_category_ids.end(); category_2++)
     {
-        for(auto category_2(std::find(analysis_configuration.priority_sorted_category_ids.begin(), analysis_configuration.priority_sorted_category_ids.end(), *category_1));
-                            category_2 != analysis_configuration.priority_sorted_category_ids.end(); category_2++)
+        for(auto category_1(std::find(analysis_configuration.priority_sorted_category_ids.begin(), analysis_configuration.priority_sorted_category_ids.end(), *category_2));
+                            category_1 != analysis_configuration.priority_sorted_category_ids.end(); category_1++)
         {
             required_pair_correlations.push_back(std::pair<int,int>(*category_1, *category_2));
         }
@@ -204,7 +204,7 @@ void RadialDistributionReproducer::generate_points_through_random_moves()
             delete destination_point;
         }
 
-        if(i%10000 == 0)
+        if(i%100 == 0)
             std::cout << ((((float)i)/m_reproduction_configuration.n_iterations) * 100) << "%" << std::endl;
     }
     std::cout << "Accepted moves: " << n_accepted_moves << " | Refused moves: " << n_refused_moves << std::endl;
@@ -332,6 +332,12 @@ float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* refe
     int reference_point_normalization_length(reference_point->getRadius()-1); // Perform analysis for each point normalized to a length of 1
     QLineF line;
     line.setP1(reference_point->getCenter());
+
+    CategoryProperties category_properties (m_category_properties.find(reference_point->getCategoryId())->second);
+    std::vector<int> dependent_category_ids(category_properties.m_header.category_dependent_ids);
+
+    bool within_radius_of_dependent_point = dependent_category_ids.empty();
+
     for(AnalysisPoint* destination_point : destination_points)
     {
         line.setP2(destination_point->getCenter());
@@ -342,7 +348,17 @@ float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* refe
         int r_bracket ( RadialDistributionUtils::getRBracket(length, m_analysis_configuration.r_min, m_analysis_configuration.r_diff) );
         if(r_bracket < m_analysis_configuration.r_max)
         {
-            RadialDistribution & radial_distribution( m_pair_correlations.find(std::pair<int,int>(destination_point->getCategoryId(), reference_point->getCategoryId()))->second );
+            if(!within_radius_of_dependent_point)
+                within_radius_of_dependent_point = (length < 1) && (std::find(dependent_category_ids.begin(), dependent_category_ids.end(), destination_point->getCategoryId()) != dependent_category_ids.end());
+
+            auto pair_correlation_it (m_pair_correlations.find(std::pair<int,int>(reference_point->getCategoryId(), destination_point->getCategoryId())));
+            if( pair_correlation_it == m_pair_correlations.end())
+            {
+                std::cerr << "FAILED TO FIND PAIR CORRELATION DATA!" << std::endl;
+                exit(1);
+            }
+
+            RadialDistribution & radial_distribution( pair_correlation_it->second) ;
 
             if(length < 1 ) // Within radius
                 strength *= radial_distribution.m_within_radius_distribution;
@@ -354,7 +370,7 @@ float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* refe
         }
     }
 
-    return strength;
+    return (within_radius_of_dependent_point ? strength : 0);
 }
 
 std::map<int,std::vector<AnalysisPoint*> >& RadialDistributionReproducer::getGeneratedPoints()
