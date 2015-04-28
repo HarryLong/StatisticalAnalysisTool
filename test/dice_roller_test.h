@@ -1,5 +1,5 @@
-#include "cppunit/TestFixture.h"
 #include "../dice_roller.h"
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 class DiceRollerTest : public CppUnit::TestFixture
