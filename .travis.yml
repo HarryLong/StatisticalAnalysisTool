@@ -8,7 +8,7 @@ install:
   - sudo apt-get install libcppunit-dev libcppunit-1.12-1
   - ./build.sh
 script:
-  - ./build/runTests
+  - ./build/test/runTests
 notifications:
   recipients:
     - hjlong1@gmail.com
