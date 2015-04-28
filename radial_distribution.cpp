@@ -22,7 +22,7 @@ RadialDistribution::RadialDistribution(std::string filename)
 void RadialDistribution::write(std::string filename)
 {
     std::ofstream file;
-    file.open(filename, std::ios_base::binary );
+    file.open(filename, std::ios_base::binary | std::ios_base::trunc );
 
     // First write the header
     char * header (RADIAL_DISTRIBUTION_SIGNATURE);

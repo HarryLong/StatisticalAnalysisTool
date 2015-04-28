@@ -23,15 +23,10 @@ RadialDistribution * TestDataFactory::generateSingleCategoryRadialDistribution(A
                                                                                         size_range.first, size_range.second));
 
     bool dependent;
-    return new RadialDistribution(analyser.getRadialDistribution(points, points, category_id, category_id, dependent));
-}
+    RadialDistribution * radial_distribution = new RadialDistribution(analyser.getRadialDistribution(points, points, category_id, category_id, dependent));
 
-AnalysisConfiguration* TestDataFactory::generateAnalysisConfiguration(int r_min, int r_max, int r_diff, int analysis_window_width, int analysis_window_height)
-{
-    return new AnalysisConfiguration(
-                r_min,
-                r_max,
-                r_diff,
-                analysis_window_width,
-                analysis_window_height);
+    for(AnalysisPoint * p : points)
+        delete p;
+
+    return radial_distribution;
 }

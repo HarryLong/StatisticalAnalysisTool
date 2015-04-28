@@ -7,5 +7,4 @@ public:
                                                                          int n_points,
                                                                          int category_id,
                                                                          std::pair<int,int> size_range = std::pair<int,int>(1,1));
-    static AnalysisConfiguration* generateAnalysisConfiguration(int r_min, int r_max, int r_diff, int analysis_window_width, int analysis_window_height);
 };

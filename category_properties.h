@@ -14,6 +14,17 @@ public:
         category_id(category_id), priority(priority), n_points(n_points), min_size(min_size), max_size(max_size), bin_size(bin_size)
     {}
 
+    bool operator ==(const CategoryPropertiesHeader &other) const
+    {
+        return (category_id == other.category_id &&
+                min_size == other.min_size &&
+                max_size == other.max_size &&
+                bin_size == other.bin_size &&
+                n_points == other.n_points &&
+                priority == other.priority &&
+                category_dependent_ids == other.category_dependent_ids);
+    }
+
     int category_id;
     int min_size;
     int max_size;

@@ -2,7 +2,6 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 class RadialDistribution;
-class AnalysisConfiguration;
 class RadialDistributionFileTest : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE( RadialDistributionFileTest );
@@ -17,7 +16,6 @@ public:
 
 private:
     RadialDistribution * m_radial_distribution;
-    AnalysisConfiguration * m_analysis_config;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( RadialDistributionFileTest );

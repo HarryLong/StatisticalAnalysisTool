@@ -120,7 +120,7 @@ bool CategoryProperties::load_data(std::string filename)
 void CategoryProperties::write(std::string filename)
 {
     std::ofstream file;
-    file.open(filename, std::ios_base::binary );
+    file.open(filename, std::ios_base::binary | std::ios_base::trunc );
 
     // First write the header
     char * header (CATEGORY_PROPERTIES_SIGNATURE);
