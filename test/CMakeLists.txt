@@ -26,7 +26,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG_ON -O3 -Wall -std=c++11 -Wno-reo
 
 #add_executable(UnitTester reproduction_configuration analyzer analysis_configuration point_spatial_hashmap point_factory category_properties category_analyzer point_map analysis_point constants dice_roller reproducer main distribution_factory radial_distribution radial_distribution_analyzer utils)
 
-add_executable(runTests main ../dice_roller unit_tests dice_roller_test category_analyzer_test radial_distribution_analyzer_test category_reproducer_test radial_distribution_reproducer_test)
+add_executable(runTests main ../dice_roller unit_tests dice_roller_test category_analyzer_test radial_distribution_analyzer_test category_reproducer_test radial_distribution_reproducer_test
+radial_distribution_file_test category_properties_file_test analysis_configuration_file_test )
 
 #target_link_libraries(RadialDistributionFileCreator Qt5::Widgets Qt5::Core Qt5::Gui)
 #target_link_libraries(RadialDistributionFileAnalyzer Qt5::Widgets Qt5::Core Qt5::Gui)
