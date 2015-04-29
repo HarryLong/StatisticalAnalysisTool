@@ -33,12 +33,14 @@ bool CategoryProperties::load_data(std::string filename)
 
         // Check the signature
         {
-            char * memblock = new char[CATEGORY_PROPERTIES_SIGNATURE_LENGTH];
-            file.read(memblock, CATEGORY_PROPERTIES_SIGNATURE_LENGTH);
+            char * memblock = new char[CATEGORY_PROPERTIES_SIGNATURE_LENGTH+1];
+            file.read(memblock, CATEGORY_PROPERTIES_SIGNATURE_LENGTH);            
+            memblock[CATEGORY_PROPERTIES_SIGNATURE_LENGTH] = '\0'; // Null-terminate
 
-            if(strcmp(memblock, CATEGORY_PROPERTIES_SIGNATURE) != 0)
+            std::string expected_signature(CATEGORY_PROPERTIES_SIGNATURE);
+            if(strcmp(memblock, expected_signature.c_str()) != 0)
             {
-                std::cerr << "File signature (" << memblock << ") is invalid!" << std::endl;
+                std::cerr << "File signature (" << memblock << ") is invalid! (Expected: " << CATEGORY_PROPERTIES_SIGNATURE << ")" << std::endl;
                 delete [] memblock;
                 return false;
             }
@@ -123,8 +125,8 @@ void CategoryProperties::write(std::string filename)
     file.open(filename, std::ios_base::binary | std::ios_base::trunc );
 
     // First write the header
-    char * header (CATEGORY_PROPERTIES_SIGNATURE);
-    file.write(header, CATEGORY_PROPERTIES_SIGNATURE_LENGTH);
+    std::string header (CATEGORY_PROPERTIES_SIGNATURE);
+    file.write(header.c_str(), CATEGORY_PROPERTIES_SIGNATURE_LENGTH);
     file.write((char*) Binutils::toBin((unsigned int)m_header.category_id,4),4);
     file.write((char*) Binutils::toBin((unsigned int)m_header.min_size,4),4);
     file.write((char*) Binutils::toBin((unsigned int)m_header.max_size,4),4);

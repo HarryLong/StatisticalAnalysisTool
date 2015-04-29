@@ -55,12 +55,14 @@ bool RadialDistribution::load(std::string filename)
 
         // Check the signature
         {
-            char * memblock = new char[RADIAL_DISTRIBUTION_SIGNATURE_LENGTH];
+            char * memblock = new char[RADIAL_DISTRIBUTION_SIGNATURE_LENGTH+1];
             file.read(memblock, RADIAL_DISTRIBUTION_SIGNATURE_LENGTH);
+            memblock[RADIAL_DISTRIBUTION_SIGNATURE_LENGTH] = '\0'; // Null-terminate
 
-            if(strcmp(memblock, RADIAL_DISTRIBUTION_SIGNATURE) != 0)
+            std::string expected_signature(RADIAL_DISTRIBUTION_SIGNATURE);
+            if(strcmp(memblock, expected_signature.c_str()) != 0)
             {
-                std::cerr << "File signature (" << memblock << ") is invalid!" << std::endl;
+                std::cerr << "File signature (" << memblock << ") is invalid! (Expected: " << expected_signature << ")" << std::endl;
                 delete [] memblock;
                 return false;
             }

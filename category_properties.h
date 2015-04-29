@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#define CATEGORY_PROPERTIES_SIGNATURE "POINTPROPERTIESFILE"
-#define CATEGORY_PROPERTIES_SIGNATURE_LENGTH 19
+#define CATEGORY_PROPERTIES_SIGNATURE "CATEGORYPROPERTIESFILE"
+#define CATEGORY_PROPERTIES_SIGNATURE_LENGTH 22
 struct CategoryPropertiesHeader{
 public:
     CategoryPropertiesHeader() {}

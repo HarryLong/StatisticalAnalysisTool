@@ -23,7 +23,7 @@ void CategoryPropertiesFileTest::tearDown()
 
 void CategoryPropertiesFileTest::testWriteRead()
 {
-    std::string test_file ("test_file.tmp");
+    std::string test_file ("category_properties_test_file.tmp");
     m_category_properties->write(test_file);
 
     CategoryProperties loaded_category_properties ( test_file );

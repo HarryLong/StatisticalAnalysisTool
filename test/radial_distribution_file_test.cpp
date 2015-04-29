@@ -19,7 +19,7 @@ void RadialDistributionFileTest::tearDown()
 
 void RadialDistributionFileTest::testWriteRead()
 {
-    std::string test_file ("test_file.tmp");
+    std::string test_file ("radial_distribution_test_file.tmp");
     m_radial_distribution->write(test_file);
 
     RadialDistribution loaded_radial_distribution ( test_file );

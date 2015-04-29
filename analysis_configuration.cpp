@@ -37,8 +37,10 @@ bool AnalysisConfiguration::load_data(std::string filename)
         {
             char * memblock = new char[CONFIGURATION_SIGNATURE_LENGTH];
             file.read(memblock, CONFIGURATION_SIGNATURE_LENGTH);
+            memblock[CONFIGURATION_SIGNATURE_LENGTH] = '\0'; // Null-terminate
 
-            if(strcmp(memblock, CONFIGURATION_SIGNATURE) != 0)
+            std::string expected_signature(CONFIGURATION_SIGNATURE);
+            if(strcmp(memblock, expected_signature.c_str()) != 0)
             {
                 std::cerr << "File signature (" << memblock << ") is invalid!" << std::endl;
                 delete [] memblock;
@@ -98,8 +100,8 @@ void AnalysisConfiguration::write(std::string filename)
     file.open(filename, std::ios_base::binary | std::ios_base::trunc );
 
     // First write the header
-    char * header (CONFIGURATION_SIGNATURE);
-    file.write(header, CONFIGURATION_SIGNATURE_LENGTH);
+    std::string header (CONFIGURATION_SIGNATURE);
+    file.write(header.c_str(), CONFIGURATION_SIGNATURE_LENGTH);
     file.write((char*) Binutils::toBin((unsigned int)r_min,4),4);
     file.write((char*) Binutils::toBin((unsigned int)r_max,4),4);
     file.write((char*) Binutils::toBin((unsigned int)r_diff,4),4);
