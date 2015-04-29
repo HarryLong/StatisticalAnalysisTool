@@ -23,6 +23,8 @@ public:
     int analysis_window_width;
     int analysis_window_height;
     std::vector<int> priority_sorted_category_ids;
+
+    bool operator ==(const AnalysisConfiguration &other) const;
 };
 
 #endif //ANALYSIS_CONFIGURATION_H

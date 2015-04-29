@@ -21,6 +21,16 @@ AnalysisConfiguration::AnalysisConfiguration(std::string filename)
     load_data(filename);
 }
 
+bool AnalysisConfiguration::operator ==(const AnalysisConfiguration &other) const
+{
+    return  (r_min == other.r_min &&
+             r_max == other.r_max &&
+             r_diff == other.r_diff &&
+             analysis_window_width == other.analysis_window_width &&
+             analysis_window_height == other.analysis_window_height &&
+             priority_sorted_category_ids == other.priority_sorted_category_ids);
+}
+
 bool AnalysisConfiguration::load_data(std::string filename)
 {
     std::ifstream file;
