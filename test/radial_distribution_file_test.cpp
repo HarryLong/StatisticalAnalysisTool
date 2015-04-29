@@ -8,7 +8,7 @@
 
 void RadialDistributionFileTest::setUp()
 {
-    AnalysisConfiguration * analysis_config = new AnalysisConfiguration(0, 100, 1, 500, 500) ;
+    AnalysisConfiguration analysis_config (0, 100, 1, 500, 500) ;
     m_radial_distribution = TestDataFactory::generateSingleCategoryRadialDistribution(analysis_config, 1000, 1);
 }
 

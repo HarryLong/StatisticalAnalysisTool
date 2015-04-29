@@ -4,7 +4,7 @@
 #include "../analyzer.h"
 #include "../radial_distribution_analyzer.h"
 
-RadialDistribution * TestDataFactory::generateSingleCategoryRadialDistribution(AnalysisConfiguration * analysis_config,
+RadialDistribution * TestDataFactory::generateSingleCategoryRadialDistribution(AnalysisConfiguration & analysis_config,
                                                                                int n_points,
                                                                                int category_id,
                                                                                std::pair<int,int> size_range)
@@ -12,14 +12,14 @@ RadialDistribution * TestDataFactory::generateSingleCategoryRadialDistribution(A
     // Generate analysis configuration
     std::vector<int> category_ids;
     category_ids.push_back(category_id);
-    analysis_config->setPrioritySortedCategoryIds(category_ids);
+    analysis_config.setPrioritySortedCategoryIds(category_ids);
 
     // Create analyser
-    RadialDistributionAnalyzer analyser (*analysis_config);
+    RadialDistributionAnalyzer analyser (analysis_config);
 
     // Create points
     DistributionFactory distribution_factory;
-    std::vector<AnalysisPoint*> points (distribution_factory.generateRandomDistribution(category_id, n_points, analysis_config->analysis_window_width, analysis_config->analysis_window_height,
+    std::vector<AnalysisPoint*> points (distribution_factory.generateRandomDistribution(category_id, n_points, analysis_config.analysis_window_width, analysis_config.analysis_window_height,
                                                                                         size_range.first, size_range.second));
 
     bool dependent;
