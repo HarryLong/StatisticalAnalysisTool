@@ -43,12 +43,12 @@ std::map<int,std::vector<AnalysisPoint*> > RadialDistributionReproducer::reprodu
     }
 
     std::vector<std::pair<int,int> > required_pair_correlations;
-    for(auto category_2(analysis_configuration.priority_sorted_category_ids.begin()); category_2 != analysis_configuration.priority_sorted_category_ids.end(); category_2++)
+    for(auto reference_category(analysis_configuration.priority_sorted_category_ids.begin()); reference_category != analysis_configuration.priority_sorted_category_ids.end(); reference_category++)
     {
-        for(auto category_1(std::find(analysis_configuration.priority_sorted_category_ids.begin(), analysis_configuration.priority_sorted_category_ids.end(), *category_2));
-                            category_1 != analysis_configuration.priority_sorted_category_ids.end(); category_1++)
+        for(auto target_category(std::find(analysis_configuration.priority_sorted_category_ids.begin(), analysis_configuration.priority_sorted_category_ids.end(), *reference_category));
+                            target_category != analysis_configuration.priority_sorted_category_ids.end(); target_category++)
         {
-            required_pair_correlations.push_back(std::pair<int,int>(*category_1, *category_2));
+            required_pair_correlations.push_back(std::pair<int,int>(*reference_category, *target_category));
         }
     }
 
@@ -325,49 +325,52 @@ float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* refe
     return calculate_strength(reference_point, possible_reachable_points);
 }
 
-float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* reference_point, const std::vector<AnalysisPoint*> & destination_points)
+float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* candidate_point, const std::vector<AnalysisPoint*> & existing_points)
 {
     float strength(1.0f);
 
-    int reference_point_normalization_length(reference_point->getRadius()-1); // Perform analysis for each point normalized to a length of 1
     QLineF line;
-    line.setP1(reference_point->getCenter());
+    line.setP1(candidate_point->getCenter());
 
-    CategoryProperties category_properties (m_category_properties.find(reference_point->getCategoryId())->second);
-    std::vector<int> dependent_category_ids(category_properties.m_header.category_dependent_ids);
+    CategoryProperties category_properties (m_category_properties.find(candidate_point->getCategoryId())->second);
+    std::set<int> dependent_category_ids(category_properties.m_header.category_dependent_ids);
 
-    bool within_radius_of_dependent_point = dependent_category_ids.empty();
+    bool within_radius_of_dependent_point ( dependent_category_ids.empty() );
 
-    for(AnalysisPoint* destination_point : destination_points)
+    for(AnalysisPoint* existing_point : existing_points)
     {
-        line.setP2(destination_point->getCenter());
-        int target_point_normalization_length(destination_point->getRadius()-1);
+        // Get the pair correlation
+        auto pair_correlation_it (m_pair_correlations.find(std::pair<int,int>(existing_point->getCategoryId(), candidate_point->getCategoryId())));
+        if( pair_correlation_it == m_pair_correlations.end())
+        {
+            std::cerr << "FAILED TO FIND PAIR CORRELATION DATA!" << std::endl;
+            exit(1);
+        }
+        RadialDistribution & radial_distribution( pair_correlation_it->second) ;
 
-        float length(std::max(0.0,line.length()-reference_point_normalization_length-target_point_normalization_length));
+        line.setP2(existing_point->getCenter());
+        float distance(line.length()-existing_point->getRadius()); // Distance from the reference points circumference [remove the radius]
 
-        int r_bracket ( RadialDistributionUtils::getRBracket(length, m_analysis_configuration.r_min, m_analysis_configuration.r_diff) );
-        if(r_bracket < m_analysis_configuration.r_max)
+        // Check if its within the radius
+        if(distance < .0f) // within radius
         {
             if(!within_radius_of_dependent_point)
-                within_radius_of_dependent_point = (length < 1) && (std::find(dependent_category_ids.begin(), dependent_category_ids.end(), destination_point->getCategoryId()) != dependent_category_ids.end());
+                within_radius_of_dependent_point = (std::find(dependent_category_ids.begin(), dependent_category_ids.end(), existing_point->getCategoryId()) != dependent_category_ids.end());
 
-            auto pair_correlation_it (m_pair_correlations.find(std::pair<int,int>(reference_point->getCategoryId(), destination_point->getCategoryId())));
-            if( pair_correlation_it == m_pair_correlations.end())
-            {
-                std::cerr << "FAILED TO FIND PAIR CORRELATION DATA!" << std::endl;
-                exit(1);
-            }
-
-            RadialDistribution & radial_distribution( pair_correlation_it->second) ;
-
-            if(length < 1 ) // Within radius
-                strength *= radial_distribution.m_within_radius_distribution;
-            else
-                strength *= radial_distribution.m_data.find(r_bracket)->second;
-
-            if(strength == 0) // Optimization. It will always be zero
-                return strength;
+            strength *= radial_distribution.m_within_radius_distribution;
         }
+        else
+        {
+            int r_bracket ( RadialDistributionUtils::getRBracket(distance, m_analysis_configuration.r_min, m_analysis_configuration.r_diff) );
+            if(r_bracket < m_analysis_configuration.r_max)
+            {
+                strength *= radial_distribution.m_data.find(r_bracket)->second;
+            }
+        }
+
+
+        if(strength == 0) // Optimization. It will always be zero
+            return strength;
     }
 
     return (within_radius_of_dependent_point ? strength : 0);

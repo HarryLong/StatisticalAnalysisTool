@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <set>
 
 #define CATEGORY_PROPERTIES_SIGNATURE "CATEGORYPROPERTIESFILE"
 #define CATEGORY_PROPERTIES_SIGNATURE_LENGTH 22
@@ -31,7 +32,7 @@ public:
     int bin_size;
     int n_points;
     int priority;
-    std::vector<int> category_dependent_ids;
+    std::set<int> category_dependent_ids;
 };
 
 class CategoryProperties

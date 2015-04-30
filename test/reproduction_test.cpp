@@ -76,8 +76,3 @@ void ReproductionTest::testRadialDistributionReproduction()
         CPPUNIT_ASSERT_DOUBLES_EQUAL(it->second, reproduced_it->second, 0.2); // Allow 10%
     }
 }
-
-void ReproductionTest::testCategoricalReproduction()
-{
-
-}

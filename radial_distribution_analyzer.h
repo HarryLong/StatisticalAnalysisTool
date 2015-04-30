@@ -16,7 +16,7 @@ public:
     ~RadialDistributionAnalyzer();
 
     RadialDistribution getRadialDistribution(std::vector<AnalysisPoint*> & reference_points, std::vector<AnalysisPoint*> & target_points,
-                                             int reference_points_id, int destination_points_id, bool & dependent);
+                                             int reference_points_id, int destination_points_id);
 
     static bool overflows_border(QPoint center, int radius, int window_width, int window_height);
     static double calculate_bordered_circle_area(QPoint center, int radius, int width, int height);

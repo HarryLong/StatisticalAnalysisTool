@@ -6,7 +6,6 @@ class ReproductionTest : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE( ReproductionTest );
     CPPUNIT_TEST( testRadialDistributionReproduction );
-    CPPUNIT_TEST( testCategoricalReproduction );
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -14,7 +13,6 @@ public:
     void tearDown();
 
     void testRadialDistributionReproduction();
-    void testCategoricalReproduction();
 
 private:
     void reset_test_directory();

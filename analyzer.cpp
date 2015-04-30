@@ -6,6 +6,7 @@
 #include "category_analyzer.h"
 #include "utils.h"
 #include "analysis_point.h"
+#include "dependency_analyzer.h"
 
 #include <iostream>
 
@@ -53,37 +54,25 @@ void Analyzer::generate_statistical_data(QString directory, std::map<int, std::v
         }
     }
 
-    // Generate the radial distribution files
-    std::map<int,std::vector<int>> dependent_categories;
-
     RadialDistributionAnalyzer radial_distribution_analyzer(analysis_configuration);
     std::vector<RadialDistribution> radial_distributions;
-    for(auto target_category(analysis_configuration.priority_sorted_category_ids.begin());
-        target_category != analysis_configuration.priority_sorted_category_ids.end(); target_category++)
+    for(auto reference_category(analysis_configuration.priority_sorted_category_ids.begin());
+        reference_category != analysis_configuration.priority_sorted_category_ids.end(); reference_category++)
     {
-        int target_category_id(*target_category);
-        std::vector<AnalysisPoint*> target_category_points(points.find(target_category_id)->second);
+        int reference_category_id(*reference_category);
+        std::vector<AnalysisPoint*> reference_category_points(points.find(reference_category_id)->second);
 
-        for(auto reference_category(std::find(analysis_configuration.priority_sorted_category_ids.begin(), analysis_configuration.priority_sorted_category_ids.end(), target_category_id));
-                            reference_category != analysis_configuration.priority_sorted_category_ids.end(); reference_category++)
+        for(auto target_category(std::find(analysis_configuration.priority_sorted_category_ids.begin(), analysis_configuration.priority_sorted_category_ids.end(), reference_category_id));
+                            target_category != analysis_configuration.priority_sorted_category_ids.end(); target_category++)
         {
-            int reference_category_id(*reference_category);
+            int target_category_id(*target_category);
             QString generic_filename("category_");
             generic_filename.append(QString::number(reference_category_id)).append("_and_").append(QString::number(target_category_id));
 
-            std::vector<AnalysisPoint*> reference_category_points(points.find(reference_category_id)->second);
+            std::vector<AnalysisPoint*> target_category_points(points.find(target_category_id)->second);
 
-            bool dependent;
             RadialDistribution radial_distribution(radial_distribution_analyzer.getRadialDistribution(reference_category_points, target_category_points,
-                                                                                                      reference_category_id, target_category_id, dependent));
-
-            if(dependent)
-            {
-                if(dependent_categories.find(reference_category_id) == dependent_categories.end())
-                    dependent_categories.insert(std::pair<int,std::vector<int> >(reference_category_id, std::vector<int>()));
-
-                dependent_categories[reference_category_id].push_back(target_category_id);
-            }
+                                                                                                      reference_category_id, target_category_id));
 
             radial_distributions.push_back(radial_distribution);
 
@@ -92,7 +81,7 @@ void Analyzer::generate_statistical_data(QString directory, std::map<int, std::v
                 QString output_filename(radial_distributions_folder);
                 output_filename.append(generic_filename).append(RADIAL_DISTRIBUTION_FILE_EXTENSION);
                 radial_distribution.write(output_filename.toStdString());
-                std::cout << "Radial distribution file for categories: " << reference_category_id << " and " << target_category_id <<
+                std::cout << "Radial distribution file for categories: " << target_category_id << " and " << reference_category_id <<
                              " written to file: " << output_filename.toStdString() << std::endl;
             }
             // Write CSV file
@@ -101,13 +90,19 @@ void Analyzer::generate_statistical_data(QString directory, std::map<int, std::v
                 QString output_filename(csv_files_folder);
                 output_filename.append(generic_filename).append("_pair_correlation").append(".csv");
                 radial_distribution.writeToCSV(output_filename.toStdString());
-                std::cout << "CSV distribution file for categories: " << reference_category_id << " and " << target_category_id <<
+                std::cout << "CSV distribution file for categories: " << target_category_id << " and " << reference_category_id <<
                              " written to file: " << output_filename.toStdString() << std::endl;
             }
         }
     }
 
     // Generate the category properties
+    // First determine the dependencies
+    DependencyAnalyzer::Dependencies dependencies(DependencyAnalyzer::getDependencies(points, analysis_configuration.analysis_window_width,
+                                                                                      analysis_configuration.analysis_window_height));
+
+    if(dependencies.size() != 0)
+        std::cout << "DEPENDENCIES" << std::endl;
     CategoryAnalyzer category_analyzer;
     int priority(1);
     for(auto it(analysis_configuration.priority_sorted_category_ids.begin()); it != analysis_configuration.priority_sorted_category_ids.end(); it++)
@@ -122,8 +117,8 @@ void Analyzer::generate_statistical_data(QString directory, std::map<int, std::v
         CategoryProperties category_properties(category_analyzer.getCategoryProperties(category_points, category_id, priority++));
 
         // Dependent category ids
-        auto dependent_categories_it(dependent_categories.find(category_id));
-        if(dependent_categories_it != dependent_categories.end())
+        auto dependent_categories_it(dependencies.find(category_id));
+        if(dependent_categories_it != dependencies.end())
         {
             category_properties.m_header.category_dependent_ids = dependent_categories_it->second;
         }

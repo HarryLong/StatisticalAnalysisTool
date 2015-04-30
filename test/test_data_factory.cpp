@@ -22,8 +22,7 @@ RadialDistribution * TestDataFactory::generateSingleCategoryRadialDistribution(A
     std::vector<AnalysisPoint*> points (distribution_factory.generateRandomDistribution(category_id, n_points, analysis_config.analysis_window_width, analysis_config.analysis_window_height,
                                                                                         size_range.first, size_range.second));
 
-    bool dependent;
-    RadialDistribution * radial_distribution = new RadialDistribution(analyser.getRadialDistribution(points, points, category_id, category_id, dependent));
+    RadialDistribution * radial_distribution = new RadialDistribution(analyser.getRadialDistribution(points, points, category_id, category_id));
 
     for(AnalysisPoint * p : points)
         delete p;

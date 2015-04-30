@@ -122,52 +122,7 @@ void RadialDistributionAnalyzerTest::testAnalysisConfigRespected()
     }
 }
 
-void RadialDistributionAnalyzerTest::testDependentCategories()
-{
-    // Generate analysis configuration
-    AnalysisConfiguration analysis_config(0,125,10,500,500);
 
-    std::vector<int> category_ids;
-    category_ids.push_back(1);
-    category_ids.push_back(2);
-    analysis_config.setPrioritySortedCategoryIds(category_ids);
-
-
-    // Create analyser
-    RadialDistributionAnalyzer analyser (analysis_config);
-
-    // Create points
-    std::vector<AnalysisPoint*> category_1_points;
-    category_1_points.push_back(new AnalysisPoint(1, QPoint(250,250), 10));
-
-    // Add the category 2 points
-    std::vector<AnalysisPoint*> category_2_points;
-    for(int i(1); i < 10; i++)
-    {
-        category_2_points.push_back(new AnalysisPoint(2, QPoint(250-i,250), 1));
-        category_2_points.push_back(new AnalysisPoint(2, QPoint(250,250-i), 1));
-
-        category_2_points.push_back(new AnalysisPoint(2, QPoint(250+i,250), 1));
-        category_2_points.push_back(new AnalysisPoint(2, QPoint(250,250+i), 1));
-    }
-
-    bool dependent;
-    RadialDistribution radial_distribution(analyser.getRadialDistribution(category_2_points, category_1_points, 2, 1, dependent));
-
-    CPPUNIT_ASSERT(dependent);
-
-    CPPUNIT_ASSERT(radial_distribution.m_within_radius_distribution != 0);
-
-    // All histogram values should equal to zero except for the range [0,10[
-    for(auto it(radial_distribution.m_data.begin()); it != radial_distribution.m_data.end(); it++)
-        CPPUNIT_ASSERT((it->first == 0 && it->second != 0) || it->second == 0);
-
-    for(AnalysisPoint * p : category_1_points)
-        delete p;
-
-    for(AnalysisPoint * p : category_2_points)
-        delete p;
-}
 
 void RadialDistributionAnalyzerTest::testRBracketCalculations()
 {

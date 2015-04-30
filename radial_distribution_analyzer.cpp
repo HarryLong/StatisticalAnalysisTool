@@ -23,10 +23,8 @@ RadialDistributionAnalyzer::~RadialDistributionAnalyzer()
 }
 
 RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector<AnalysisPoint*> & reference_points, std::vector<AnalysisPoint*> & target_points,
-                                                                     int reference_points_id, int destination_points_id, bool & dependent)
+                                                                     int reference_points_id, int destination_points_id)
 {
-    dependent = true;
-
     // Optimization: build a spatial hashmap
     PointSpatialHashmap spatial_point_storage(m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height);
 
@@ -63,20 +61,17 @@ RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector
         {
             n_pairs_processed += possible_reachable_points.size();
             line.setP1(reference_point->getCenter());
-            int reference_point_normalization_length(reference_point->getRadius()); // Perform distance analysis for each point from the circumference
 
-            bool reference_point_dependent = false;
             for(AnalysisPoint* target_point : possible_reachable_points)
             {
                 line.setP2(target_point->getCenter());
-                int target_point_normalization_length(target_point->getRadius());
-                float distance(line.length()-reference_point_normalization_length);
+
+                float distance(line.length()-reference_point->getRadius()); // Distance from the reference points circumference [remove the radius]
 
                 if((m_analysis_configuration.r_min == 0 || distance >= m_analysis_configuration.r_min) && distance < m_analysis_configuration.r_max)
                 {
                     if(distance < .0f) // Within radius
                     {
-                        reference_point_dependent = true;
                         double area;
                         if(RadialDistributionAnalyzer::overflows_border(reference_point->getCenter(), reference_point->getRadius(), m_analysis_configuration.analysis_window_width,
                                                                         m_analysis_configuration.analysis_window_height))
@@ -128,12 +123,8 @@ RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector
                     }
                 }
             }
-            if(dependent)
-                dependent = reference_point_dependent;
         }
     }
-
-    dependent = (dependent && (n_pairs_processed > 0));
     // Exponential difference
 //    std::cout << "***** ANALYSIS SUMMARY *****" << std::endl;
 //    std::cout << "# Reference points: " << reference_points.size() << std::endl;

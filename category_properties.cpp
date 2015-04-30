@@ -83,7 +83,7 @@ bool CategoryProperties::load_data(std::string filename)
                 for(int i (0); i < n_dependent_category_ids; i++)
                 {
                     file.read(memblock, 4);
-                    m_header.category_dependent_ids.push_back( Binutils::readInt32((unsigned char*) memblock) );
+                    m_header.category_dependent_ids.insert( Binutils::readInt32((unsigned char*) memblock) );
                 }
             }
 

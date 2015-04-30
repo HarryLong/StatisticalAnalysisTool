@@ -15,10 +15,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCC_GL_DEBUG_ -DDEBUG_ON -Wall -g -std=
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG_ON -O3 -Wall -std=c++11 -Wno-reorder -Wno-unused-variable") #RELEASE
 
 add_executable(runTests main ../dice_roller ../analysis_configuration ../utils ../point_drawer ../radial_distribution_analyzer ../point_spatial_hashmap ../radial_distribution
-../distribution_factory ../analysis_point ../point_map ../category_analyzer ../category_properties ../analyzer ../reproduction_configuration
+../distribution_factory ../analysis_point ../point_map ../category_analyzer ../category_properties ../analyzer ../reproduction_configuration ../dependency_analyzer
 ../reproducer ../point_factory
-test_data_factory bin_test unit_tests dice_roller_test category_analyzer_test radial_distribution_analyzer_test
-radial_distribution_file_test category_properties_file_test analysis_configuration_file_test reproduction_test )
+test_data_factory bin_test unit_tests dice_roller_test category_analyzer_test radial_distribution_analyzer_test dependency_test radial_distribution_file_test
+category_properties_file_test analysis_configuration_file_test reproduction_test )
 
 target_link_libraries(runTests cppunit Qt5::Core Qt5::Gui)
 
