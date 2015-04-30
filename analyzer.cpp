@@ -49,27 +49,20 @@ void Analyzer::generate_statistical_data(QString directory, std::map<int, std::v
             QString output_filename(csv_files_folder);
             output_filename.append(generic_filename).append(".csv");
             analysis_configuration.writeToCSV(output_filename.toStdString());
-            std::cout << __LINE__ << std::endl;
             std::cout << "Configuration CSV file written to: " << output_filename.toStdString() << std::endl;
-            std::cout << __LINE__ << std::endl;
         }
-        std::cout << __LINE__ << std::endl;
     }
 
     // Generate the radial distribution files
-    std::cout << __LINE__ << std::endl;
     std::map<int,std::vector<int>> dependent_categories;
-    std::cout << __LINE__ << std::endl;
 
     RadialDistributionAnalyzer radial_distribution_analyzer(analysis_configuration);
     std::vector<RadialDistribution> radial_distributions;
     for(auto target_category(analysis_configuration.priority_sorted_category_ids.begin());
         target_category != analysis_configuration.priority_sorted_category_ids.end(); target_category++)
     {
-        std::cout << __LINE__ << std::endl;
         int target_category_id(*target_category);
         std::vector<AnalysisPoint*> target_category_points(points.find(target_category_id)->second);
-        std::cout << __LINE__ << std::endl;
 
         for(auto reference_category(std::find(analysis_configuration.priority_sorted_category_ids.begin(), analysis_configuration.priority_sorted_category_ids.end(), target_category_id));
                             reference_category != analysis_configuration.priority_sorted_category_ids.end(); reference_category++)
@@ -113,7 +106,6 @@ void Analyzer::generate_statistical_data(QString directory, std::map<int, std::v
             }
         }
     }
-    std::cout << __LINE__ << std::endl;
 
     // Generate the category properties
     CategoryAnalyzer category_analyzer;
@@ -152,6 +144,5 @@ void Analyzer::generate_statistical_data(QString directory, std::map<int, std::v
             std::cout << "Category properties CSV file for category " << category_id << " written to: " << output_filename.toStdString() << std::endl;
         }
     }
-    std::cout << __LINE__ << std::endl;
 }
 

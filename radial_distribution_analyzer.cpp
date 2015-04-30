@@ -15,12 +15,6 @@ RadialDistributionAnalyzer::RadialDistributionAnalyzer(AnalysisConfiguration ana
                 ((((analysis_configuration.r_max-analysis_configuration.r_min)/analysis_configuration.r_diff) + 1) * analysis_configuration.r_diff);
         std::cout << analysis_configuration.r_max << std::endl;
     }
-    // Calculate annular shell areas
-    for(int r (analysis_configuration.r_min); r < analysis_configuration.r_max; r += analysis_configuration.r_diff)
-    {
-        double area ( (M_PI * pow(r+analysis_configuration.r_diff, 2)) - (M_PI * pow(r, 2)));
-        m_annular_shell_areas.insert(std::pair<int,double>(r, area));
-    }
 }
 
 RadialDistributionAnalyzer::~RadialDistributionAnalyzer()
@@ -69,38 +63,68 @@ RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector
         {
             n_pairs_processed += possible_reachable_points.size();
             line.setP1(reference_point->getCenter());
-            int reference_point_normalization_length(reference_point->getRadius()-1); // Perform analysis for each point normalized to a length of 1
+            int reference_point_normalization_length(reference_point->getRadius()); // Perform distance analysis for each point from the circumference
 
             bool reference_point_dependent = false;
-
             for(AnalysisPoint* target_point : possible_reachable_points)
             {
                 line.setP2(target_point->getCenter());
-                int target_point_normalization_length(target_point->getRadius()-1);
-                float length(std::max(0.0,line.length()-reference_point_normalization_length-target_point_normalization_length));
+                int target_point_normalization_length(target_point->getRadius());
+                float distance(line.length()-reference_point_normalization_length);
 
-                if(length >= m_analysis_configuration.r_min && length < m_analysis_configuration.r_max)
+                if((m_analysis_configuration.r_min == 0 || distance >= m_analysis_configuration.r_min) && distance < m_analysis_configuration.r_max)
                 {
-                    int r_bracket(RadialDistributionUtils::getRBracket(length, m_analysis_configuration.r_min, m_analysis_configuration.r_diff));
-
-                    if(RadialDistributionAnalyzer::overflows_border(reference_point->getCenter(), r_bracket, m_analysis_configuration.r_diff, m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height))
+                    if(distance < .0f) // Within radius
                     {
-                        double small_circle_area(RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), r_bracket, m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height));
-                        double large_circle_area(RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), r_bracket+m_analysis_configuration.r_diff, m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height));
-
-                        double annular_shell_area (large_circle_area - small_circle_area);
-
-                        results[r_bracket] += (constant_normalization_factor / annular_shell_area);
-                    }
-                    else
-                    {
-                        results[r_bracket] += (constant_normalization_factor / m_annular_shell_areas[r_bracket]);
-                    }
-
-                    if(length == 0)
-                    {
-                        within_radius_distribution += (constant_normalization_factor / M_PI);
                         reference_point_dependent = true;
+                        double area;
+                        if(RadialDistributionAnalyzer::overflows_border(reference_point->getCenter(), reference_point->getRadius(), m_analysis_configuration.analysis_window_width,
+                                                                        m_analysis_configuration.analysis_window_height))
+                        {
+                            area = RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), reference_point->getRadius(),
+                                                                            m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height);
+                        }
+                        else
+                            area = GeometricUtils::getCircleArea(reference_point->getRadius());
+
+                        within_radius_distribution += (constant_normalization_factor / area);
+                    }
+                    else // Outside radius
+                    {
+                        int r_bracket(RadialDistributionUtils::getRBracket(distance, m_analysis_configuration.r_min, m_analysis_configuration.r_diff));
+
+                        // Small circle
+                        int small_circle_radius( reference_point->getRadius() + r_bracket );
+                        double small_circle_area;
+                        if(RadialDistributionAnalyzer::overflows_border(reference_point->getCenter(), small_circle_radius,
+                                                                        m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height))
+                        {
+                            small_circle_area =
+                                    RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), small_circle_radius,
+                                                        m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height);
+                        }
+                        else
+                        {
+                            small_circle_area = GeometricUtils::getCircleArea(small_circle_radius);
+                        }
+
+                        // Large circle
+                        int large_circle_radius (small_circle_radius + m_analysis_configuration.r_diff);
+                        double large_circle_area;
+                        if(RadialDistributionAnalyzer::overflows_border(reference_point->getCenter(), large_circle_radius,
+                                                                        m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height))
+                        {
+                            large_circle_area =
+                                    RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), large_circle_radius,
+                                                        m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height);
+                        }
+                        else
+                        {
+                            large_circle_area = GeometricUtils::getCircleArea(large_circle_radius);
+                        }
+
+                        double area(large_circle_area - small_circle_area);
+                        results[r_bracket] += (constant_normalization_factor / area);
                     }
                 }
             }
@@ -218,22 +242,21 @@ RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector
 //                               within_radius_distribution, results);
 //}
 
-bool RadialDistributionAnalyzer::overflows_border(QPoint center, int r_bracket, int r_diff, int width, int height)
+bool RadialDistributionAnalyzer::overflows_border(QPoint center, int radius, int window_width, int window_height)
 {
-    int annular_shell_max_radius (r_bracket+r_diff);
     //TOP
-    return (center.y() - annular_shell_max_radius < 0) ||
+    return (center.y() - radius < 0) ||
     // BOTTOM
-            (center.y() + annular_shell_max_radius > height) ||
+            (center.y() + radius > window_height) ||
     // LEFT
-            (center.x() - annular_shell_max_radius < 0) ||
+            (center.x() - radius < 0) ||
     // RIGHT
-            (center.x() + annular_shell_max_radius > width);
+            (center.x() + radius > window_width);
 }
 
 double RadialDistributionAnalyzer::calculate_bordered_circle_area(QPoint center, int radius, int width, int height)
 {
-    double max_circle_area(M_PI * pow(radius,2));
+    double max_circle_area(GeometricUtils::getCircleArea(radius));
 
     double vertical_min_radius(std::min(radius,std::min(center.y(), height-center.y())));
     double horizontal_min_radius(std::min(radius,std::min(center.x(), width-center.x())));

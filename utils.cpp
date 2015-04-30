@@ -160,6 +160,14 @@ bool ProbabilisticUtils::returnTrueWithProbability(float probability, DiceRoller
 }
 
 /**************
+ * GEOM UTILS *
+ **************/
+float GeometricUtils::getCircleArea(int radius)
+{
+    return M_PI * (radius*radius);
+}
+
+/**************
  * FILE UTILS *
  **************/
 bool FileUtils::init_directory_structure(QString directory, QString & radial_distribution_folder, QString & category_properties_folder,

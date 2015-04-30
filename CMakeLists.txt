@@ -8,8 +8,18 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 
 # Link directories
-include_directories("/home/harry/workspaces/qt-workspace/spatial-hashmap/")
-link_directories("/home/harry/workspaces/qt-workspace/spatial-hashmap/")
+
+include_directories("${CMAKE_SOURCE_DIR}/include/spatial_hashmap/"
+                    ${QT_QTCORE_INCLUDE_DIR}
+                    ${QT_QTGUI_INCLUDE_DIR}
+                    ${QT_QTWIDGETS_INCLUDE_DIR})
+
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+foreach(dir ${dirs})
+  message(STATUS "dir='${dir}'")
+endforeach()
+
+link_directories("${CMAKE_SOURCE_DIR}/lib/")
 
 add_subdirectory("test")
 

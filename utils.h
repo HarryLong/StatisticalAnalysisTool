@@ -45,6 +45,10 @@ namespace FileUtils{
     QString get_configuration_file(QString directory);
 }
 
+namespace GeometricUtils{
+    float getCircleArea(int radius);
+}
+
 /***************
  * IMAGE UTILS *
  ***************/
