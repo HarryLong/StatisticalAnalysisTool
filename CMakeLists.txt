@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(STATISTICAL-ANALYSIS-TOOL)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set( CMAKE_VERBOSE_MAKEFILE on )
 
 # QT Imports
 find_package(Qt5Widgets REQUIRED)
