@@ -20,8 +20,6 @@ foreach(dir ${dirs})
   message(STATUS "dir='${dir}'")
 endforeach()
 
-link_directories("${CMAKE_SOURCE_DIR}/lib/")
-
 add_subdirectory("test")
 
 set(CMAKE_AUTOMOC ON)
