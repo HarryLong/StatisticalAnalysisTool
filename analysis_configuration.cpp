@@ -104,7 +104,7 @@ bool AnalysisConfiguration::load_data(std::string filename)
     return false;
 }
 
-void AnalysisConfiguration::write(std::string filename)
+void AnalysisConfiguration::write(std::string filename) const
 {
     std::ofstream file;
     file.open(filename, std::ios_base::binary | std::ios_base::trunc );
@@ -126,7 +126,7 @@ void AnalysisConfiguration::write(std::string filename)
     file.close();
 }
 
-void AnalysisConfiguration::writeToCSV(std::string filename)
+void AnalysisConfiguration::writeToCSV(std::string filename) const
 {
     std::ofstream file;
     file.open(filename);

@@ -110,7 +110,6 @@ void CentralWidget::analyse()
     for(auto it(categorised_points.begin()); it != categorised_points.end(); it++)
         analysis_configuration.priority_sorted_category_ids.push_back(it->first);
 
-    Analyzer::generate_statistical_data(m_analysis_configuration_producer_dialog->getOutputDir(), categorised_points,
-                                        analysis_configuration, true);
+    Analyzer::analyze(m_analysis_configuration_producer_dialog->getOutputDir(), categorised_points, analysis_configuration);
 }
 

@@ -42,6 +42,7 @@ public:
 
     CategoryProperties(CategoryPropertiesHeader header, Histogram data);
     CategoryProperties(std::string filename);
+    CategoryProperties();
     void write(std::string filename);
     void writeToCSV(std::string filename);
 

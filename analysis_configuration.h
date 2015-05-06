@@ -13,8 +13,8 @@ public:
     AnalysisConfiguration(std::string filename);
 
     bool load_data(std::string filename);
-    void write(std::string filename);
-    void writeToCSV(std::string filename);
+    void write(std::string filename) const;
+    void writeToCSV(std::string filename) const;
     void setPrioritySortedCategoryIds(std::vector<int> priority_sorted_category_ids);
 
     int r_min;

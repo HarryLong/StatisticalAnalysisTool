@@ -5,7 +5,7 @@
 #include <cstring>
 
 RadialDistribution::RadialDistribution(RadialDistributionHeader header, float within_radius_distribution, Histogram data) :
-    m_header(header), m_data(data), m_within_radius_distribution(within_radius_distribution)
+    m_header(header), m_data(data), m_within_radius_distribution(within_radius_distribution), m_maximum(-1)
 {
 
 }
@@ -19,7 +19,25 @@ RadialDistribution::RadialDistribution(std::string filename)
     }
 }
 
-void RadialDistribution::write(std::string filename)
+RadialDistribution::RadialDistribution()
+{
+
+}
+
+float RadialDistribution::getMaximum()
+{
+    if(m_maximum == -1)
+    {
+        for(auto it(m_data.begin()); it != m_data.end(); it++)
+        {
+            if(it->second > m_maximum)
+                m_maximum = it->second;
+        }
+    }
+    return m_maximum;
+}
+
+void RadialDistribution::write(std::string filename) const
 {
     std::ofstream file;
     file.open(filename, std::ios_base::binary | std::ios_base::trunc );
@@ -118,7 +136,7 @@ bool RadialDistribution::load(std::string filename)
     return false;
 }
 
-void RadialDistribution::printToConsole()
+void RadialDistribution::printToConsole() const
 {
     std::cout << "***********HEADER*****************" << std::endl;
     std::cout << "Reference id: " << m_header.reference_id << std::endl;
@@ -130,7 +148,7 @@ void RadialDistribution::printToConsole()
 }
 
 
-void RadialDistribution::writeToCSV(std::string filename)
+void RadialDistribution::writeToCSV(std::string filename) const
 {
     std::ofstream file;
     file.open(filename);

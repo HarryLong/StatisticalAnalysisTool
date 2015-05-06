@@ -19,6 +19,11 @@ CategoryProperties::CategoryProperties(std::string filename)
     }
 }
 
+CategoryProperties::CategoryProperties()
+{
+
+}
+
 bool CategoryProperties::load_data(std::string filename)
 {
     std::ifstream file;

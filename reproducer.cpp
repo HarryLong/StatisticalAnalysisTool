@@ -178,7 +178,6 @@ void RadialDistributionReproducer::generate_points_through_random_moves()
         // Calculate source point strength
         source_point_strength = calculate_strength(selected_point);
 
-
         /*********************
          * DESTINATION POINT *
          *********************/
@@ -188,6 +187,9 @@ void RadialDistributionReproducer::generate_points_through_random_moves()
         destination_point_strength = calculate_strength(destination_point);
 
         float acceptance_ratio(destination_point_strength/source_point_strength);
+
+        //        std::cout << "Source point strength: " << source_point_strength << " | Destination point strength: " << destination_point_strength << std::endl;
+
         if(ProbabilisticUtils::returnTrueWithProbability(acceptance_ratio, dice_roller))
         {
             n_accepted_moves++;
@@ -212,65 +214,65 @@ void RadialDistributionReproducer::generate_points_through_random_moves()
 
 void RadialDistributionReproducer::generate_points_through_births_and_deaths()
 {
-    DiceRoller dice_roller(0,1000);
-    int n_births(0), n_deaths(0);
+//    DiceRoller dice_roller(0,1000);
+//    int n_births(0), n_deaths(0);
 
-    for(int i(0); i < m_reproduction_configuration.n_iterations; i++)
-    {
-        if(ProbabilisticUtils::returnTrueWithProbability(.5f, dice_roller)) // Birth
-        {
-            AnalysisPoint * random_point(m_point_factory.getPoint());
+//    for(int i(0); i < m_reproduction_configuration.n_iterations; i++)
+//    {
+//        if(ProbabilisticUtils::returnTrueWithProbability(.5f, dice_roller)) // Birth
+//        {
+//            AnalysisPoint * random_point(m_point_factory.getPoint());
 
-            float point_strength(calculate_strength(random_point));
+//            float point_strength(calculate_strength(random_point));
 
-            if(ProbabilisticUtils::returnTrueWithProbability(point_strength, dice_roller)) // Insert the point!
-            {
-                n_births++;
-                add_destination_point(random_point);
-            }
-            else
-                delete random_point;
-        }
-        else // Death
-        {
-            if(m_active_category_points.size() > 2) // Don't attempt to kill if less than 3 elements
-            {
-                // Get a random point from the generated points
-                int selected_point_index (rand()%m_active_category_points.size());
-                AnalysisPoint* selected_point( m_active_category_points.at(selected_point_index) );
+//            if(ProbabilisticUtils::returnTrueWithProbability(point_strength, dice_roller)) // Insert the point!
+//            {
+//                n_births++;
+//                add_destination_point(random_point);
+//            }
+//            else
+//                delete random_point;
+//        }
+//        else // Death
+//        {
+//            if(m_active_category_points.size() > 2) // Don't attempt to kill if less than 3 elements
+//            {
+//                // Get a random point from the generated points
+//                int selected_point_index (rand()%m_active_category_points.size());
+//                AnalysisPoint* selected_point( m_active_category_points.at(selected_point_index) );
 
-                // Calculate the strength
-                float point_strength(calculate_strength(selected_point));
+//                // Calculate the strength
+//                float point_strength(calculate_strength(selected_point));
 
-                if(!ProbabilisticUtils::returnTrueWithProbability(point_strength, dice_roller)) // Remove the point
-                {
-                    n_deaths++;
-                    remove_destination_point(selected_point, selected_point_index);
-                }
-            }
-        }
-        if(i%10000 == 0)
-            std::cout << ((((float)i)/m_reproduction_configuration.n_iterations) * 100) << "%" << std::endl;
-    }
+//                if(!ProbabilisticUtils::returnTrueWithProbability(point_strength, dice_roller)) // Remove the point
+//                {
+//                    n_deaths++;
+//                    remove_destination_point(selected_point, selected_point_index);
+//                }
+//            }
+//        }
+//        if(i%10000 == 0)
+//            std::cout << ((((float)i)/m_reproduction_configuration.n_iterations) * 100) << "%" << std::endl;
+//    }
 
-    std::cout << "Births: " << n_births << " | Deaths: " << n_deaths << std::endl;
+//    std::cout << "Births: " << n_births << " | Deaths: " << n_deaths << std::endl;
 }
 
 void RadialDistributionReproducer::two_point_initialize()
 {
-    // POINT 1
-    AnalysisPoint * p1(m_point_factory.getPoint());
-    add_destination_point(p1);
+//    // POINT 1
+//    AnalysisPoint * p1(m_point_factory.getPoint());
+//    add_destination_point(p1);
 
-    // POINT 2
-    AnalysisPoint * p2(m_point_factory.getPoint());
-    while(calculate_strength(p2) == 0)
-    {
-        delete p2;
-        p2 = m_point_factory.getPoint();
-    }
+//    // POINT 2
+//    AnalysisPoint * p2(m_point_factory.getPoint());
+//    while(calculate_strength(p2) == 0)
+//    {
+//        delete p2;
+//        p2 = m_point_factory.getPoint();
+//    }
 
-    add_destination_point(p2);
+//    add_destination_point(p2);
 }
 
 void RadialDistributionReproducer::matching_density_initialize()
@@ -287,6 +289,7 @@ void RadialDistributionReproducer::matching_density_initialize()
     while(m_active_category_points.size() < n_points)
     {
         AnalysisPoint * random_point(m_point_factory.getPoint());
+
         if(calculate_strength(random_point) > 0)
         {
             add_destination_point(random_point);
@@ -356,7 +359,6 @@ float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* cand
         {
             if(!within_radius_of_dependent_point)
                 within_radius_of_dependent_point = (std::find(dependent_category_ids.begin(), dependent_category_ids.end(), existing_point->getCategoryId()) != dependent_category_ids.end());
-
             strength *= radial_distribution.m_within_radius_distribution;
         }
         else
@@ -367,7 +369,6 @@ float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* cand
                 strength *= radial_distribution.m_data.find(r_bracket)->second;
             }
         }
-
 
         if(strength == 0) // Optimization. It will always be zero
             return strength;

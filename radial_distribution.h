@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <memory>
 
 #define RADIAL_DISTRIBUTION_SIGNATURE "RADIALDISTRIBUTIONFILE"
 #define RADIAL_DISTRIBUTION_SIGNATURE_LENGTH 22
@@ -29,17 +30,20 @@ public:
 
     RadialDistribution(RadialDistributionHeader properties, float within_radius_distribution, Histogram data);
     RadialDistribution(std::string filename);
+    RadialDistribution();
 
-    void write(std::string filename);
+    void write(std::string filename) const;
 
-    void printToConsole();
-    void writeToCSV(std::string filename);
+    void printToConsole() const;
+    void writeToCSV(std::string filename) const;
+    float getMaximum();
 
     float m_within_radius_distribution;
     Histogram m_data;
     RadialDistributionHeader m_header;
 private:
     bool load(std::string filename);
+    float m_maximum;
 };
 
 #endif //RADIAL_DISTRIBUTION_H

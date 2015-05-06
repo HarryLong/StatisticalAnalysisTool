@@ -20,8 +20,7 @@ void ReproductionTest::setUp()
         DistributionFactory factory;
         std::map<int, std::vector<AnalysisPoint*> >analysis_points;
         analysis_points[1] = (factory.generateRandomDistribution(1, 1000, 1000, 1000, 1, 10) );
-
-        Analyzer::generate_statistical_data(m_production_test_dir, analysis_points, analysis_config, true);
+        Analyzer::analyze(m_production_test_dir, analysis_points, analysis_config);
         for(auto category_it(analysis_points.begin()); category_it != analysis_points.end(); category_it++)
             for(auto points_it(category_it->second.begin()); points_it != category_it->second.end(); points_it++)
                 delete *points_it;
@@ -30,7 +29,7 @@ void ReproductionTest::setUp()
     // Reproduce
     ReproductionConfiguration reproduction_config(m_production_test_dir, 1000, 1000, 10000);
     std::map<int,std::vector<AnalysisPoint*> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
-    Analyzer::generate_statistical_data(m_reproduction_test_dir, reproduced_points, analysis_config, true);
+    Analyzer::analyze(m_reproduction_test_dir, reproduced_points, analysis_config);
 }
 
 void ReproductionTest::tearDown()

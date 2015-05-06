@@ -57,7 +57,7 @@ InputWidget::InputWidget(int width, int height, QWidget* parent, Qt::WindowFlags
 
 InputWidget::~InputWidget()
 {
-
+    delete_points();
 }
 
 void InputWidget::init_layout()

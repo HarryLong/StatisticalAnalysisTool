@@ -5,8 +5,10 @@
 #include "utils.h"
 #include "point_spatial_hashmap.h"
 
-RadialDistributionAnalyzer::RadialDistributionAnalyzer(AnalysisConfiguration analysis_configuration) :
-    m_analysis_configuration(analysis_configuration)
+RadialDistributionAnalyzer::RadialDistributionAnalyzer(AnalysisConfiguration analysis_configuration, const std::vector<AnalysisPoint*> reference_points,
+                           const std::vector<AnalysisPoint*> target_points, int reference_points_id, int destination_points_id, RadialDistributionCompletionListener * m_completion_listener) :
+    m_analysis_configuration(analysis_configuration), m_reference_points(reference_points), m_target_points(target_points),
+    m_reference_points_id(reference_points_id), m_target_points_id(destination_points_id), m_completion_listener(m_completion_listener)
 {
     if((analysis_configuration.r_max-analysis_configuration.r_min) % analysis_configuration.r_diff != 0)
     {
@@ -22,19 +24,28 @@ RadialDistributionAnalyzer::~RadialDistributionAnalyzer()
 
 }
 
-RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector<AnalysisPoint*> & reference_points, std::vector<AnalysisPoint*> & target_points,
-                                                                     int reference_points_id, int destination_points_id)
+RadialDistribution RadialDistributionAnalyzer::getRadialDistribution()
+{
+    return m_radial_distribution;
+}
+
+void RadialDistributionAnalyzer::calculateRadialDistribution(bool asynchronous)
+{
+    if(asynchronous)
+        std::thread(&RadialDistributionAnalyzer::calculate_radial_distribution, this).detach();
+    else
+        calculate_radial_distribution();
+}
+
+void RadialDistributionAnalyzer::calculate_radial_distribution()
 {
     // Optimization: build a spatial hashmap
     PointSpatialHashmap spatial_point_storage(m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height);
 
-    for(AnalysisPoint* p : target_points)
+    for(AnalysisPoint* p : m_target_points)
         spatial_point_storage.getCell(p->getCenter(), true)->points.push_back(p);
 
     int total_area( m_analysis_configuration.analysis_window_width * m_analysis_configuration.analysis_window_height );
-
-    // First calculate the average density
-    float avg_density (((float)target_points.size()) / total_area);
 
     // initialize the histogram and calculate different annular shell areas
     RadialDistribution::Histogram results;
@@ -44,16 +55,16 @@ RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector
 
     float within_radius_distribution(.0f);
 
-    double constant_normalization_factor(((float)total_area) / (reference_points.size()*target_points.size()));
+    double constant_normalization_factor(((float)total_area) / (m_reference_points.size()*m_target_points.size()));
     // Set histogram values
     QLineF line;
 
     int n_pairs_processed(0);
     int reference_points_processed(0);
-    for(AnalysisPoint * reference_point : reference_points)
+    for(AnalysisPoint * reference_point : m_reference_points)
     {
         if(reference_points_processed++ % 100 == 0)
-            std::cout << "Points processed: " << reference_points_processed << " / " << reference_points.size() << std::endl;
+            std::cout << "Points processed: " << reference_points_processed << " / " << m_reference_points.size() << std::endl;
 
         std::vector<AnalysisPoint*> possible_reachable_points(spatial_point_storage.getPossibleReachablePoints(reference_point, m_analysis_configuration.r_max));
 
@@ -142,7 +153,9 @@ RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector
 //    for(auto it(m_annular_shell_areas.begin()); it != m_annular_shell_areas.end(); it++)
 //        std::cout << "R: " << it->first << " |  Area: " << it->second << std::endl;
 
-    return RadialDistribution(RadialDistributionHeader(reference_points_id, destination_points_id), within_radius_distribution, results);
+    m_radial_distribution = RadialDistribution(RadialDistributionHeader(m_reference_points_id, m_target_points_id), within_radius_distribution, results);
+    if(m_completion_listener)
+        m_completion_listener->complete(m_radial_distribution);
 }
 //RadialDistribution RadialDistributionAnalyzer::getRadialDistribution(std::vector<AnalysisPoint*> & reference_points, std::vector<AnalysisPoint*> & target_points,
 //                                                                     int reference_points_id, int destination_points_id)

@@ -11,8 +11,8 @@ link_directories("/home/harry/workspaces/qt-workspace/spatial-hashmap/" )
 
 set(CMAKE_AUTOMOC ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCC_GL_DEBUG_ -DDEBUG_ON -Wall -g -std=c++11 -Wno-reorder -Wno-unused-variable") #DEBUG
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG_ON -O3 -Wall -std=c++11 -Wno-reorder -Wno-unused-variable") #RELEASE
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCC_GL_DEBUG_ -DDEBUG_ON -Wall -g -std=c++11 -Wno-reorder -Wno-unused-variable") #DEBUG
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG_ON -O3 -Wall -std=c++11 -Wno-reorder -Wno-unused-variable") #RELEASE
 
 add_executable(runTests main ../dice_roller ../analysis_configuration ../utils ../point_drawer ../radial_distribution_analyzer ../point_spatial_hashmap ../radial_distribution
 ../distribution_factory ../analysis_point ../point_map ../category_analyzer ../category_properties ../analyzer ../reproduction_configuration ../dependency_analyzer
