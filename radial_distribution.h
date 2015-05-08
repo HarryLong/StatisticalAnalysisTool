@@ -28,7 +28,7 @@ class RadialDistribution{
 public:
     typedef std::map<int,float> Histogram;
 
-    RadialDistribution(RadialDistributionHeader properties, float within_radius_distribution, Histogram data);
+    RadialDistribution(RadialDistributionHeader properties, float within_radius_distribution, float past_rmax_distribution, Histogram data);
     RadialDistribution(std::string filename);
     RadialDistribution();
 
@@ -36,14 +36,18 @@ public:
 
     void printToConsole() const;
     void writeToCSV(std::string filename) const;
-    float getMaximum();
+    float getMaximum() const;
+    float getMinimum() const;
 
     float m_within_radius_distribution;
+    float m_past_rmax_distribution;
     Histogram m_data;
     RadialDistributionHeader m_header;
 private:
     bool load(std::string filename);
+    void calculate_min_max();
     float m_maximum;
+    float m_minimum;
 };
 
 #endif //RADIAL_DISTRIBUTION_H

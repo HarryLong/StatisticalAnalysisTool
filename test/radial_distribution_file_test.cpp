@@ -28,6 +28,8 @@ void RadialDistributionFileTest::testWriteRead()
     CPPUNIT_ASSERT(m_radial_distribution->m_header == loaded_radial_distribution.m_header);
     // Test the within radius distribution
     CPPUNIT_ASSERT_DOUBLES_EQUAL(m_radial_distribution->m_within_radius_distribution, loaded_radial_distribution.m_within_radius_distribution, 0.001);
+    // Test the past radius distribution
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(m_radial_distribution->m_past_rmax_distribution, loaded_radial_distribution.m_past_rmax_distribution, 0.001);
     // Test the data
     CPPUNIT_ASSERT(m_radial_distribution->m_data.size() == loaded_radial_distribution.m_data.size());
     for(auto it(m_radial_distribution->m_data.begin()); it != m_radial_distribution->m_data.end(); it++)

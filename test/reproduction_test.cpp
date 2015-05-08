@@ -66,6 +66,9 @@ void ReproductionTest::testRadialDistributionReproduction()
     // Test the within radius distribution
     CPPUNIT_ASSERT_DOUBLES_EQUAL(produced_radial_distribution.m_within_radius_distribution,
                                  reproduced_radial_distribution.m_within_radius_distribution, 0.1);
+    // Test the outside radius distribution
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(produced_radial_distribution.m_past_rmax_distribution,
+                                 reproduced_radial_distribution.m_past_rmax_distribution, 0.1);
     // Test the data
     CPPUNIT_ASSERT(produced_radial_distribution.m_data.size() == reproduced_radial_distribution.m_data.size());
     for(auto it(produced_radial_distribution.m_data.begin()); it != produced_radial_distribution.m_data.end(); it++)

@@ -34,6 +34,8 @@ private:
     void matching_density_initialize();
     std::map<int,std::vector<AnalysisPoint*> >& getGeneratedPoints();
 
+    void accelerated_point_validity_check(const AnalysisPoint* reference_point, bool & valid, bool & strength_calculation_necessary);
+    void accelerated_point_validity_check(const AnalysisPoint* reference_point, int queried_category, bool & valid, bool & strength_calculation_necessary);
     float calculate_strength(const AnalysisPoint* reference_point, const std::vector<AnalysisPoint*> & destination_points);
     float calculate_strength(const AnalysisPoint* reference_point);
 
@@ -44,6 +46,8 @@ private:
     void remove_destination_point(AnalysisPoint * point, int destination_points_position);
 
     void generate_points();
+
+    const RadialDistribution & get_radial_distribution(int reference_category, int target_category);
 
     PairCorrelations m_pair_correlations;
     CategoryPropertiesContainer m_category_properties;
