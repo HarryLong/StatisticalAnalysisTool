@@ -1,13 +1,12 @@
 #include "reproducer.h"
-#include "utils.h"
+#include "../utils/file_utils.h"
+#include "../utils/utils.h"
 #include "distribution_factory.h"
-#include "analysis_point.h"
-#include "analysis_configuration.h"
+#include "../analysis_point.h"
 
 #include <math.h>
 #include <QLineF>
 #include <iostream>
-
 #include <chrono>
 #include <QStringList>
 

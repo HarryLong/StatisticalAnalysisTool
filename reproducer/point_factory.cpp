@@ -1,5 +1,5 @@
 #include "point_factory.h"
-#include "analysis_point.h"
+#include "../analysis_point.h"
 #include <iostream>
 
 PointFactory::PointFactory(int max_width, int max_height) :

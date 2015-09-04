@@ -4,8 +4,8 @@
 #include <map>
 #include <QPoint>
 #include <vector>
-#include "radial_distribution.h"
-#include "analysis_point.h"
+#include "../radial_distribution.h"
+#include "../analysis_point.h"
 #include "analysis_configuration.h"
 #include <thread>
 

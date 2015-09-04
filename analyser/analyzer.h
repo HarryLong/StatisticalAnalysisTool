@@ -39,6 +39,7 @@ private:
 class RadialDistributionTracker : public RadialDistributionCompletionListener{
 public:
     RadialDistributionTracker(QString m_output_bin_dir, QString m_output_human_readable_file);
+    virtual ~RadialDistributionTracker();
     virtual void complete(const RadialDistribution & radial_distribution);
 
     const QString m_output_bin_dir;
@@ -52,6 +53,7 @@ public:
 class CategoryPropertiesTracker: public CategoryAnalysisCompletionListener{
 public:
     CategoryPropertiesTracker(QString m_output_bin_dir, QString m_output_human_readable_file, std::set<int> category_dependencies);
+    virtual~CategoryPropertiesTracker();
     virtual void complete(CategoryProperties & category_properties);
 
     const QString m_output_bin_dir;

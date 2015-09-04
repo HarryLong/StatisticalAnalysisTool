@@ -1,6 +1,6 @@
 #include "bin_test.h"
-#include "../utils.h"
-#include "../dice_roller.h"
+#include "../utils/file_utils.h"
+#include "../utils/dice_roller.h"
 #include <math.h>
 #include <climits>
 
@@ -45,7 +45,7 @@ void BinTest::testInt()
         for(int i(0); i < 1000; i++)
         {
             unsigned int random_value(dice_roller.generate());
-            unsigned char * bin_random_value(Binutils::toBin(random_value,size));
+            unsigned char * bin_random_value(FileUtils::toBin(random_value,size));
 
             // Write
             open_file_w();
@@ -57,7 +57,7 @@ void BinTest::testInt()
             int input_file_size (get_file_size());
             CPPUNIT_ASSERT(input_file_size == size);
             m_in_stream.read(memblock, size);
-            unsigned int read_value (Binutils::readInt32((unsigned char*) memblock,size));
+            unsigned int read_value (FileUtils::readInt32((unsigned char*) memblock,size));
             m_in_stream.close();
 
             CPPUNIT_ASSERT_MESSAGE("Read value: " + std::to_string(read_value) + " | Written value: " +
@@ -88,7 +88,7 @@ void BinTest::testFloat()
                 random_value += fractional_part;
             }
 
-            unsigned char * bin_random_value(Binutils::toBin(random_value,size));
+            unsigned char * bin_random_value(FileUtils::toBin(random_value,size));
 
             // Write
             open_file_w();
@@ -100,7 +100,7 @@ void BinTest::testFloat()
             int input_file_size (get_file_size());
             CPPUNIT_ASSERT(input_file_size == size);
             m_in_stream.read(memblock, size);
-            float read_value (Binutils::readFloat32((unsigned char*) memblock,size));
+            float read_value (FileUtils::readFloat32((unsigned char*) memblock,size));
             m_in_stream.close();
 
             CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Read value: " + std::to_string(read_value) + " | Written value: " +

@@ -1,10 +1,11 @@
 #include "analyzer.h"
 
-#include "analysis_point.h"
-#include "constants.h"
-#include "utils.h"
-#include "analysis_point.h"
+#include "../analysis_point.h"
 #include "dependency_analyzer.h"
+#include "../analysis_point.h"
+
+#include "../utils/file_utils.h"
+#include "../utils/utils.h"
 
 #include <iostream>
 #include <thread>
@@ -18,6 +19,11 @@ RadialDistributionTracker::RadialDistributionTracker(QString output_bin_dir, QSt
     m_complete.store(false);
 }
 
+RadialDistributionTracker::~RadialDistributionTracker()
+{
+
+}
+
 void RadialDistributionTracker::complete(const RadialDistribution & radial_distribution)
 {
     int reference_category_id(radial_distribution.m_header.reference_id);
@@ -29,7 +35,7 @@ void RadialDistributionTracker::complete(const RadialDistribution & radial_distr
     // Write rad file
     {
         QString output_filename(m_output_bin_dir);
-        output_filename.append(filename).append(RADIAL_DISTRIBUTION_FILE_EXTENSION);
+        output_filename.append(filename).append(FileUtils::_RADIAL_DISTRIBUTION_EXT);
         radial_distribution.write(output_filename.toStdString());
         std::cout << "Radial distribution file for categories: " << target_category_id << " and " << reference_category_id <<
                      " written to file: " << output_filename.toStdString() << std::endl;
@@ -54,6 +60,11 @@ CategoryPropertiesTracker::CategoryPropertiesTracker(QString output_bin_dir, QSt
     m_complete.store(false);
 }
 
+CategoryPropertiesTracker::~CategoryPropertiesTracker()
+{
+
+}
+
 void CategoryPropertiesTracker::complete(CategoryProperties & category_properties)
 {
     int category_id(category_properties.m_header.category_id);
@@ -66,7 +77,7 @@ void CategoryPropertiesTracker::complete(CategoryProperties & category_propertie
     // Write category properties file
     {
         QString output_filename(m_output_bin_dir);
-        output_filename.append(filename).append(CATEGORY_PROPERTIES_FILE_EXTENSION);
+        output_filename.append(filename).append(FileUtils::_CATEGORY_PROPERTIES_EXT);
         category_properties.write(output_filename.toStdString());
         std::cout << "Category properties file for category " << category_id << " written to: " << output_filename.toStdString() << std::endl;
     }
@@ -126,7 +137,7 @@ Analyzer::~Analyzer()
 
 void Analyzer::generate_configuration()
 {
-    QString generic_filename(CONFIGURATION_FILE_NAME);
+    QString generic_filename(FileUtils::_CONFIGURATION_FILENAME);
 
     // Write bin file
     {

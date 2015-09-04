@@ -9,8 +9,8 @@
 #include <QButtonGroup>
 #include <QCheckBox>
 
-#include "reproduction_configuration.h"
-#include "analysis_configuration.h"
+#include "../reproducer/reproduction_configuration.h"
+#include "../analyser/analysis_configuration.h"
 
 /**********************************************
  * REPRODUCTION CONFIGURATION PRODUCER DIALOG *

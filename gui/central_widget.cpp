@@ -1,18 +1,18 @@
 #include "central_widget.h"
-#include "constants.h"
-#include "radial_distribution_analyzer.h"
-#include "utils.h"
-#include "category_analyzer.h"
-#include "analyzer.h"
+#include "../analyser/radial_distribution_analyzer.h"
+#include "../utils/utils.h"
+#include "../analyser/category_analyzer.h"
+#include "../analyser/analyzer.h"
 
 #include <QBoxLayout>
 #include <iostream>
 
-CentralWidget::CentralWidget(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f), m_input_widget(DEFAULT_INPUT_WIDGET_DIMENSION, DEFAULT_INPUT_WIDGET_DIMENSION, this),
+CentralWidget::CentralWidget(int input_widget_dimension, QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f),
+    m_input_widget(input_widget_dimension, input_widget_dimension, this),
     m_analysis_configuration_producer_dialog(new AnalysisConfigurationProducerDialog)
 {
     connect(m_analysis_configuration_producer_dialog, SIGNAL(accepted()), this, SLOT(analyse()));
-    setInputWidgetSize(DEFAULT_INPUT_WIDGET_DIMENSION, DEFAULT_INPUT_WIDGET_DIMENSION);
+    setInputWidgetSize(input_widget_dimension, input_widget_dimension);
 
     init_layout();
 }

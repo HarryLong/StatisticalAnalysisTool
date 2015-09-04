@@ -1,7 +1,7 @@
 #ifndef DISTRIBUTION_FACTORY_H
 #define DISTRIBUTION_FACTORY_H
 
-#include "dice_roller.h"
+#include "../utils/dice_roller.h"
 
 #include <QPoint>
 

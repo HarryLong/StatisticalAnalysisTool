@@ -1,27 +1,32 @@
-#include "utils.h"
-#include <malloc.h>
-#include <algorithm>
+#include "file_utils.h"
 #include <iostream>
-#include <QImage>
-#include "analysis_point.h"
-#include "point_drawer.h"
-#include "constants.h"
-
-#include <QPainter>
 #include <QDir>
+
+#define RADIAL_DISTRIBUTION_SUBFOLDER "radial_distribution"
+#define CATEGORY_PROPERTIES_SUBFOLDER "category_properties"
+#define CSV_FILES_SUBFOLDER "csv"
+
+#define CONFIGURATION_FILE_NAME "configuration.conf"
+#define RADIAL_DISTRIBUTION_FILE_EXTENSION ".rad"
+#define CATEGORY_PROPERTIES_FILE_EXTENSION ".category_properties"
+
 #define MAX_8_BITS 256
 #define MAX_16_BITS 65536
+
+const char * FileUtils::_CONFIGURATION_FILENAME = CONFIGURATION_FILE_NAME;
+const char * FileUtils::_RADIAL_DISTRIBUTION_EXT = RADIAL_DISTRIBUTION_FILE_EXTENSION;
+const char * FileUtils::_CATEGORY_PROPERTIES_EXT = CATEGORY_PROPERTIES_FILE_EXTENSION;
 
 /*************
  * BIN UTILS *
  *************/
-void Binutils::insertPadding(unsigned char * data, int from, int to)
+void FileUtils::insertPadding(unsigned char * data, int from, int to)
 {
     for(int i(from); i < to; i++)
         data[i] = 0x00;
 }
 
-unsigned char* Binutils::toBin(unsigned int value, int n_bytes)
+unsigned char* FileUtils::toBin(unsigned int value, int n_bytes)
 {
     unsigned char* ret = new unsigned char[n_bytes];
     int byte_index(0);
@@ -51,7 +56,7 @@ unsigned char* Binutils::toBin(unsigned int value, int n_bytes)
  * @param n_bytes
  * @return
  */
-unsigned char* Binutils::toBin(float value, int n_bytes)
+unsigned char* FileUtils::toBin(float value, int n_bytes)
 {
     if(n_bytes < 4)
     {
@@ -98,7 +103,7 @@ unsigned char* Binutils::toBin(float value, int n_bytes)
     return ret;
 }
 
-int Binutils::readInt32(unsigned char * data, int n_bytes)
+int FileUtils::readInt32(unsigned char * data, int n_bytes)
 {
     int value(0);
 
@@ -114,7 +119,7 @@ int Binutils::readInt32(unsigned char * data, int n_bytes)
     return value;
 }
 
-float Binutils::readFloat32(unsigned char * data, int n_bytes)
+float FileUtils::readFloat32(unsigned char * data, int n_bytes)
 {
     if(n_bytes < 4)
     {
@@ -134,37 +139,6 @@ float Binutils::readFloat32(unsigned char * data, int n_bytes)
     fractional_part -= 1.0f;
 
     return (integral_part+fractional_part);
-}
-
-/*****************************
- * RADIAL DISTRIBUTION UTILS *
- *****************************/
-int RadialDistributionUtils::getRBracket(double distance, int r_min, int r_diff)
-{
-//    if(distance < 1)
-//        return 0;
-//    if(r_min == 0)
-//        return 1 + ((int)((distance-1)/r_diff)) * r_diff;
-    return r_min + ((int)((distance-r_min)/r_diff)) * r_diff;
-}
-
-/***********************
- * PROBABILISTIC UTILS *
- ***********************/
-// DiceRoller must be set to return a value between 0 and 1000
-bool ProbabilisticUtils::returnTrueWithProbability(float probability, DiceRoller & dice_roller)
-{
-    int i_probability(probability*1000);
-
-    return (dice_roller.generate() < i_probability);
-}
-
-/**************
- * GEOM UTILS *
- **************/
-float GeometricUtils::getCircleArea(int radius)
-{
-    return M_PI * (radius*radius);
 }
 
 /**************
@@ -317,39 +291,3 @@ QString FileUtils::get_configuration_file(QString directory)
 
     return directory.append(CONFIGURATION_FILE_NAME);
 }
-
-/***************
- * IMAGE UTILS *
- ***************/
-void ImageUtils::printPointsToImg(std::string image_file, const std::map<int,std::vector<AnalysisPoint*> > & points, int width, int height)
-{
-    PointDrawer drawer(width, height);
-
-    for(auto category_it( points.begin() ); category_it != points.end(); category_it++) // Draw higher priority first to ensure no overlap
-    {
-        for(auto point_it(category_it->second.begin()); point_it != category_it->second.end(); point_it++)
-        {
-            drawer.drawPoint(*point_it);
-        }
-    }
-
-    drawer.toImage().save(QString(image_file.c_str()));
-}
-
-//int main(int argc, char *argv[])
-//{
-//    int total(500000);
-//    int trues(0);
-
-//    DiceRoller roller(0,1000);
-
-//    for(int i = 0; i < total; i++)
-//    {
-//        if(ProbabilisticUtils::returnTrueWithProbability(0.5f, roller))
-//            trues++;
-//    }
-//    std::cout << "Trues: " << trues << " / " << total << std::endl;
-//    return 0;
-//}
-
-

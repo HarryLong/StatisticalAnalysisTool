@@ -1,8 +1,8 @@
 #include "test_data_factory.h"
 
-#include "../distribution_factory.h"
-#include "../analyzer.h"
-#include "../radial_distribution_analyzer.h"
+#include "../reproducer/distribution_factory.h"
+#include "../analyser/analyzer.h"
+#include "../analyser/radial_distribution_analyzer.h"
 
 RadialDistribution * TestDataFactory::generateSingleCategoryRadialDistribution(AnalysisConfiguration & analysis_config,
                                                                                int n_points,

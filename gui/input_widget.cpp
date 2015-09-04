@@ -1,5 +1,4 @@
 #include "input_widget.h"
-#include "constants.h"
 
 #include <QPainter>
 #include <QBoxLayout>

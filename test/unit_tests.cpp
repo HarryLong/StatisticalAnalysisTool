@@ -1,8 +1,8 @@
 #include "unit_tests.h"
-#include "../radial_distribution_analyzer.h"
-#include "../distribution_factory.h"
-#include "../category_analyzer.h"
-#include "../utils.h"
+#include "../analyser/radial_distribution_analyzer.h"
+#include "../reproducer/distribution_factory.h"
+#include "../analyser/category_analyzer.h"
+#include "../utils/utils.h"
 
 #include <cassert>
 #include <iostream>

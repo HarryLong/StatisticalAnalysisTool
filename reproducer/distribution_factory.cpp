@@ -1,8 +1,9 @@
 #include "distribution_factory.h"
-#include "math.h"
+#include "../analysis_point.h"
+#include "../point_map.h"
+
+#include <math.h>
 #include <map>
-#include "analysis_point.h"
-#include "point_map.h"
 
 DistributionFactory::DistributionFactory() : m_dice_roller(0, RAND_MAX)
 {

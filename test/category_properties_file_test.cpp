@@ -1,7 +1,7 @@
 #include "category_properties_file_test.h"
 #include "../category_properties.h"
-#include "../category_analyzer.h"
-#include "../distribution_factory.h"
+#include "../analyser/category_analyzer.h"
+#include "../reproducer/distribution_factory.h"
 
 void CategoryPropertiesFileTest::setUp()
 {

@@ -1,5 +1,5 @@
 #include "point_drawer.h"
-#include "analysis_point.h"
+#include "../analysis_point.h"
 #include <QPainter>
 
 PointDrawer::PointDrawer(int width, int height) : m_image(width, height, QImage::Format_RGB32)

@@ -1,8 +1,7 @@
-#include "../radial_distribution.h"
-#include "../analysis_configuration.h"
-
-#include "test_data_factory.h"
 #include "radial_distribution_file_test.h"
+#include "../radial_distribution.h"
+#include "../analyser/analysis_configuration.h"
+#include "test_data_factory.h"
 
 #include <QString>
 

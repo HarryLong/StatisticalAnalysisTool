@@ -5,9 +5,10 @@
 #include <string>
 #include <memory>
 
-#define RADIAL_DISTRIBUTION_SIGNATURE "RADIALDISTRIBUTIONFILE"
-#define RADIAL_DISTRIBUTION_SIGNATURE_LENGTH 22
 struct RadialDistributionHeader{
+
+    static std::string _SIGNATURE;
+
     unsigned int reference_id;
     unsigned int destination_id;
 

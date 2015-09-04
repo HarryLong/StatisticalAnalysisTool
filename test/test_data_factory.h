@@ -1,5 +1,5 @@
 #include "../radial_distribution.h"
-#include "../analysis_configuration.h"
+#include "../analyser/analysis_configuration.h"
 
 class TestDataFactory{
 public:

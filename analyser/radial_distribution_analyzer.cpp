@@ -2,8 +2,8 @@
 #include <iostream>
 #include <QLineF>
 #include <math.h>
-#include "utils.h"
-#include "point_spatial_hashmap.h"
+#include "../utils/utils.h"
+#include "../point_spatial_hashmap.h"
 
 RadialDistributionAnalyzer::RadialDistributionAnalyzer(AnalysisConfiguration analysis_configuration, const std::vector<AnalysisPoint*> reference_points,
                            const std::vector<AnalysisPoint*> target_points, int reference_points_id, int destination_points_id, RadialDistributionCompletionListener * m_completion_listener) :

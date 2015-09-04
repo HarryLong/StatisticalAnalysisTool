@@ -1,5 +1,5 @@
 #include "analysis_configuration.h"
-#include "utils.h"
+#include "../utils/file_utils.h"
 
 #include <iostream>
 #include <fstream>
@@ -66,32 +66,32 @@ bool AnalysisConfiguration::load_data(std::string filename)
 
             // Points id
             file.read(memblock, 4);
-            r_min = Binutils::readInt32((unsigned char*) memblock);
+            r_min = FileUtils::readInt32((unsigned char*) memblock);
 
             // Min
             file.read(memblock, 4);
-            r_max = Binutils::readInt32((unsigned char*) memblock);
+            r_max = FileUtils::readInt32((unsigned char*) memblock);
 
             // Max
             file.read(memblock, 4);
-            r_diff = Binutils::readInt32((unsigned char*) memblock);
+            r_diff = FileUtils::readInt32((unsigned char*) memblock);
 
             // Diff
             file.read(memblock, 4);
-            analysis_window_width = Binutils::readInt32((unsigned char*) memblock);
+            analysis_window_width = FileUtils::readInt32((unsigned char*) memblock);
 
             // N points
             file.read(memblock, 4);
-            analysis_window_height = Binutils::readInt32((unsigned char*) memblock);
+            analysis_window_height = FileUtils::readInt32((unsigned char*) memblock);
 
             // N categories
             file.read(memblock, 4);
-            int n_categories = Binutils::readInt32((unsigned char*) memblock);
+            int n_categories = FileUtils::readInt32((unsigned char*) memblock);
 
             for(int i = 0; i < n_categories; i++)
             {
                 file.read(memblock, 4);
-                priority_sorted_category_ids.push_back(Binutils::readInt32((unsigned char*) memblock));
+                priority_sorted_category_ids.push_back(FileUtils::readInt32((unsigned char*) memblock));
             }
 
             delete [] memblock;
@@ -112,16 +112,16 @@ void AnalysisConfiguration::write(std::string filename) const
     // First write the header
     std::string header (CONFIGURATION_SIGNATURE);
     file.write(header.c_str(), CONFIGURATION_SIGNATURE_LENGTH);
-    file.write((char*) Binutils::toBin((unsigned int)r_min,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)r_max,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)r_diff,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)analysis_window_width,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)analysis_window_height,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)r_min,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)r_max,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)r_diff,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)analysis_window_width,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)analysis_window_height,4),4);
 
     // Sorted category ids
-    file.write((char*) Binutils::toBin((unsigned int)priority_sorted_category_ids.size(),4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)priority_sorted_category_ids.size(),4),4);
     for(int category_id : priority_sorted_category_ids)
-        file.write((char*) Binutils::toBin((unsigned int)category_id,4),4);
+        file.write((char*) FileUtils::toBin((unsigned int)category_id,4),4);
 
     file.close();
 }

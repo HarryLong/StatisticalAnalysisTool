@@ -2,16 +2,17 @@
 #define CENTRAL_WIDGET_H
 
 #include "input_widget.h"
+#include "dialogs.h"
+
 #include <QWidget>
 #include <QPushButton>
 #include <QSpinBox>
-#include "dialogs.h"
 
 class AnalysisPoint;
 class CentralWidget : public QWidget{
 Q_OBJECT
 public:
-    CentralWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    CentralWidget(int input_widget_dimension, QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~CentralWidget();
     void setInputWidgetSize(int width, int height);
     void setInputWidgetPoints(std::vector<AnalysisPoint*>& points);

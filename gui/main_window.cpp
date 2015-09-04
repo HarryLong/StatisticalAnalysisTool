@@ -1,12 +1,17 @@
 #include "main_window.h"
 #include <QBoxLayout>
-#include "constants.h"
 #include <QMenuBar>
-#include "analysis_point.h"
-#include "reproducer.h"
-#include "utils.h"
+#include "../analysis_point.h"
+#include "../reproducer/reproducer.h"
+#include "../utils/utils.h"
 
-MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) : QMainWindow(parent, flags), m_central_widget(new CentralWidget(this)),
+#define MAX_INPUT_WIDGET_DIMENSION 1000
+#define MIN_INPUT_WIDGET_DIMENSION 100
+#define INPUT_WIDGET_DIMENSION_INCREMENTS 100
+#define DEFAULT_INPUT_WIDGET_DIMENSION 500
+
+MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) : QMainWindow(parent, flags),
+    m_central_widget(new CentralWidget(DEFAULT_INPUT_WIDGET_DIMENSION, this)),
     m_random_distribution_producer_dlg(new RandomDistributionProducerDialog),
     m_clustered_distribution_producer_dlg(new ClusteredDistributionProducerDialog),
     m_reproduction_configuration_producer_dlg(new ReproductionConfigurationProducerDialog),

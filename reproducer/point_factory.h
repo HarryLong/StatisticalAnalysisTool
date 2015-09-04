@@ -1,11 +1,12 @@
 #ifndef POINT_FACTORY_H
 #define POINT_FACTORY_H
 
+#include "../category_properties.h"
+#include "../utils/dice_roller.h"
+#include "../point_map.h"
+
 #include <map>
 #include <QPoint>
-#include "category_properties.h"
-#include "dice_roller.h"
-#include "point_map.h"
 
 class AnalysisPoint;
 

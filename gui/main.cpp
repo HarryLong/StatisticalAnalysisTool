@@ -1,69 +1,11 @@
-#include "main.h"
-#include "radial_distribution_analyzer.h"
-#include "distribution_factory.h"
-#include "utils.h"
-#include "radial_distribution.h"
-#include "reproducer.h"
 #include "main_window.h"
 
-#include <iostream>
-#include <string>
+#include <QDebug>
 #include <QApplication>
 
-#define CREATOR_BIN "RadialDistributionFileCreator"
-#define REPRODUCER_BIN "RadialDistributionReproducer"
-#define ANALYSER_BIN "RadialDistributionFileAnalyzer"
-#define GUI_BIN "RadialDistributionToolGUI"
-
-
-static void print_file_production_usage()
-{
-    std::cerr << "Usage: " << CREATOR_BIN<< " <option(s)> OUTPUT_FILE\n"
-        << "Options:\n"
-        << "\t-h,--help\tShow this help message\n"
-        << "\t-width\t Area width\n"
-        << "\t-height\t Area height\n"
-        << "\t-r-min\t R min\n"
-        << "\t-r-max\t R max\n"
-        << "\t-r-diff\t R diff\n"
-        << "\t-random-distribution\tproduce a file with randomly distributed points\n"
-            << "\t\t-n-points\t number of random points to produce\n"
-        << "\t-seeded-distribution\tproduce a file with seeded distributed points\n"
-            << "\t\t-n-seeds\t Number of starting seeds\n"
-            << "\t\t-max-seeding-distance\t Maximum distance for a seed can seed to\n"
-            << "\t\t-n-seeding-iterations\t Number of seeding iterations\n"
-        << "\t-grid-distribution\tproduce a file with randomly distributed points\n"
-            << "\t\t-grid-separation\tseparation between two points on the grid\n"
-        << "\t-v\tverbose\n"
-
-        << std::endl;
-}
-
-static void print_distribution_reproducer_usage()
-{
-    std::cerr << "Usage: " << REPRODUCER_BIN<< " <option(s)> INPUT_RADIAL_DISTRIBUTION_FILE OUTPUT_IMG_FILE\n"
-        << "Options:\n"
-        << "\t-h,--help\t\tShow this help message\n"
-        << "\t-width\t Area width\n"
-        << "\t-height\t Area height\n"
-        << "\t-n-iterations\t Number of iterations\n"
-        << "\t-v\tverbose\n"
-        << std::endl;
-}
-
-static void print_radial_distribution_file_analyzer_usage()
-{
-    std::cerr << "Usage: " << ANALYSER_BIN<< " <option(s)> INPUT_RADIAL_DISTRIBUTION_FILE OUTPUT_CSV_FILE\n"
-        << "Options:\n"
-        << "\t-h,--help\t\tShow this help message\n"
-        << std::endl;
-}
-
-
-#define TMP_IMAGE_FILE "/home/harry/radial_distributions/tmp.jpg"
 int main(int argc, char *argv[])
 {
-    std::cout << "Starting GUI..." << std::endl;
+    qWarning() << "Starting GUI...";
     QApplication app(argc, argv);
     MainWindow w;
     w.resize(w.sizeHint());
@@ -71,6 +13,59 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
+
+//#define CREATOR_BIN "RadialDistributionFileCreator"
+//#define REPRODUCER_BIN "RadialDistributionReproducer"
+//#define ANALYSER_BIN "RadialDistributionFileAnalyzer"
+//#define GUI_BIN "RadialDistributionToolGUI"
+
+
+//static void print_file_production_usage()
+//{
+//    std::cerr << "Usage: " << CREATOR_BIN<< " <option(s)> OUTPUT_FILE\n"
+//        << "Options:\n"
+//        << "\t-h,--help\tShow this help message\n"
+//        << "\t-width\t Area width\n"
+//        << "\t-height\t Area height\n"
+//        << "\t-r-min\t R min\n"
+//        << "\t-r-max\t R max\n"
+//        << "\t-r-diff\t R diff\n"
+//        << "\t-random-distribution\tproduce a file with randomly distributed points\n"
+//            << "\t\t-n-points\t number of random points to produce\n"
+//        << "\t-seeded-distribution\tproduce a file with seeded distributed points\n"
+//            << "\t\t-n-seeds\t Number of starting seeds\n"
+//            << "\t\t-max-seeding-distance\t Maximum distance for a seed can seed to\n"
+//            << "\t\t-n-seeding-iterations\t Number of seeding iterations\n"
+//        << "\t-grid-distribution\tproduce a file with randomly distributed points\n"
+//            << "\t\t-grid-separation\tseparation between two points on the grid\n"
+//        << "\t-v\tverbose\n"
+
+//        << std::endl;
+//}
+
+//static void print_distribution_reproducer_usage()
+//{
+//    std::cerr << "Usage: " << REPRODUCER_BIN<< " <option(s)> INPUT_RADIAL_DISTRIBUTION_FILE OUTPUT_IMG_FILE\n"
+//        << "Options:\n"
+//        << "\t-h,--help\t\tShow this help message\n"
+//        << "\t-width\t Area width\n"
+//        << "\t-height\t Area height\n"
+//        << "\t-n-iterations\t Number of iterations\n"
+//        << "\t-v\tverbose\n"
+//        << std::endl;
+//}
+
+//static void print_radial_distribution_file_analyzer_usage()
+//{
+//    std::cerr << "Usage: " << ANALYSER_BIN<< " <option(s)> INPUT_RADIAL_DISTRIBUTION_FILE OUTPUT_CSV_FILE\n"
+//        << "Options:\n"
+//        << "\t-h,--help\t\tShow this help message\n"
+//        << std::endl;
+//}
+
+
+#define TMP_IMAGE_FILE "/home/harry/radial_distributions/tmp.jpg"
+
 ////    std::string bin(argv[0]);
 ////    if(bin.find(CREATOR_BIN) != std::string::npos)
 ////    {

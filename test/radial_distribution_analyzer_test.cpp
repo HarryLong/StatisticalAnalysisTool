@@ -1,9 +1,9 @@
 #include "radial_distribution_analyzer_test.h"
 #include "test_data_factory.h"
 
-#include "../radial_distribution_analyzer.h"
-#include "../analysis_configuration.h"
-#include "../utils.h"
+#include "../analyser/radial_distribution_analyzer.h"
+#include "../analyser/analysis_configuration.h"
+#include "../utils/utils.h"
 
 void RadialDistributionAnalyzerTest::setUp()
 {

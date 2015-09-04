@@ -1,15 +1,14 @@
 #ifndef REPRODUCER_H
 #define REPRODUCER_H
 
-#include "radial_distribution.h"
 #include <string>
 #include <QPoint>
-#include "point_spatial_hashmap.h"
-#include "point_map.h"
-#include "category_properties.h"
-#include "dice_roller.h"
+
+#include "../radial_distribution.h"
+#include "../point_spatial_hashmap.h"
+#include "../category_properties.h"
+#include "../analyser/analysis_configuration.h"
 #include "point_factory.h"
-#include "analysis_configuration.h"
 #include "reproduction_configuration.h"
 
 class AnalysisPoint;

@@ -1,6 +1,7 @@
 #include "dependency_analyzer.h"
-#include "point_spatial_hashmap.h"
-#include "analysis_point.h"
+#include "../analysis_point.h"
+#include "../point_spatial_hashmap.h"
+
 #include <QLineF>
 
 DependencyAnalyzer::Dependencies DependencyAnalyzer::getDependencies(std::map<int, std::vector<AnalysisPoint*>> points, int analysis_window_width, int analysis_window_height)

@@ -6,8 +6,8 @@
 #include <QPoint>
 #include <vector>
 #include <QImage>
-#include "analysis_point.h"
-#include "point_drawer.h"
+#include "../analysis_point.h"
+#include "../utils/point_drawer.h"
 
 #define DEFAULT_CIRCLE_RADIUS 1
 

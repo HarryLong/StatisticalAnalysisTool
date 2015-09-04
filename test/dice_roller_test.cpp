@@ -1,5 +1,5 @@
 #include "dice_roller_test.h"
-#include "../dice_roller.h"
+#include "../utils/dice_roller.h"
 #include <string>
 
 void DiceRollerTest::setUp()

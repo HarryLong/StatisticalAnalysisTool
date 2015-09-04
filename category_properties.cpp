@@ -1,5 +1,5 @@
 #include "category_properties.h"
-#include "utils.h"
+#include "utils/file_utils.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -59,36 +59,36 @@ bool CategoryProperties::load_data(std::string filename)
 
             // Points id
             file.read(memblock, 4);
-            m_header.category_id = Binutils::readInt32((unsigned char*) memblock);
+            m_header.category_id = FileUtils::readInt32((unsigned char*) memblock);
 
             // Min
             file.read(memblock, 4);
-            m_header.min_size = Binutils::readInt32((unsigned char*) memblock);
+            m_header.min_size = FileUtils::readInt32((unsigned char*) memblock);
 
             // Max
             file.read(memblock, 4);
-            m_header.max_size = Binutils::readInt32((unsigned char*) memblock);
+            m_header.max_size = FileUtils::readInt32((unsigned char*) memblock);
 
             // Diff
             file.read(memblock, 4);
-            m_header.bin_size = Binutils::readInt32((unsigned char*) memblock);
+            m_header.bin_size = FileUtils::readInt32((unsigned char*) memblock);
 
             // N points
             file.read(memblock, 4);
-            m_header.n_points = Binutils::readInt32((unsigned char*) memblock);
+            m_header.n_points = FileUtils::readInt32((unsigned char*) memblock);
 
             // Priority
             file.read(memblock, 4);
-            m_header.priority = Binutils::readInt32((unsigned char*) memblock);
+            m_header.priority = FileUtils::readInt32((unsigned char*) memblock);
 
             // Dependent category ids
             {
                 file.read(memblock, 4);
-                int n_dependent_category_ids (Binutils::readInt32((unsigned char*) memblock) );
+                int n_dependent_category_ids (FileUtils::readInt32((unsigned char*) memblock) );
                 for(int i (0); i < n_dependent_category_ids; i++)
                 {
                     file.read(memblock, 4);
-                    m_header.category_dependent_ids.insert( Binutils::readInt32((unsigned char*) memblock) );
+                    m_header.category_dependent_ids.insert( FileUtils::readInt32((unsigned char*) memblock) );
                 }
             }
 
@@ -105,11 +105,11 @@ bool CategoryProperties::load_data(std::string filename)
             {
                 // size
                 file.read(memblock, 4);
-                point_size = Binutils::readInt32((unsigned char*) memblock,4);
+                point_size = FileUtils::readInt32((unsigned char*) memblock,4);
 
                 // Distribution
                 file.read(memblock, 4);
-                ratio = Binutils::readFloat32((unsigned char*) memblock,4);
+                ratio = FileUtils::readFloat32((unsigned char*) memblock,4);
 
                 m_data.insert(std::pair<int,float>(point_size, ratio));
             }
@@ -132,22 +132,22 @@ void CategoryProperties::write(std::string filename)
     // First write the header
     std::string header (CATEGORY_PROPERTIES_SIGNATURE);
     file.write(header.c_str(), CATEGORY_PROPERTIES_SIGNATURE_LENGTH);
-    file.write((char*) Binutils::toBin((unsigned int)m_header.category_id,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)m_header.min_size,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)m_header.max_size,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)m_header.bin_size,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)m_header.n_points,4),4);
-    file.write((char*) Binutils::toBin((unsigned int)m_header.priority,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.category_id,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.min_size,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.max_size,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.bin_size,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.n_points,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.priority,4),4);
 
     // Dependent category ids
-    file.write((char*) Binutils::toBin((unsigned int)m_header.category_dependent_ids.size(),4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.category_dependent_ids.size(),4),4);
     for(int category_dependent_id : m_header.category_dependent_ids)
-        file.write((char*) Binutils::toBin((unsigned int)category_dependent_id,4),4);
+        file.write((char*) FileUtils::toBin((unsigned int)category_dependent_id,4),4);
 
     for(std::pair<int,float> size_data : m_data)
     {
-        file.write((char*) Binutils::toBin((unsigned int) size_data.first,4),4);
-        file.write((char*) Binutils::toBin(size_data.second,4),4);
+        file.write((char*) FileUtils::toBin((unsigned int) size_data.first,4),4);
+        file.write((char*) FileUtils::toBin(size_data.second,4),4);
     }
 
     file.close();

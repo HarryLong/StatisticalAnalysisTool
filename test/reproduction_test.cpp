@@ -1,10 +1,11 @@
 #include "reproduction_test.h"
 #include "test_data_factory.h"
-#include "../reproducer.h"
-#include "../analyzer.h"
-#include "../reproduction_configuration.h"
-#include "../distribution_factory.h"
-#include "../utils.h"
+#include "../reproducer/reproducer.h"
+#include "../analyser/analyzer.h"
+#include "../reproducer/reproduction_configuration.h"
+#include "../reproducer/distribution_factory.h"
+#include "../utils/file_utils.h"
+
 #include <QDir>
 
 void ReproductionTest::setUp()

@@ -1,5 +1,5 @@
 #include "analysis_configuration_file_test.h"
-#include "../analysis_configuration.h"
+#include "../analyser/analysis_configuration.h"
 
 void AnalysisiConfigurationFileTest::setUp()
 {

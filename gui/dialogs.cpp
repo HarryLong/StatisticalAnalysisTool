@@ -1,4 +1,4 @@
-#include "dialogs.h"
+#include "../gui/dialogs.h"
 #include <algorithm>
 #include <QBoxLayout>
 #include <QLabel>

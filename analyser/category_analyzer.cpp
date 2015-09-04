@@ -1,5 +1,6 @@
 #include "category_analyzer.h"
-#include "analysis_point.h"
+#include "../analysis_point.h"
+
 #include <climits>
 #include <thread>
 

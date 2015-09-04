@@ -1,7 +1,7 @@
 #ifndef CATEGORY_ANALYZER_H
 #define CATEGORY_ANALYZER_H
 
-#include "category_properties.h"
+#include "../category_properties.h"
 #include <vector>
 
 class CategoryAnalysisCompletionListener{

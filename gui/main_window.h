@@ -1,11 +1,12 @@
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
-#include <QMainWindow>
 #include "central_widget.h"
-#include <QActionGroup>
-#include "distribution_factory.h"
+#include "../reproducer/distribution_factory.h"
 #include "dialogs.h"
+
+#include <QMainWindow>
+#include <QActionGroup>
 
 class MainWindow : public QMainWindow
 {

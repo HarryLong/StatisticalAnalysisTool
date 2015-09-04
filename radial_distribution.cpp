@@ -1,8 +1,10 @@
 #include "radial_distribution.h"
-#include "utils.h"
+#include "utils/file_utils.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
+
+std::string RadialDistributionHeader::_SIGNATURE = "RADIALDISTRIBUTIONFILE";
 
 RadialDistribution::RadialDistribution(RadialDistributionHeader header, float within_radius_distribution, float past_rmax_distribution, Histogram data) :
     m_header(header), m_data(data), m_within_radius_distribution(within_radius_distribution), m_past_rmax_distribution(past_rmax_distribution),
@@ -69,18 +71,18 @@ void RadialDistribution::write(std::string filename) const
     file.open(filename, std::ios_base::binary | std::ios_base::trunc );
 
     // First write the header
-    char * header (RADIAL_DISTRIBUTION_SIGNATURE);
-    file.write(header, RADIAL_DISTRIBUTION_SIGNATURE_LENGTH);
-    file.write((char*) Binutils::toBin(m_header.reference_id,4),4);
-    file.write((char*) Binutils::toBin(m_header.destination_id,4),4);
+    const char * header  = RadialDistributionHeader::_SIGNATURE.c_str();
+    file.write(header, RadialDistributionHeader::_SIGNATURE.length());
+    file.write((char*) FileUtils::toBin(m_header.reference_id,4),4);
+    file.write((char*) FileUtils::toBin(m_header.destination_id,4),4);
 
-    file.write((char*) Binutils::toBin(m_within_radius_distribution,4),4);
-    file.write((char*) Binutils::toBin(m_past_rmax_distribution,4),4);
+    file.write((char*) FileUtils::toBin(m_within_radius_distribution,4),4);
+    file.write((char*) FileUtils::toBin(m_past_rmax_distribution,4),4);
 
     for(std::pair<int,float> point : m_data)
     {
-        file.write((char*) Binutils::toBin((unsigned int) point.first,4),4);
-        file.write((char*) Binutils::toBin(point.second,4),4);
+        file.write((char*) FileUtils::toBin((unsigned int) point.first,4),4);
+        file.write((char*) FileUtils::toBin(point.second,4),4);
     }
 
     file.close();
@@ -100,11 +102,12 @@ bool RadialDistribution::load(std::string filename)
 
         // Check the signature
         {
-            char * memblock = new char[RADIAL_DISTRIBUTION_SIGNATURE_LENGTH+1];
-            file.read(memblock, RADIAL_DISTRIBUTION_SIGNATURE_LENGTH);
-            memblock[RADIAL_DISTRIBUTION_SIGNATURE_LENGTH] = '\0'; // Null-terminate
+            int sig_length(RadialDistributionHeader::_SIGNATURE.length());
+            char * memblock = new char[sig_length+1];
+            file.read(memblock, sig_length);
+            memblock[sig_length] = '\0'; // Null-terminate
 
-            std::string expected_signature(RADIAL_DISTRIBUTION_SIGNATURE);
+            std::string expected_signature(RadialDistributionHeader::_SIGNATURE);
             if(strcmp(memblock, expected_signature.c_str()) != 0)
             {
                 std::cerr << "File signature (" << memblock << ") is invalid! (Expected: " << expected_signature << ")" << std::endl;
@@ -121,11 +124,11 @@ bool RadialDistribution::load(std::string filename)
 
             // Reference id
             file.read(memblock, 4);
-            m_header.reference_id = Binutils::readInt32((unsigned char*) memblock);
+            m_header.reference_id = FileUtils::readInt32((unsigned char*) memblock);
 
             // Destination id
             file.read(memblock, 4);
-            m_header.destination_id = Binutils::readInt32((unsigned char*) memblock);
+            m_header.destination_id = FileUtils::readInt32((unsigned char*) memblock);
 
             delete [] memblock;
         }
@@ -138,21 +141,21 @@ bool RadialDistribution::load(std::string filename)
 
             // First the within radius distribution
             file.read(memblock, 4);
-            m_within_radius_distribution = Binutils::readFloat32((unsigned char*) memblock,4);
+            m_within_radius_distribution = FileUtils::readFloat32((unsigned char*) memblock,4);
 
             // First the within radius distribution
             file.read(memblock, 4);
-            m_past_rmax_distribution = Binutils::readFloat32((unsigned char*) memblock,4);
+            m_past_rmax_distribution = FileUtils::readFloat32((unsigned char*) memblock,4);
 
             while(file.tellg() < size)
             {
                 // R
                 file.read(memblock, 4);
-                r = Binutils::readInt32((unsigned char*) memblock,4);
+                r = FileUtils::readInt32((unsigned char*) memblock,4);
 
                 // Distribution
                 file.read(memblock, 4);
-                distribution = Binutils::readFloat32((unsigned char*) memblock,4);
+                distribution = FileUtils::readFloat32((unsigned char*) memblock,4);
 
                 m_data.insert(std::pair<int,float>(r, distribution));
             }

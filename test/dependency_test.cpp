@@ -1,7 +1,7 @@
 #include "dependency_test.h"
-#include "../dependency_analyzer.h"
+#include "../analyser/dependency_analyzer.h"
 #include "../analysis_point.h"
-#include "../distribution_factory.h"
+#include "../reproducer/distribution_factory.h"
 
 #include <QPoint>
 
