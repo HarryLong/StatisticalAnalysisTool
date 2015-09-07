@@ -34,6 +34,9 @@ set(UTILS_SRC_FILES utils/utils utils/dice_roller utils/file_utils utils/point_d
 set(REPRODUCTION_SRC_FILES reproducer/distribution_factory reproducer/point_factory reproducer/reproducer reproducer/reproduction_configuration)
 set(CORE_SRC_FILES point_spatial_hashmap category_properties point_map analysis_point radial_distribution)
 
+set(ANALYSER_API_HEADERS analyser/analysis_configuration.h analyser/analyzer.h)
+set(REPRODUCER_API_HEADERS reproducer/reproducer.h reproducer/reproduction_configuration.h)
+
 add_executable(RadialDistributionToolGUI
 ${GUI_SRC_FILES}
 ${ANALYSER_SRC_FILES}
@@ -62,3 +65,7 @@ install(TARGETS RadialDistributionAnalyser
 install(TARGETS RadialDistributionReproducer
         LIBRARY DESTINATION lib
         CONFIGURATIONS Release)
+
+# INSTALL HEADER FILES
+install(FILES ${ANALYSER_API_HEADERS} ${REPRODUCER_API_HEADERS}
+        DESTINATION include/radialDistribution)
