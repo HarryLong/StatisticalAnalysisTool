@@ -34,8 +34,9 @@ set(UTILS_SRC_FILES utils/utils utils/dice_roller utils/file_utils utils/point_d
 set(REPRODUCTION_SRC_FILES reproducer/distribution_factory reproducer/point_factory reproducer/reproducer reproducer/reproduction_configuration)
 set(CORE_SRC_FILES point_spatial_hashmap category_properties point_map analysis_point radial_distribution)
 
-set(ANALYSER_API_HEADERS analyser/analysis_configuration.h analyser/analyzer.h)
-set(REPRODUCER_API_HEADERS reproducer/reproducer.h reproducer/reproduction_configuration.h)
+set(CORE_HEADER_FILES radial_distribution.h analysis_point.h category_properties.h)
+set(ANALYSIS_HEADER_FILES analyser/analysis_configuration.h analyser/analyzer.h analyser/radial_distribution_analyzer.h analyser/category_analyzer.h )
+set(REPRODUCER_HEADER_FILES reproducer/reproducer.h reproducer/reproduction_configuration.h )
 
 add_executable(RadialDistributionToolGUI
 ${GUI_SRC_FILES}
@@ -66,6 +67,12 @@ install(TARGETS RadialDistributionReproducer
         LIBRARY DESTINATION lib
         CONFIGURATIONS Release)
 
-# INSTALL HEADER FILES
-install(FILES ${ANALYSER_API_HEADERS} ${REPRODUCER_API_HEADERS}
+# INSTALL CORE HEADER FILES
+install(FILES ${CORE_HEADER_FILES}
         DESTINATION include/radialDistribution)
+# INSTALL ANALYSIS HEADER FILES
+install(FILES ${ANALYSIS_HEADER_FILES}
+        DESTINATION include/radialDistribution/analyser)
+# INSTALL REPRODUCER HEADER FILES
+install(FILES ${REPRODUCER_HEADER_FILES}
+        DESTINATION include/radialDistribution/reproducer)

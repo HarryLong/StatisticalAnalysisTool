@@ -2,6 +2,7 @@
 #include "../category_properties.h"
 #include "../analyser/category_analyzer.h"
 #include "../reproducer/distribution_factory.h"
+#include "../analysis_point.h"
 
 void CategoryPropertiesFileTest::setUp()
 {

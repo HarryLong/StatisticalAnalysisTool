@@ -96,7 +96,7 @@ void CategoryPropertiesTracker::complete(CategoryProperties & category_propertie
  ************/
 void Analyzer::analyze(QString base_directory, std::map<int, std::vector<AnalysisPoint*> > & points, AnalysisConfiguration configuration)
 {
-    Analyzer analyzer(base_directory, points, configuration);
+    Analyzer(base_directory, points, configuration).analyze();
 }
 
 Analyzer::Analyzer(QString base_directory, std::map<int, std::vector<AnalysisPoint*> > & points, AnalysisConfiguration analysis_configuration) :
@@ -120,7 +120,14 @@ Analyzer::Analyzer(QString base_directory, std::map<int, std::vector<AnalysisPoi
         ImageUtils::printPointsToImg(input_file.toStdString(), m_points, m_analysis_conf.analysis_window_width, m_analysis_conf.analysis_window_height);
         std::cout << "Input image written to: " << input_file.toStdString() << std::endl;
     }
+}
 
+Analyzer::~Analyzer()
+{
+}
+
+void Analyzer::analyze()
+{
     // Generate the configuration file
     generate_configuration();
 
@@ -129,10 +136,6 @@ Analyzer::Analyzer(QString base_directory, std::map<int, std::vector<AnalysisPoi
 
     // Generate the category properties
     generate_category_properties();
-}
-
-Analyzer::~Analyzer()
-{
 }
 
 void Analyzer::generate_configuration()

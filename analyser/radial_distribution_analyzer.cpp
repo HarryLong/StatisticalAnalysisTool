@@ -6,7 +6,7 @@
 #include "../point_spatial_hashmap.h"
 
 RadialDistributionAnalyzer::RadialDistributionAnalyzer(AnalysisConfiguration analysis_configuration, const std::vector<AnalysisPoint*> reference_points,
-                           const std::vector<AnalysisPoint*> target_points, int reference_points_id, int destination_points_id, RadialDistributionCompletionListener * m_completion_listener) :
+                           const std::vector<AnalysisPoint*> target_points, int reference_points_id, int destination_points_id, CompletionListener * m_completion_listener) :
     m_analysis_configuration(analysis_configuration), m_reference_points(reference_points), m_target_points(target_points),
     m_reference_points_id(reference_points_id), m_target_points_id(destination_points_id), m_completion_listener(m_completion_listener)
 {

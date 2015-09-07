@@ -9,16 +9,16 @@
 #include "analysis_configuration.h"
 #include <thread>
 
-class RadialDistributionCompletionListener{
-public:
-    virtual void complete(const RadialDistribution & radial_distribution) = 0;
-};
-
 class RadialDistributionAnalyzer{
 public:
+    class CompletionListener{
+    public:
+        virtual void complete(const RadialDistribution & radial_distribution) = 0;
+    };
+
     RadialDistributionAnalyzer(AnalysisConfiguration analysis_configuration, const std::vector<AnalysisPoint*> reference_points,
                                const std::vector<AnalysisPoint*> target_points, int reference_points_id, int destination_points_id,
-                               RadialDistributionCompletionListener * m_completion_listener = NULL);
+                               CompletionListener * m_completion_listener = NULL);
     ~RadialDistributionAnalyzer();
 
     void calculateRadialDistribution(bool asynchronous = true);
@@ -36,7 +36,7 @@ public:
 private:
     void calculate_radial_distribution();
     RadialDistribution m_radial_distribution;
-    RadialDistributionCompletionListener * m_completion_listener;
+    CompletionListener * m_completion_listener;
     std::thread * m_worker;
 };
 

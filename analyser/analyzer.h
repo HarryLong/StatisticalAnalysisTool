@@ -21,6 +21,8 @@ private:
     Analyzer(QString base_directory, std::map<int, std::vector<AnalysisPoint*> > & points, AnalysisConfiguration configuration);
     ~Analyzer();
 
+    void analyze();
+
     void generate_configuration();
     void generate_pair_correlations();
     void generate_category_properties();
@@ -36,7 +38,7 @@ private:
 /*******************************
  * RADIAL DISTRIBUTION TRACKER *
  *******************************/
-class RadialDistributionTracker : public RadialDistributionCompletionListener{
+class RadialDistributionTracker : public RadialDistributionAnalyzer::CompletionListener{
 public:
     RadialDistributionTracker(QString m_output_bin_dir, QString m_output_human_readable_file);
     virtual ~RadialDistributionTracker();
@@ -50,7 +52,7 @@ public:
 /*******************************
  * CATEGORY PROPERTIES TRACKER *
  *******************************/
-class CategoryPropertiesTracker: public CategoryAnalysisCompletionListener{
+class CategoryPropertiesTracker: public CategoryAnalyzer::CompletionListener{
 public:
     CategoryPropertiesTracker(QString m_output_bin_dir, QString m_output_human_readable_file, std::set<int> category_dependencies);
     virtual~CategoryPropertiesTracker();

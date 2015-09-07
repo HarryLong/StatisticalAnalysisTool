@@ -5,7 +5,7 @@
 #include <thread>
 
 CategoryAnalyzer::CategoryAnalyzer(std::vector<AnalysisPoint *>& points, int category_id, int priority,
-                                   CategoryAnalysisCompletionListener * completion_listener, int bin_size) :
+                                   CompletionListener * completion_listener, int bin_size) :
     m_points(points), m_category_id(category_id), m_priority(priority), m_completion_listener(completion_listener),
     m_bin_size(bin_size)
 {
