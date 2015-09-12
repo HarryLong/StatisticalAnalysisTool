@@ -4,7 +4,7 @@
 #include <climits>
 #include <thread>
 
-CategoryAnalyzer::CategoryAnalyzer(std::vector<AnalysisPoint *>& points, int category_id, int priority,
+CategoryAnalyzer::CategoryAnalyzer(std::vector<AnalysisPoint> & points, int category_id, int priority,
                                    CompletionListener * completion_listener, int bin_size) :
     m_points(points), m_category_id(category_id), m_priority(priority), m_completion_listener(completion_listener),
     m_bin_size(bin_size)
@@ -31,10 +31,10 @@ void CategoryAnalyzer::calculate_category_properties()
 
     float addition_value(1.0f/m_points.size());
 
-    for(AnalysisPoint* p : m_points)
+    for(AnalysisPoint & p : m_points)
     {
-        int size(p->getRadius());
-        int bracket(CategoryAnalyzer::getBin(p->getRadius(), m_bin_size));
+        int size(p.getRadius());
+        int bracket(CategoryAnalyzer::getBin(p.getRadius(), m_bin_size));
         if(size < min)
             min = size;
         if (size > max)

@@ -11,6 +11,18 @@ AnalysisPoint::~AnalysisPoint()
 
 }
 
+bool AnalysisPoint::operator==(const AnalysisPoint & other) const
+{
+    return (this->r == other.r &&
+            this->category_id == other.category_id &&
+            this->center == other.center);
+}
+
+bool AnalysisPoint::operator!=(const AnalysisPoint & other) const
+{
+    return !this->operator ==(other);
+}
+
 int AnalysisPoint::getRadius() const
 {
     return r;

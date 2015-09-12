@@ -2,7 +2,6 @@
 
 #include "../analysis_point.h"
 #include "dependency_analyzer.h"
-#include "../analysis_point.h"
 
 #include "../utils/file_utils.h"
 #include "../utils/utils.h"
@@ -94,12 +93,12 @@ void CategoryPropertiesTracker::complete(CategoryProperties & category_propertie
 /************
  * ANALYZER *
  ************/
-void Analyzer::analyze(QString base_directory, std::map<int, std::vector<AnalysisPoint*> > & points, AnalysisConfiguration configuration)
+void Analyzer::analyze(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration configuration)
 {
     Analyzer(base_directory, points, configuration).analyze();
 }
 
-Analyzer::Analyzer(QString base_directory, std::map<int, std::vector<AnalysisPoint*> > & points, AnalysisConfiguration analysis_configuration) :
+Analyzer::Analyzer(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration analysis_configuration) :
     m_analysis_conf(analysis_configuration), m_points(points)
 {
     // Init the base directory
@@ -167,13 +166,13 @@ void Analyzer::generate_pair_correlations()
         reference_category != m_analysis_conf.priority_sorted_category_ids.end(); reference_category++)
     {
         int reference_category_id(*reference_category);
-        std::vector<AnalysisPoint*> reference_category_points(m_points.find(reference_category_id)->second);
+        std::vector<AnalysisPoint> reference_category_points(m_points.find(reference_category_id)->second);
 
         for(auto target_category(std::find(m_analysis_conf.priority_sorted_category_ids.begin(), m_analysis_conf.priority_sorted_category_ids.end(), reference_category_id));
                             target_category != m_analysis_conf.priority_sorted_category_ids.end(); target_category++)
         {
             int target_category_id(*target_category);
-            std::vector<AnalysisPoint*> target_category_points(m_points.find(target_category_id)->second);
+            std::vector<AnalysisPoint> target_category_points(m_points.find(target_category_id)->second);
 
             RadialDistributionTracker * tracker = new RadialDistributionTracker(m_radial_distribution_dir,
                                                                                  m_csv_dir);
@@ -219,7 +218,7 @@ void Analyzer::generate_category_properties()
     for(auto it(m_analysis_conf.priority_sorted_category_ids.begin()); it != m_analysis_conf.priority_sorted_category_ids.end(); it++)
     {
         int category_id(*it);
-        std::vector<AnalysisPoint*> category_points(m_points.find(category_id)->second);
+        std::vector<AnalysisPoint> category_points(m_points.find(category_id)->second);
 
         // Tracker
         std::set<int> dependent_categories;

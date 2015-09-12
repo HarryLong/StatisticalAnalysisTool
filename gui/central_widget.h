@@ -15,7 +15,7 @@ public:
     CentralWidget(int input_widget_dimension, QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~CentralWidget();
     void setInputWidgetSize(int width, int height);
-    void setInputWidgetPoints(std::vector<AnalysisPoint*>& points);
+    void setInputWidgetPoints(std::vector<AnalysisPoint>& points);
     int getActiveCategoryId();
 
 private slots:

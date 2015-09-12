@@ -16,7 +16,7 @@ RadialDistribution * TestDataFactory::generateSingleCategoryRadialDistribution(A
 
     // Create points
     DistributionFactory distribution_factory;
-    std::vector<AnalysisPoint*> points (distribution_factory.generateRandomDistribution(category_id, n_points, analysis_config.analysis_window_width, analysis_config.analysis_window_height,
+    std::vector<AnalysisPoint> points (distribution_factory.generateRandomDistribution(category_id, n_points, analysis_config.analysis_window_width, analysis_config.analysis_window_height,
                                                                                         size_range.first, size_range.second));
 
     // Create analyser
@@ -24,8 +24,8 @@ RadialDistribution * TestDataFactory::generateSingleCategoryRadialDistribution(A
     analyser.calculateRadialDistribution(false);
     RadialDistribution * radial_distribution ( new RadialDistribution(analyser.getRadialDistribution()) );
 
-    for(AnalysisPoint * p : points)
-        delete p;
+//    for(AnalysisPoint * p : points)
+//        delete p;
 
     return radial_distribution;
 }

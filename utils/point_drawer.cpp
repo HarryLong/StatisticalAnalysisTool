@@ -12,13 +12,13 @@ PointDrawer::~PointDrawer()
 {
 }
 
-void PointDrawer::drawPoint(const AnalysisPoint * p)
+void PointDrawer::drawPoint(const AnalysisPoint & p)
 {
-    Qt::GlobalColor color(m_category_to_color_map[p->getCategoryId()]);
+    Qt::GlobalColor color(m_category_to_color_map[p.getCategoryId()]);
     QPainter painter(&m_image);
     painter.setPen(color);
     painter.setBrush( color );
-    painter.drawEllipse(p->getCenter(), p->getRadius(), p->getRadius());
+    painter.drawEllipse(p.getCenter(), p.getRadius(), p.getRadius());
     painter.end();
 }
 

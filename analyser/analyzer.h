@@ -15,10 +15,10 @@ class AnalysisPoint;
 class RadialDistributionTracker;
 class Analyzer{
 public:
-     static void analyze(QString base_directory, std::map<int, std::vector<AnalysisPoint*> > & points, AnalysisConfiguration configuration);
+     static void analyze(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration configuration);
 
 private:
-    Analyzer(QString base_directory, std::map<int, std::vector<AnalysisPoint*> > & points, AnalysisConfiguration configuration);
+    Analyzer(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration configuration);
     ~Analyzer();
 
     void analyze();
@@ -32,7 +32,7 @@ private:
     QString m_cateory_properties_dir;
     QString m_csv_dir;
     const AnalysisConfiguration m_analysis_conf;
-    const std::map<int, std::vector<AnalysisPoint*> > & m_points;
+    const std::map<int, std::vector<AnalysisPoint> > m_points;
 };
 
 /*******************************

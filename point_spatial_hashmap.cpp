@@ -9,16 +9,7 @@ PointSpatialHashmap::PointSpatialHashmap(int width, int height) :
                                             std::ceil(((float)width)/SPATIAL_HASHMAP_CELL_WIDTH),
                                             std::ceil(((float)height)/SPATIAL_HASHMAP_CELL_HEIGHT))
 {
-    // Initialize all the cells
-    for(int x = 0; x < getHorizontalCellCount(); x++)
-    {
-        for(int y = 0; y < getVerticalCellCount(); y++)
-        {
-            QPoint cell_location(x,y);
-            if(!get(cell_location))
-                init_cell(cell_location);
-        }
-    }
+
 }
 
 PointSpatialHashmap::~PointSpatialHashmap()
@@ -26,43 +17,48 @@ PointSpatialHashmap::~PointSpatialHashmap()
 
 }
 
-void PointSpatialHashmap::addPoint(AnalysisPoint * p)
+void PointSpatialHashmap::addPoint(const AnalysisPoint & p)
 {
-    for(PointSpatialHashMapCell* cell : SpatialHashMap<PointSpatialHashMapCell>::getCells(p->getCenter(), p->getRadius(), false))
+    std::vector<QPoint> cells(SpatialHashMap<PointSpatialHashMapCell>::getPoints(p.getCenter(), p.getRadius(), false));
+
+    for(QPoint & c : cells)
     {
-        cell->points.push_back(p);
+        this->operator [](c).points.insert(p);
     }
 }
 
-void PointSpatialHashmap::removePoint(AnalysisPoint * p)
+void PointSpatialHashmap::removePoint(const AnalysisPoint & p)
 {
-    for(PointSpatialHashMapCell* cell : SpatialHashMap<PointSpatialHashMapCell>::getCells(p->getCenter(), p->getRadius(), false))
+    std::vector<QPoint> cells(SpatialHashMap<PointSpatialHashMapCell>::getPoints(p.getCenter(), p.getRadius(), false));
+
+    for(QPoint & c : cells)
     {
-        cell->points.erase(std::find(cell->points.begin(), cell->points.end(), p));
+        this->operator [](c).points.erase(p);
     }
 }
 
-std::vector<PointSpatialHashMapCell*> PointSpatialHashmap::getCells(const AnalysisPoint * p, int r_max)
+std::vector<QPoint> PointSpatialHashmap::get_points(const AnalysisPoint & p, int r_max)
 {
-    return SpatialHashMap<PointSpatialHashMapCell>::getCells(p->getCenter(), r_max+p->getRadius(), false);
+    return SpatialHashMap<PointSpatialHashMapCell>::getPoints(p.getCenter(), r_max+p.getRadius(), false);
 }
 
-bool PointSpatialHashmap::coversMultipleCells(AnalysisPoint * p)
+bool PointSpatialHashmap::coversMultipleCells(const AnalysisPoint & p)
 {
-    return SpatialHashMap::coversMultipleCells(p->getCenter(), p->getRadius());
+    return SpatialHashMap::coversMultipleCells(p.getCenter(), p.getRadius());
 }
 
-std::vector<AnalysisPoint*> PointSpatialHashmap::getPossibleReachablePoints(const AnalysisPoint * reference_point, int r_max)
+std::vector<AnalysisPoint> PointSpatialHashmap::getPossibleReachablePoints(const AnalysisPoint & reference_point, int r_max)
 {
-    std::vector<AnalysisPoint*> ret;
+    std::vector<AnalysisPoint> ret;
 
-    std::unordered_map<AnalysisPoint*, bool> processed_multicell_target_points;
+    std::unordered_map<AnalysisPoint, bool> processed_multicell_target_points;
 
-    std::vector<PointSpatialHashMapCell*> cells_within_r_max( getCells(reference_point, r_max) );
+    std::vector<QPoint> cells_within_r_max( get_points(reference_point, r_max) );
 
-    for(PointSpatialHashMapCell * cell : cells_within_r_max)
+    for(QPoint & c : cells_within_r_max)
     {
-        for(AnalysisPoint* destination_point : cell->points)
+        PointSpatialHashMapCell & cell (this->operator [](c));
+        for(const AnalysisPoint & destination_point : cell.points)
         {
             if(reference_point != destination_point)
             {
@@ -73,7 +69,8 @@ std::vector<AnalysisPoint*> PointSpatialHashmap::getPossibleReachablePoints(cons
                     ret.push_back(destination_point);
 
                     if(multi_cell_target_point)
-                        processed_multicell_target_points[destination_point] = true;                }
+                        processed_multicell_target_points[destination_point] = true;
+                }
             }
         }
     }

@@ -19,17 +19,14 @@ void ReproductionTest::setUp()
     analysis_config.setPrioritySortedCategoryIds(priority_sorted_category_ids);
     {
         DistributionFactory factory;
-        std::map<int, std::vector<AnalysisPoint*> >analysis_points;
+        std::map<int, std::vector<AnalysisPoint> >analysis_points;
         analysis_points[1] = (factory.generateRandomDistribution(1, 1000, 1000, 1000, 1, 10) );
         Analyzer::analyze(m_production_test_dir, analysis_points, analysis_config);
-        for(auto category_it(analysis_points.begin()); category_it != analysis_points.end(); category_it++)
-            for(auto points_it(category_it->second.begin()); points_it != category_it->second.end(); points_it++)
-                delete *points_it;
     }
 
     // Reproduce
     ReproductionConfiguration reproduction_config(m_production_test_dir, 1000, 1000, 10000);
-    std::map<int,std::vector<AnalysisPoint*> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
+    std::map<int,std::vector<AnalysisPoint> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
     Analyzer::analyze(m_reproduction_test_dir, reproduced_points, analysis_config);
 }
 

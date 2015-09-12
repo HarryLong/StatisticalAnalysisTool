@@ -10,7 +10,7 @@
 #include <chrono>
 #include <QStringList>
 
-std::map<int,std::vector<AnalysisPoint*> > RadialDistributionReproducer::reproduce(ReproductionConfiguration reproduction_configuration)
+std::map<int,std::vector<AnalysisPoint> > RadialDistributionReproducer::reproduce(ReproductionConfiguration reproduction_configuration)
 {
     if(!FileUtils::check_directory_structure(reproduction_configuration.active_directory))
     {
@@ -118,7 +118,7 @@ void RadialDistributionReproducer::startPointGeneration()
 
         if(m_active_category_points.size() > 0)
         {
-            m_all_generated_points[m_active_category_points.at(0)->getCategoryId()] = m_active_category_points;
+            m_all_generated_points[m_active_category_points.at(0).getCategoryId()] = m_active_category_points;
             total_point_count += m_active_category_points.size();
         }
 
@@ -172,7 +172,7 @@ void RadialDistributionReproducer::generate_points_through_random_moves()
          ****************/
         // Select a source point at random
         int selected_point_index (rand()%m_active_category_points.size());
-        AnalysisPoint* selected_point( m_active_category_points.at(selected_point_index) );
+        AnalysisPoint selected_point( m_active_category_points.at(selected_point_index) );
 
         // Calculate source point strength
         source_point_strength = calculate_strength(selected_point);
@@ -180,7 +180,7 @@ void RadialDistributionReproducer::generate_points_through_random_moves()
         /*********************
          * DESTINATION POINT *
          *********************/
-        AnalysisPoint * destination_point( m_point_factory.getPoint() );
+        AnalysisPoint destination_point( m_point_factory.getPoint() );
 
         // Calculate strength
         destination_point_strength = calculate_strength(destination_point);
@@ -202,7 +202,6 @@ void RadialDistributionReproducer::generate_points_through_random_moves()
         else
         {
             n_refused_moves++;
-            delete destination_point;
         }
 
         if(i%100 == 0)
@@ -288,7 +287,7 @@ void RadialDistributionReproducer::matching_density_initialize()
 
     while(m_active_category_points.size() < n_points)
     {
-        AnalysisPoint * random_point(m_point_factory.getPoint());
+        AnalysisPoint random_point(m_point_factory.getPoint());
 
         // Attempt accelerated point validity check
         accelerated_point_validity_check(random_point, valid, strength_calculation_necessary);
@@ -298,8 +297,6 @@ void RadialDistributionReproducer::matching_density_initialize()
         {
             add_destination_point(random_point);
         }
-        else
-            delete random_point;
 
         if(i++ % 10000 == 0)
         {
@@ -308,24 +305,22 @@ void RadialDistributionReproducer::matching_density_initialize()
     }
 }
 
-void RadialDistributionReproducer::add_destination_point(AnalysisPoint *point)
+void RadialDistributionReproducer::add_destination_point(const AnalysisPoint & point)
 {
-    m_point_factory.setPositionStatus(point->getCenter(), false); // Update the point factory
+    m_point_factory.setPositionStatus(point.getCenter(), false); // Update the point factory
     m_active_category_points.push_back(point); // Update the active category points vector
     m_spatial_point_storage.addPoint(point);
 }
 
-void RadialDistributionReproducer::remove_destination_point(AnalysisPoint * point, int this_category_points_index)
+void RadialDistributionReproducer::remove_destination_point(const AnalysisPoint & point, int this_category_points_index)
 {
-    m_point_factory.setPositionStatus(point->getCenter(), true); // Update the point factory
+    m_point_factory.setPositionStatus(point.getCenter(), true); // Update the point factory
     m_active_category_points.erase(m_active_category_points.begin()+this_category_points_index); // Update the active category points vector
 
     m_spatial_point_storage.removePoint(point);
-
-    delete point;
 }
 
-void RadialDistributionReproducer::accelerated_point_validity_check(const AnalysisPoint *reference_point, bool & valid, bool & strength_calculation_necessary)
+void RadialDistributionReproducer::accelerated_point_validity_check(const AnalysisPoint & reference_point, bool & valid, bool & strength_calculation_necessary)
 {
     // Check pair correlations for this point and other points present and check if any are equal to zero
     for(auto it(m_all_generated_points.begin()); it != m_all_generated_points.end(); it++)
@@ -338,14 +333,14 @@ void RadialDistributionReproducer::accelerated_point_validity_check(const Analys
     accelerated_point_validity_check(reference_point, m_point_factory.getActiveCategoryId(), valid, strength_calculation_necessary);
 }
 
-void RadialDistributionReproducer::accelerated_point_validity_check(const AnalysisPoint* reference_point, int queried_category, bool & valid,
+void RadialDistributionReproducer::accelerated_point_validity_check(const AnalysisPoint & reference_point, int queried_category, bool & valid,
                                                                     bool & strength_calculation_necessary)
 {
     // Start negative
     valid = false;
     strength_calculation_necessary = true;
 
-    const RadialDistribution distribution (get_radial_distribution(queried_category, reference_point->getCategoryId()));
+    const RadialDistribution distribution (get_radial_distribution(queried_category, reference_point.getCategoryId()));
     if(distribution.getMinimum() == 0)
     {
         if(distribution.m_past_rmax_distribution == 0)
@@ -359,14 +354,14 @@ void RadialDistributionReproducer::accelerated_point_validity_check(const Analys
         if(distribution.m_within_radius_distribution == 0) // most probable, just attempt to find points
         {
             QLineF line;
-            line.setP1(reference_point->getCenter());
-            std::vector<AnalysisPoint*> possible_reachable_points = m_spatial_point_storage.getPossibleReachablePoints(reference_point,0);
-            for(AnalysisPoint * p : possible_reachable_points)
+            line.setP1(reference_point.getCenter());
+            std::vector<AnalysisPoint> possible_reachable_points = m_spatial_point_storage.getPossibleReachablePoints(reference_point,0);
+            for(AnalysisPoint & p : possible_reachable_points)
             {
-                if(p->getCategoryId() == queried_category)
+                if(p.getCategoryId() == queried_category)
                 {
-                    line.setP2(p->getCenter());
-                    float distance(line.length()-p->getRadius()); // Distance from the reference points circumference [remove the radius]
+                    line.setP2(p.getCenter());
+                    float distance(line.length()-p.getRadius()); // Distance from the reference points circumference [remove the radius]
 
                     if(distance < 0) // within radius
                     {
@@ -384,21 +379,21 @@ void RadialDistributionReproducer::accelerated_point_validity_check(const Analys
     strength_calculation_necessary = false;
 }
 
-float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* reference_point)
+float RadialDistributionReproducer::calculate_strength(const AnalysisPoint & reference_point)
 {
-    std::vector<AnalysisPoint*> possible_reachable_points(m_spatial_point_storage.getPossibleReachablePoints(reference_point, m_analysis_configuration.r_max));
+    std::vector<AnalysisPoint> possible_reachable_points(m_spatial_point_storage.getPossibleReachablePoints(reference_point, m_analysis_configuration.r_max));
 
     return calculate_strength(reference_point, possible_reachable_points);
 }
 
-float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* candidate_point, const std::vector<AnalysisPoint*> & existing_points)
+float RadialDistributionReproducer::calculate_strength(const AnalysisPoint & candidate_point, const std::vector<AnalysisPoint> & existing_points)
 {
     float strength(1.0f);
 
     QLineF line;
-    line.setP1(candidate_point->getCenter());
+    line.setP1(candidate_point.getCenter());
 
-    CategoryProperties category_properties (m_category_properties.find(candidate_point->getCategoryId())->second);
+    CategoryProperties category_properties (m_category_properties.find(candidate_point.getCategoryId())->second);
     std::set<int> dependent_category_ids(category_properties.m_header.category_dependent_ids);
 
     bool within_radius_of_dependent_point ( dependent_category_ids.empty() );
@@ -407,20 +402,20 @@ float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* cand
     for(auto it(m_all_generated_points.begin()); it != m_all_generated_points.end(); it++)
         category_points_processed.insert(std::pair<int,int>(it->first, 0));
 
-    for(AnalysisPoint* existing_point : existing_points)
+    for(const AnalysisPoint & existing_point : existing_points)
     {        
         // Get the pair correlation
-        const RadialDistribution & radial_distribution( get_radial_distribution(existing_point->getCategoryId(), candidate_point->getCategoryId()) );
+        const RadialDistribution & radial_distribution( get_radial_distribution(existing_point.getCategoryId(), candidate_point.getCategoryId()) );
 
-        line.setP2(existing_point->getCenter());
-        float distance(line.length()-existing_point->getRadius()); // Distance from the reference points circumference [remove the radius]
+        line.setP2(existing_point.getCenter());
+        float distance(line.length()-existing_point.getRadius()); // Distance from the reference points circumference [remove the radius]
 
         // Check if its within the radius
         if(distance < .0f) // within radius
         {
-            category_points_processed[existing_point->getCategoryId()]++;
+            category_points_processed[existing_point.getCategoryId()]++;
             if(!within_radius_of_dependent_point)
-                within_radius_of_dependent_point = (std::find(dependent_category_ids.begin(), dependent_category_ids.end(), existing_point->getCategoryId()) != dependent_category_ids.end());
+                within_radius_of_dependent_point = (std::find(dependent_category_ids.begin(), dependent_category_ids.end(), existing_point.getCategoryId()) != dependent_category_ids.end());
             strength *= radial_distribution.m_within_radius_distribution;
         }
         else
@@ -428,7 +423,7 @@ float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* cand
             int r_bracket ( RadialDistributionUtils::getRBracket(distance, m_analysis_configuration.r_min, m_analysis_configuration.r_diff) );
             if(r_bracket < m_analysis_configuration.r_max)
             {
-                category_points_processed[existing_point->getCategoryId()]++;
+                category_points_processed[existing_point.getCategoryId()]++;
                 strength *= radial_distribution.m_data.find(r_bracket)->second;
             }
         }
@@ -442,12 +437,12 @@ float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* cand
         {
             int category_id(it->first);
             int remainding_points_of_category;
-            if(category_id == candidate_point->getCategoryId())
+            if(category_id == candidate_point.getCategoryId())
                 remainding_points_of_category = m_active_category_points.size() - it->second;
             else
                 remainding_points_of_category = m_all_generated_points[category_id].size() - it->second;
             // Get the pair correlation
-            const RadialDistribution & radial_distribution( get_radial_distribution(category_id, candidate_point->getCategoryId()) );
+            const RadialDistribution & radial_distribution( get_radial_distribution(category_id, candidate_point.getCategoryId()) );
 
             strength += (remainding_points_of_category * radial_distribution.m_past_rmax_distribution);
         }
@@ -457,7 +452,7 @@ float RadialDistributionReproducer::calculate_strength(const AnalysisPoint* cand
     return 0; // Not within radius of dependent point
 }
 
-std::map<int,std::vector<AnalysisPoint*> >& RadialDistributionReproducer::getGeneratedPoints()
+std::map<int,std::vector<AnalysisPoint> >& RadialDistributionReproducer::getGeneratedPoints()
 {
     return m_all_generated_points;
 }

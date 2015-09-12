@@ -21,8 +21,8 @@ public:
 private:
     void setup_dependent_points();
     void setup_independent_points();
-    std::map<int, std::vector<AnalysisPoint*> > m_dependent_points;
-    std::map<int, std::vector<AnalysisPoint*> > m_independent_points;
+    std::map<int, std::vector<AnalysisPoint> > m_dependent_points;
+    std::map<int, std::vector<AnalysisPoint> > m_independent_points;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( DependencyTest );

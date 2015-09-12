@@ -5,8 +5,8 @@
 #include "../utils/utils.h"
 #include "../point_spatial_hashmap.h"
 
-RadialDistributionAnalyzer::RadialDistributionAnalyzer(AnalysisConfiguration analysis_configuration, const std::vector<AnalysisPoint*> reference_points,
-                           const std::vector<AnalysisPoint*> target_points, int reference_points_id, int destination_points_id, CompletionListener * m_completion_listener) :
+RadialDistributionAnalyzer::RadialDistributionAnalyzer(AnalysisConfiguration analysis_configuration, const std::vector<AnalysisPoint> reference_points,
+                           const std::vector<AnalysisPoint> target_points, int reference_points_id, int destination_points_id, CompletionListener * m_completion_listener) :
     m_analysis_configuration(analysis_configuration), m_reference_points(reference_points), m_target_points(target_points),
     m_reference_points_id(reference_points_id), m_target_points_id(destination_points_id), m_completion_listener(m_completion_listener)
 {
@@ -42,8 +42,10 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
     // Optimization: build a spatial hashmap
     PointSpatialHashmap spatial_point_storage(m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height);
 
-    for(AnalysisPoint* p : m_target_points)
-        spatial_point_storage.getCell(p->getCenter(), true)->points.push_back(p);
+    for(const AnalysisPoint & p : m_target_points)
+    {
+        spatial_point_storage.getCell(p.getCenter()).points.insert(p);
+    }
 
     int total_area( m_analysis_configuration.analysis_window_width * m_analysis_configuration.analysis_window_height );
 
@@ -62,36 +64,36 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
 
     int n_pairs_processed(0);
     int reference_points_processed(0);
-    for(AnalysisPoint * reference_point : m_reference_points)
+    for(const AnalysisPoint & reference_point : m_reference_points)
     {
         if(reference_points_processed++ % 100 == 0)
             std::cout << "Points processed: " << reference_points_processed << " / " << m_reference_points.size() << std::endl;
 
-        std::vector<AnalysisPoint*> possible_reachable_points(spatial_point_storage.getPossibleReachablePoints(reference_point, m_analysis_configuration.r_max));
+        std::vector<AnalysisPoint> possible_reachable_points(spatial_point_storage.getPossibleReachablePoints(reference_point, m_analysis_configuration.r_max));
         int processed_points(0);
 
         std::map<int,double> annular_shell_areas; // Caching
         // Within radius area
         float within_radius_area;
-        if(RadialDistributionAnalyzer::overflows_border(reference_point->getCenter(), reference_point->getRadius(), m_analysis_configuration.analysis_window_width,
+        if(RadialDistributionAnalyzer::overflows_border(reference_point.getCenter(), reference_point.getRadius(), m_analysis_configuration.analysis_window_width,
                                                             m_analysis_configuration.analysis_window_height))
         {
-            within_radius_area = RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), reference_point->getRadius(),
+            within_radius_area = RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point.getCenter(), reference_point.getRadius(),
                                                                 m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height);
         }
         else
-            within_radius_area = GeometricUtils::getCircleArea(reference_point->getRadius());
+            within_radius_area = GeometricUtils::getCircleArea(reference_point.getRadius());
 
         if(possible_reachable_points.size() > 0)
         {
             n_pairs_processed += possible_reachable_points.size();
-            line.setP1(reference_point->getCenter());
+            line.setP1(reference_point.getCenter());
 
-            for(AnalysisPoint* target_point : possible_reachable_points)
+            for(AnalysisPoint & target_point : possible_reachable_points)
             {
-                line.setP2(target_point->getCenter());
+                line.setP2(target_point.getCenter());
 
-                float distance(line.length()-reference_point->getRadius()); // Distance from the reference points circumference [remove the radius]
+                float distance(line.length()-reference_point.getRadius()); // Distance from the reference points circumference [remove the radius]
 
                 if((m_analysis_configuration.r_min == 0 || distance >= m_analysis_configuration.r_min) && distance < m_analysis_configuration.r_max)
                 {
@@ -106,13 +108,13 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
                         if(annular_shell_areas.find(r_bracket) == annular_shell_areas.end())
                         {
                             // Small circle
-                            int small_circle_radius( reference_point->getRadius() + r_bracket );
+                            int small_circle_radius( reference_point.getRadius() + r_bracket );
                             double small_circle_area;
-                            if(RadialDistributionAnalyzer::overflows_border(reference_point->getCenter(), small_circle_radius,
+                            if(RadialDistributionAnalyzer::overflows_border(reference_point.getCenter(), small_circle_radius,
                                                                             m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height))
                             {
                                 small_circle_area =
-                                        RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), small_circle_radius,
+                                        RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point.getCenter(), small_circle_radius,
                                                             m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height);
                             }
                             else
@@ -123,11 +125,11 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
                             // Large circle
                             int large_circle_radius (small_circle_radius + m_analysis_configuration.r_diff);
                             double large_circle_area;
-                            if(RadialDistributionAnalyzer::overflows_border(reference_point->getCenter(), large_circle_radius,
+                            if(RadialDistributionAnalyzer::overflows_border(reference_point.getCenter(), large_circle_radius,
                                                                             m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height))
                             {
                                 large_circle_area =
-                                        RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), large_circle_radius,
+                                        RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point.getCenter(), large_circle_radius,
                                                             m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height);
                             }
                             else
@@ -145,17 +147,17 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
             // Remaining points
             // Past radius area
             float past_radius_area;
-            if(RadialDistributionAnalyzer::overflows_border(reference_point->getCenter(), m_analysis_configuration.r_max+ reference_point->getRadius(), m_analysis_configuration.analysis_window_width,
+            if(RadialDistributionAnalyzer::overflows_border(reference_point.getCenter(), m_analysis_configuration.r_max+ reference_point.getRadius(), m_analysis_configuration.analysis_window_width,
                                                                 m_analysis_configuration.analysis_window_height))
             {
-                double large_circle_area = RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point->getCenter(), m_analysis_configuration.r_max+ reference_point->getRadius(),
+                double large_circle_area = RadialDistributionAnalyzer::calculate_bordered_circle_area(reference_point.getCenter(), m_analysis_configuration.r_max+ reference_point.getRadius(),
                                                                     m_analysis_configuration.analysis_window_width, m_analysis_configuration.analysis_window_height);
                 past_radius_area = (m_analysis_configuration.analysis_window_height*m_analysis_configuration.analysis_window_width) - large_circle_area;
             }
             else
             {
                 past_radius_area = (m_analysis_configuration.analysis_window_height*m_analysis_configuration.analysis_window_width) -
-                        GeometricUtils::getCircleArea(m_analysis_configuration.r_max+ reference_point->getRadius());
+                        GeometricUtils::getCircleArea(m_analysis_configuration.r_max+ reference_point.getRadius());
             }
             past_rmax_distribution += (m_target_points.size()-processed_points)*(constant_normalization_factor / past_radius_area);
         }

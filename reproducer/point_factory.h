@@ -16,7 +16,7 @@ public:
     PointFactory(int max_width, int max_height);
     ~PointFactory();
 
-    AnalysisPoint* getPoint();
+    AnalysisPoint getPoint();
     void setPositionStatus(QPoint point, bool available);
     void setCategoryProperties(CategoryProperties properties);
     int getActiveCategoryId();

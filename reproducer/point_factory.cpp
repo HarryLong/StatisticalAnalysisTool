@@ -20,7 +20,7 @@ void PointFactory::setCategoryProperties(CategoryProperties properties)
     int current_percentage(0);
     m_probability_to_bin_size_pairs.clear();
 
-    int i(0);
+    unsigned int i(0);
     for(std::pair<int,float> size_percentage_pair : properties.m_data)
     {
         if(size_percentage_pair.second > 0)
@@ -44,7 +44,7 @@ void PointFactory::setPositionStatus(QPoint point, bool available)
         m_taken_points.insertPoint(point);
 }
 
-AnalysisPoint* PointFactory::getPoint()
+AnalysisPoint PointFactory::getPoint()
 {
     if(m_active_category_id == -1)
     {
@@ -70,9 +70,7 @@ AnalysisPoint* PointFactory::getPoint()
         size = (it->second + (m_dice_roller.generate()%m_point_size_diffs));
     }
 
-    AnalysisPoint * ret (new AnalysisPoint(m_active_category_id, position, size));
-
-    return ret;
+    return AnalysisPoint(m_active_category_id, position, size);
 }
 
 int PointFactory::getActiveCategoryId()

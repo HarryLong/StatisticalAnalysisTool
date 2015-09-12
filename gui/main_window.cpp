@@ -114,7 +114,7 @@ void MainWindow::generate_random_distribution()
     int min_point_radius( m_random_distribution_producer_dlg->getMinimumRadius() );
     int max_point_radius( m_random_distribution_producer_dlg->getMaximumRadius() );
 
-    std::vector<AnalysisPoint*> generated_points( m_distribution_factory.generateRandomDistribution(m_central_widget->getActiveCategoryId(), n_points, m_input_widget_width, m_input_widget_height,
+    std::vector<AnalysisPoint> generated_points( m_distribution_factory.generateRandomDistribution(m_central_widget->getActiveCategoryId(), n_points, m_input_widget_width, m_input_widget_height,
                                                                                                     min_point_radius, max_point_radius) );
     m_central_widget->setInputWidgetPoints( generated_points );
 }
@@ -128,7 +128,7 @@ void MainWindow::generate_clustered_distribution()
     int min_point_radius( m_clustered_distribution_producer_dlg->getMinimumRadius() );
     int max_point_radius( m_clustered_distribution_producer_dlg->getMaximumRadius() );
 
-    std::vector<AnalysisPoint*> generated_points( m_distribution_factory.generateSeededDistribution(m_central_widget->getActiveCategoryId(), n_seed_points, n_seeding_iterations, max_seeding_distance,
+    std::vector<AnalysisPoint> generated_points( m_distribution_factory.generateSeededDistribution(m_central_widget->getActiveCategoryId(), n_seed_points, n_seeding_iterations, max_seeding_distance,
                                                                                             m_input_widget_width, m_input_widget_height,
                                                                                             min_point_radius, max_point_radius, equidistant_seeds)  );
 
@@ -153,7 +153,7 @@ void MainWindow::launch_reproduction_configuration_producer_dialog()
 void MainWindow::reproduce()
 {
     ReproductionConfiguration reproduction_config( m_reproduction_configuration_producer_dlg->getConfiguration() );
-    std::map<int,std::vector<AnalysisPoint*> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
+    std::map<int,std::vector<AnalysisPoint> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
     ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputFile().toStdString(),
                                  reproduced_points, reproduction_config.width, reproduction_config.height);
 

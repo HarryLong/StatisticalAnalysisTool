@@ -56,7 +56,6 @@ InputWidget::InputWidget(int width, int height, QWidget* parent, Qt::WindowFlags
 
 InputWidget::~InputWidget()
 {
-    delete_points();
 }
 
 void InputWidget::init_layout()
@@ -68,10 +67,10 @@ void InputWidget::init_layout()
     setLayout(layout);
 }
 
-void InputWidget::addPoint(AnalysisPoint * point)
+void InputWidget::addPoint(const AnalysisPoint & point)
 {
     if(m_points.find(m_active_category) == m_points.end())
-        m_points.insert(std::pair<int, std::vector<AnalysisPoint*> >(m_active_category, std::vector<AnalysisPoint*>()));
+        m_points.insert(std::pair<int, std::vector<AnalysisPoint> >(m_active_category, std::vector<AnalysisPoint>()));
     m_points[m_active_category].push_back(point);
     m_point_drawer.drawPoint(point);
     refresh();
@@ -86,12 +85,12 @@ void InputWidget::setSize(int width, int height)
     {
         for(auto points_it(categories_it->second.begin()); points_it != categories_it->second.end(); points_it++)
         {
-            AnalysisPoint * point (*points_it);
+            AnalysisPoint & point (*points_it);
             QPoint new_center(
-                        (((float)point->getCenter().x())/m_width) * width, //x
-                        (((float)point->getCenter().y())/m_height) * height
+                        (((float)point.getCenter().x())/m_width) * width, //x
+                        (((float)point.getCenter().y())/m_height) * height
                         );
-            point->setCenter(new_center);
+            point.setCenter(new_center);
 
             m_point_drawer.drawPoint(point);
         }
@@ -109,23 +108,21 @@ void InputWidget::refresh()
 void InputWidget::mouse_pressed(QMouseEvent * event)
 {
     if (event->button() == Qt::LeftButton)
-        addPoint(new AnalysisPoint(m_active_category, event->pos(), m_point_size));
+        addPoint(AnalysisPoint(m_active_category, event->pos(), m_point_size));
 }
 
 void InputWidget::clear()
 {
-    delete_points();;
     m_points.clear();
     m_point_drawer.reset();
     refresh();
 }
 
-void InputWidget::setPoints(std::vector<AnalysisPoint*> &points)
+void InputWidget::setPoints(std::vector<AnalysisPoint> &points)
 {
-    delete_points();
     m_points.clear();
     m_point_drawer.reset();
-    for(AnalysisPoint* p : points)
+    for(AnalysisPoint & p : points)
         addPoint(p);
 
     refresh();
@@ -141,7 +138,7 @@ int InputWidget::getHeight() const
     return m_height;
 }
 
-std::map<int,std::vector<AnalysisPoint*> > & InputWidget::getPoints()
+std::map<int,std::vector<AnalysisPoint> > & InputWidget::getPoints()
 {
     return m_points;
 }
@@ -154,11 +151,4 @@ void InputWidget::setPointSize(int size)
 void InputWidget::setAciveCategoryId(int category_id)
 {
     m_active_category = category_id;
-}
-
-void InputWidget::delete_points()
-{
-    for(auto it(m_points.begin()); it != m_points.end(); it++)
-        for(auto it2(it->second.begin()); it2 != it->second.end(); it2++)
-            delete *it2;
 }

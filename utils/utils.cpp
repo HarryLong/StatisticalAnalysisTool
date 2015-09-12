@@ -42,7 +42,7 @@ float GeometricUtils::getCircleArea(int radius)
 /***************
  * IMAGE UTILS *
  ***************/
-void ImageUtils::printPointsToImg(std::string image_file, const std::map<int,std::vector<AnalysisPoint*> > & points, int width, int height)
+void ImageUtils::printPointsToImg(std::string image_file, const std::map<int,std::vector<AnalysisPoint> > & points, int width, int height)
 {
     PointDrawer drawer(width, height);
 

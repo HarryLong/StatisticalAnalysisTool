@@ -16,8 +16,8 @@ public:
         virtual void complete(const RadialDistribution & radial_distribution) = 0;
     };
 
-    RadialDistributionAnalyzer(AnalysisConfiguration analysis_configuration, const std::vector<AnalysisPoint*> reference_points,
-                               const std::vector<AnalysisPoint*> target_points, int reference_points_id, int destination_points_id,
+    RadialDistributionAnalyzer(AnalysisConfiguration analysis_configuration, const std::vector<AnalysisPoint> reference_points,
+                               const std::vector<AnalysisPoint> target_points, int reference_points_id, int destination_points_id,
                                CompletionListener * m_completion_listener = NULL);
     ~RadialDistributionAnalyzer();
 
@@ -29,8 +29,8 @@ public:
     static double calculate_bordered_circle_area(QPoint center, int radius, int width, int height);
 
     const AnalysisConfiguration m_analysis_configuration;
-    const std::vector<AnalysisPoint*> m_reference_points;
-    const std::vector<AnalysisPoint*> m_target_points;
+    const std::vector<AnalysisPoint> m_reference_points;
+    const std::vector<AnalysisPoint> m_target_points;
     const int m_reference_points_id;
     const int m_target_points_id;
 private:

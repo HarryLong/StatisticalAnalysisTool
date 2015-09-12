@@ -29,7 +29,7 @@ namespace GeometricUtils{
  ***************/
 class AnalysisPoint;
 namespace ImageUtils{
-    void printPointsToImg(std::string image_file, const std::map<int,std::vector<AnalysisPoint*> > & points, int width, int height);
+    void printPointsToImg(std::string image_file, const std::map<int,std::vector<AnalysisPoint> > & points, int width, int height);
 }
 
 #endif //UTILS_H

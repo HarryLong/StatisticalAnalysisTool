@@ -46,9 +46,9 @@ public:
     ~InputWidget();
     int getWidth() const;
     int getHeight() const;
-    void setPoints(std::vector<AnalysisPoint*> & points);
-    std::map<int,std::vector<AnalysisPoint*> > & getPoints();
-    void addPoint(AnalysisPoint * point);
+    void setPoints(std::vector<AnalysisPoint> & points);
+    std::map<int,std::vector<AnalysisPoint> > & getPoints();
+    void addPoint(const AnalysisPoint & point);
 
 public slots:
     void setSize(int width, int height);
@@ -60,7 +60,6 @@ public slots:
 private:
     void refresh();
     void init_layout();
-    void delete_points();
 
     int m_point_size;
     int m_active_category;
@@ -68,7 +67,7 @@ private:
     PointDrawer m_point_drawer;
     MySignaledLabel m_container_lbl;
 
-    std::map<int,std::vector<AnalysisPoint*> > m_points;
+    std::map<int,std::vector<AnalysisPoint> > m_points;
 };
 
 #endif // INPUT_WIDGET_H

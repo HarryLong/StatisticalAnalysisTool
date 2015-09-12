@@ -13,50 +13,44 @@ void DependencyTest::setUp()
 
 void DependencyTest::tearDown()
 {
-    for(auto category_it(m_dependent_points.begin()); category_it != m_dependent_points.end(); category_it++)
-        for(auto point_it(category_it->second.begin()); point_it != category_it->second.end(); point_it++)
-            delete *point_it;
 
-    for(auto category_it(m_independent_points.begin()); category_it != m_independent_points.end(); category_it++)
-        for(auto point_it(category_it->second.begin()); point_it != category_it->second.end(); point_it++)
-            delete *point_it;
 }
 
 void DependencyTest::setup_dependent_points()
 {
-    std::vector<AnalysisPoint*> category_1_points;
-    category_1_points.push_back(new AnalysisPoint(1, QPoint(250,250), 10));
-    category_1_points.push_back(new AnalysisPoint(1, QPoint(200,200), 5));
-    category_1_points.push_back(new AnalysisPoint(1, QPoint(80,80), 5));
-    category_1_points.push_back(new AnalysisPoint(1, QPoint(20,20), 10));
+    std::vector<AnalysisPoint> category_1_points;
+    category_1_points.push_back(AnalysisPoint(1, QPoint(250,250), 10));
+    category_1_points.push_back(AnalysisPoint(1, QPoint(200,200), 5));
+    category_1_points.push_back(AnalysisPoint(1, QPoint(80,80), 5));
+    category_1_points.push_back(AnalysisPoint(1, QPoint(20,20), 10));
 
-    m_dependent_points.insert(std::pair<int, std::vector<AnalysisPoint*> >(1, category_1_points));
+    m_dependent_points.emplace(1, category_1_points);
 
     // Add the category 2 points
-    std::vector<AnalysisPoint*> category_2_points;
+    std::vector<AnalysisPoint> category_2_points;
     for(int i(1); i < 10; i++)
     {
-        category_2_points.push_back(new AnalysisPoint(2, QPoint(250-i,250), 1));
-        category_2_points.push_back(new AnalysisPoint(2, QPoint(250,250-i), 1));
+        category_2_points.push_back(AnalysisPoint(2, QPoint(250-i,250), 1));
+        category_2_points.push_back(AnalysisPoint(2, QPoint(250,250-i), 1));
 
-        category_2_points.push_back(new AnalysisPoint(2, QPoint(250+i,250), 1));
-        category_2_points.push_back(new AnalysisPoint(2, QPoint(250,250+i), 1));
+        category_2_points.push_back(AnalysisPoint(2, QPoint(250+i,250), 1));
+        category_2_points.push_back(AnalysisPoint(2, QPoint(250,250+i), 1));
     }
-    m_dependent_points.insert(std::pair<int, std::vector<AnalysisPoint*> >(2, category_2_points));
+    m_dependent_points.emplace(2, category_2_points);
 }
 
 void DependencyTest::setup_independent_points()
 {
     DistributionFactory factory;
-    std::vector<AnalysisPoint*> c1_points(factory.generateRandomDistribution(1, 500, 240, 500, 1, 10));
-    std::vector<AnalysisPoint*> c2_points(factory.generateRandomDistribution(2, 500, 240, 500, 1, 10));
+    std::vector<AnalysisPoint> c1_points(factory.generateRandomDistribution(1, 500, 240, 500, 1, 10));
+    std::vector<AnalysisPoint> c2_points(factory.generateRandomDistribution(2, 500, 240, 500, 1, 10));
 
     //shift all c2 points by 250
-    for(AnalysisPoint * p : c2_points)
-        p->setCenter(QPoint(p->getCenter().x() + 250, p->getCenter().y()));
+    for(AnalysisPoint & p : c2_points)
+        p.setCenter(QPoint(p.getCenter().x() + 250, p.getCenter().y()));
 
-    m_independent_points.insert(std::pair<int, std::vector<AnalysisPoint*> >(1, c1_points));
-    m_independent_points.insert(std::pair<int, std::vector<AnalysisPoint*> >(2, c2_points));
+    m_independent_points.emplace(1, c1_points);
+    m_independent_points.emplace(2, c2_points);
 }
 
 void DependencyTest::testInDependent()

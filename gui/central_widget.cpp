@@ -33,7 +33,7 @@ void CentralWidget::launch_analysis_configuration_producer_dialog()
     m_analysis_configuration_producer_dialog->exec();
 }
 
-void CentralWidget::setInputWidgetPoints(std::vector<AnalysisPoint*> &points)
+void CentralWidget::setInputWidgetPoints(std::vector<AnalysisPoint> &points)
 {
     m_input_widget.setPoints(points);
 }
@@ -104,7 +104,7 @@ void CentralWidget::analyse()
     AnalysisConfiguration analysis_configuration( m_analysis_configuration_producer_dialog->getConfiguration() );
 
     // Get analysis points
-    std::map<int,std::vector<AnalysisPoint*> > categorised_points(m_input_widget.getPoints());
+    std::map<int,std::vector<AnalysisPoint> > categorised_points(m_input_widget.getPoints());
 
     // Build vector of categories sorted by priority. Here, we simply use the category id as priority (1 higher than 2)
     for(auto it(categorised_points.begin()); it != categorised_points.end(); it++)

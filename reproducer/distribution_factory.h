@@ -10,9 +10,9 @@ class DistributionFactory
 {
 public:
     DistributionFactory();
-    std::vector<AnalysisPoint*> generateRandomDistribution(int category_id, int p_number_of_points, int width, int height, int min_radius = 1, int max_radius = 1);
-    std::vector<AnalysisPoint*> generateGriddedDistribution(int category_id, int p_grid_seperation, int width, int height, int min_radius = 1, int max_radius = 1);
-    std::vector<AnalysisPoint*> generateSeededDistribution(int category_id, int n_seeds, int n_seeding_iterations, int max_seeding_distance,
+    std::vector<AnalysisPoint> generateRandomDistribution(int category_id, int p_number_of_points, int width, int height, int min_radius = 1, int max_radius = 1);
+    std::vector<AnalysisPoint> generateGriddedDistribution(int category_id, int p_grid_seperation, int width, int height, int min_radius = 1, int max_radius = 1);
+    std::vector<AnalysisPoint> generateSeededDistribution(int category_id, int n_seeds, int n_seeding_iterations, int max_seeding_distance,
                                                    int width, int height, int min_radius = 1, int max_radius = 1, bool equidistant = false);
 private:
 

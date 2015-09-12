@@ -8,14 +8,12 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 
-include_directories("${CMAKE_SOURCE_DIR}/include/spatial_hashmap/"
-                    ${QT_QTCORE_INCLUDE_DIR}
-                    ${QT_QTGUI_INCLUDE_DIR}
-                    ${QT_QTWIDGETS_INCLUDE_DIR})
+set(INCLUDE_DIRECTORIES ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS})
+
+include_directories(${INCLUDE_DIRECTORIES})
 
 set(GUI_LIBS Qt5::Widgets Qt5::Core Qt5::Gui)
 set(LIB_LIBS Qt5::Core Qt5::Gui)
-
 
 add_subdirectory("test")
 

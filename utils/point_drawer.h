@@ -12,7 +12,7 @@ public:
     PointDrawer(int width, int height);
     ~PointDrawer();
 
-    void drawPoint(const AnalysisPoint * c);
+    void drawPoint(const AnalysisPoint & c);
     void reset();
 
     int getWidth() const;
