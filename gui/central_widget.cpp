@@ -6,13 +6,16 @@
 
 #include <QBoxLayout>
 #include <iostream>
+#include <QProgressBar>
 
 CentralWidget::CentralWidget(int input_widget_dimension, QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f),
     m_input_widget(input_widget_dimension, input_widget_dimension, this),
-    m_analysis_configuration_producer_dialog(new AnalysisConfigurationProducerDialog)
+    m_analysis_configuration_producer_dialog(new AnalysisConfigurationProducerDialog),
+    m_progress_bar(new QProgressBar(this))
 {
     connect(m_analysis_configuration_producer_dialog, SIGNAL(accepted()), this, SLOT(analyse()));
     setInputWidgetSize(input_widget_dimension, input_widget_dimension);
+    m_progress_bar->setVisible(false);
 
     init_layout();
 }
@@ -46,6 +49,13 @@ int CentralWidget::getActiveCategoryId()
 void CentralWidget::init_layout()
 {
     QVBoxLayout * layout = new QVBoxLayout;
+
+    // The progress bar
+    {
+        QHBoxLayout * h_layout = new QHBoxLayout;
+        h_layout->addWidget(m_progress_bar, 0, Qt::AlignCenter);
+        layout->addLayout(h_layout,0);
+    }
 
     // The input
     {
@@ -110,6 +120,8 @@ void CentralWidget::analyse()
     for(auto it(categorised_points.begin()); it != categorised_points.end(); it++)
         analysis_configuration.priority_sorted_category_ids.push_back(it->first);
 
-    Analyzer::analyze(m_analysis_configuration_producer_dialog->getOutputDir(), categorised_points, analysis_configuration);
+    m_progress_bar->setVisible(true);
+    Analyzer::analyze(m_analysis_configuration_producer_dialog->getOutputDir(), categorised_points, analysis_configuration, m_progress_bar);
+    m_progress_bar->setVisible(false);
 }
 

@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <thread>
+#include <QProgressBar>
 
 /*******************************
  * RADIAL DISTRIBUTION TRACKER *
@@ -93,13 +94,14 @@ void CategoryPropertiesTracker::complete(CategoryProperties & category_propertie
 /************
  * ANALYZER *
  ************/
-void Analyzer::analyze(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration configuration)
+void Analyzer::analyze(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration configuration, QProgressBar * progress_bar)
 {
-    Analyzer(base_directory, points, configuration).analyze();
+    Analyzer(base_directory, points, configuration, progress_bar).analyze();
 }
 
-Analyzer::Analyzer(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration analysis_configuration) :
-    m_analysis_conf(analysis_configuration), m_points(points)
+Analyzer::Analyzer(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration analysis_configuration,
+                   QProgressBar * progress_bar) :
+    m_analysis_conf(analysis_configuration), m_points(points), m_progress_bar(progress_bar)
 {
     // Init the base directory
     if(!base_directory.endsWith("/"))
@@ -157,10 +159,13 @@ void Analyzer::generate_configuration()
     }
 }
 
+#include <QDebug>
 void Analyzer::generate_pair_correlations()
 {
     std::vector<RadialDistributionAnalyzer*> radial_distribution_analyzers;
     std::vector<RadialDistributionTracker*> radial_distribution_trackers;
+
+    int n_radial_distributions(0);
 
     for(auto reference_category(m_analysis_conf.priority_sorted_category_ids.begin());
         reference_category != m_analysis_conf.priority_sorted_category_ids.end(); reference_category++)
@@ -183,18 +188,29 @@ void Analyzer::generate_pair_correlations()
             radial_distribution_trackers.push_back(tracker);
 
             analyzer->calculateRadialDistribution();
+
+            n_radial_distributions++;
         }
     }
+
+    if(m_progress_bar)
+        m_progress_bar->setRange(0,n_radial_distributions);
 
     // Wait for all the radial distribution analysis workers to be done before returning
     {
         bool workers_complete(false);
         while (!workers_complete)
         {
-            auto it(radial_distribution_trackers.begin());
-            workers_complete = (it == radial_distribution_trackers.end() || (*it)->m_complete.load());
-            while(workers_complete && (++it != radial_distribution_trackers.end()))
-                 workers_complete = workers_complete && (*it)->m_complete.load();
+            int complete_count(0);
+            for(auto it(radial_distribution_trackers.begin()); it != radial_distribution_trackers.end(); it++)
+            {
+                if((*it)->m_complete.load())
+                    complete_count++;
+            }
+            workers_complete = (complete_count == n_radial_distributions);
+
+            if(m_progress_bar)
+                m_progress_bar->setValue(workers_complete);
 
             if(!workers_complete)
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));

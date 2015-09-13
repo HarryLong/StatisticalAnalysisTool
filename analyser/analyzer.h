@@ -11,14 +11,15 @@
 
 #include <atomic>
 
+class QProgressBar;
 class AnalysisPoint;
 class RadialDistributionTracker;
 class Analyzer{
 public:
-     static void analyze(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration configuration);
+     static void analyze(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration configuration, QProgressBar * progress_bar = nullptr);
 
 private:
-    Analyzer(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration configuration);
+    Analyzer(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration configuration, QProgressBar * progress_bar = nullptr);
     ~Analyzer();
 
     void analyze();
@@ -31,6 +32,7 @@ private:
     QString m_radial_distribution_dir;
     QString m_cateory_properties_dir;
     QString m_csv_dir;
+    QProgressBar * m_progress_bar;
     const AnalysisConfiguration m_analysis_conf;
     const std::map<int, std::vector<AnalysisPoint> > m_points;
 };

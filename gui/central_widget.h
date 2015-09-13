@@ -9,6 +9,7 @@
 #include <QSpinBox>
 
 class AnalysisPoint;
+class QProgressBar;
 class CentralWidget : public QWidget{
 Q_OBJECT
 public:
@@ -34,6 +35,8 @@ private:
     QPushButton * m_clear_btn;
 
     AnalysisConfigurationProducerDialog * m_analysis_configuration_producer_dialog;
+
+    QProgressBar * m_progress_bar;
 };
 
 #endif // CENTRAL_WIDGET_H

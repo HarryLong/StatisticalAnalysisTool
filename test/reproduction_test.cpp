@@ -32,7 +32,6 @@ void ReproductionTest::setUp()
 
 void ReproductionTest::tearDown()
 {
-//    reset_test_directory();
 }
 
 void ReproductionTest::reset_test_directory()
