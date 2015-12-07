@@ -10,6 +10,8 @@
 #include <thread>
 #include <QProgressBar>
 
+#include <chrono>
+
 /*******************************
  * RADIAL DISTRIBUTION TRACKER *
  *******************************/
@@ -117,7 +119,7 @@ Analyzer::Analyzer(QString base_directory, const std::map<int, std::vector<Analy
     // Write the input image
     {
         QString input_file(m_base_dir);
-        input_file.append("input.png");
+        input_file.append("input");
         ImageUtils::printPointsToImg(input_file.toStdString(), m_points, m_analysis_conf.analysis_window_width, m_analysis_conf.analysis_window_height);
         std::cout << "Input image written to: " << input_file.toStdString() << std::endl;
     }
@@ -129,6 +131,8 @@ Analyzer::~Analyzer()
 
 void Analyzer::analyze()
 {
+    std::chrono::high_resolution_clock::time_point start_time( std::chrono::high_resolution_clock::now() );
+
     // Generate the configuration file
     generate_configuration();
 
@@ -137,6 +141,10 @@ void Analyzer::analyze()
 
     // Generate the category properties
     generate_category_properties();
+
+    auto duration (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time).count());
+
+    std::cout << "Duration: " << duration << " milliseconds." << std::endl;
 }
 
 void Analyzer::generate_configuration()

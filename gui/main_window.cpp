@@ -10,6 +10,8 @@
 #define INPUT_WIDGET_DIMENSION_INCREMENTS 100
 #define DEFAULT_INPUT_WIDGET_DIMENSION 500
 
+#include <thread>
+
 MainWindow::MainWindow(QWidget * parent, Qt::WindowFlags flags) : QMainWindow(parent, flags),
     m_central_widget(new CentralWidget(DEFAULT_INPUT_WIDGET_DIMENSION, this)),
     m_random_distribution_producer_dlg(new RandomDistributionProducerDialog),
@@ -153,13 +155,27 @@ void MainWindow::launch_reproduction_configuration_producer_dialog()
 void MainWindow::reproduce()
 {
     ReproductionConfiguration reproduction_config( m_reproduction_configuration_producer_dlg->getConfiguration() );
-    std::map<int,std::vector<AnalysisPoint> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
-    ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputFile().toStdString(),
-                                 reproduced_points, reproduction_config.width, reproduction_config.height);
 
-    // Open the file
-    std::string cmd("eog ");
-    cmd.append(m_reproduction_configuration_producer_dlg->getOutputFile().toStdString());
-    cmd.append(" &");
-    system(cmd.c_str());
+    std::vector<std::thread*> threads;
+
+    for(int i(0); i < 10; i++)
+        threads.push_back(new std::thread(RadialDistributionReproducer::reproduce,reproduction_config));
+
+    for(std::thread * t : threads)
+    {
+        t->join();
+        delete t;
+    }
+
+    //SINGLE
+    RadialDistributionReproducer::reproduce(reproduction_config);
+//    std::map<int,std::vector<AnalysisPoint> > reproduced_points1 (RadialDistributionReproducer::reproduce(reproduction_config));
+//    ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputFile().toStdString(),
+//                                 reproduced_points, reproduction_config.width, reproduction_config.height);
+
+//    // Open the file
+//    std::string cmd("eog ");
+//    cmd.append(m_reproduction_configuration_producer_dlg->getOutputFile().toStdString());
+//    cmd.append(" &");
+//    system(cmd.c_str());
 }

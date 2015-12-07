@@ -44,7 +44,7 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
 
     for(const AnalysisPoint & p : m_target_points)
     {
-        spatial_point_storage.getCell(p.getCenter()).points.insert(p);
+        spatial_point_storage.getCell(p.getCenter(), PointSpatialHashmap::_WORLD).points.insert(p);
     }
 
     int total_area( m_analysis_configuration.analysis_window_width * m_analysis_configuration.analysis_window_height );
@@ -179,7 +179,14 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
 //    for(auto it(m_annular_shell_areas.begin()); it != m_annular_shell_areas.end(); it++)
 //        std::cout << "R: " << it->first << " |  Area: " << it->second << std::endl;
 
-    m_radial_distribution = RadialDistribution(RadialDistributionHeader(m_reference_points_id, m_target_points_id), within_radius_distribution, past_rmax_distribution, results);
+    bool requires_optimization(within_radius_distribution > 0 && std::abs(within_radius_distribution-1) > .2);
+    for(auto it(results.begin()); it != results.end() && !requires_optimization; it++)
+    {
+        if(std::abs(it->second-1) > .2 )
+            requires_optimization = true;
+    }
+
+    m_radial_distribution = RadialDistribution(RadialDistributionHeader(m_reference_points_id, m_target_points_id, requires_optimization), within_radius_distribution, past_rmax_distribution, results);
     if(m_completion_listener)
         m_completion_listener->complete(m_radial_distribution);
 }

@@ -57,19 +57,27 @@ std::vector<AnalysisPoint> PointSpatialHashmap::getPossibleReachablePoints(const
 
     for(QPoint & c : cells_within_r_max)
     {
-        PointSpatialHashMapCell & cell (this->operator [](c));
-        for(const AnalysisPoint & destination_point : cell.points)
+        if(initialised(c)) // If not initialised, no points to process
         {
-            if(reference_point != destination_point)
-            {
-                bool multi_cell_target_point(coversMultipleCells(destination_point));
-                if(!multi_cell_target_point ||
-                        (processed_multicell_target_points.find(destination_point) == processed_multicell_target_points.end() ))
-                {
-                    ret.push_back(destination_point);
+            PointSpatialHashMapCell & cell (getCell(c, PointSpatialHashmap::Space::_HASHMAP));
 
-                    if(multi_cell_target_point)
-                        processed_multicell_target_points[destination_point] = true;
+//            cell.points.insert(AnalysisPoint());
+
+            for(const AnalysisPoint & destination_point : cell.points)
+            {
+                if(reference_point != destination_point)
+                {
+                    if(!destination_point.multiCellCoverageTestPerformed())
+                        destination_point.setCoversMultipleCells(coversMultipleCells(destination_point));
+                    bool multi_cell_target_point(destination_point.coversMultipleCells());
+                    if(!multi_cell_target_point ||
+                            (processed_multicell_target_points.find(destination_point) == processed_multicell_target_points.end() ))
+                    {
+                        ret.push_back(destination_point);
+
+                        if(multi_cell_target_point)
+                            processed_multicell_target_points[destination_point] = true;
+                    }
                 }
             }
         }

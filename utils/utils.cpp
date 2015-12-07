@@ -7,6 +7,7 @@
 #include "point_drawer.h"
 
 #include <QPainter>
+#include <QDebug>
 
 /*****************************
  * RADIAL DISTRIBUTION UTILS *
@@ -44,17 +45,37 @@ float GeometricUtils::getCircleArea(int radius)
  ***************/
 void ImageUtils::printPointsToImg(std::string image_file, const std::map<int,std::vector<AnalysisPoint> > & points, int width, int height)
 {
-    PointDrawer drawer(width, height);
-
-    for(auto category_it( points.begin() ); category_it != points.end(); category_it++) // Draw higher priority first to ensure no overlap
+    std::vector<PointDrawer> point_drawers;
+    for(int i(0); i < points.size(); i++)
     {
+        point_drawers.push_back(PointDrawer(width,height));
+    }
+    PointDrawer all_points_drawer(width, height);
+
+    std::vector<int> ordered_category_ids;
+    int i(0);
+    for(auto category_it( points.begin() ); category_it != points.end(); category_it++, i++) // Draw higher priority first to ensure no overlap
+    {
+        std::cout << "Printing points of category " << category_it->first << std::endl;
+        ordered_category_ids.push_back(category_it->first);
+        PointDrawer & category_drawer(point_drawers.at(i));
         for(auto point_it(category_it->second.begin()); point_it != category_it->second.end(); point_it++)
         {
-            drawer.drawPoint(*point_it);
+            all_points_drawer.drawPoint(*point_it);
+            category_drawer.drawPoint(*point_it);
         }
     }
-
-    drawer.toImage().save(QString(image_file.c_str()));
+    for(int i(0); i < points.size(); i++)
+    {
+        QString filename(QString::fromStdString(image_file));
+        filename.append("_").append(QString::number(ordered_category_ids.at(i))).append(".jpg");
+        point_drawers.at(i).toImage().save(filename);
+        qCritical() << "Written file: " << filename;
+    }
+    QString img_file(QString::fromStdString(image_file));
+    if(!img_file.endsWith(".jpg"))
+        img_file.append(".jpg");
+    all_points_drawer.toImage().save(img_file);
 }
 
 //int main(int argc, char *argv[])

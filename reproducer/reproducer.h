@@ -3,6 +3,7 @@
 
 #include <string>
 #include <QPoint>
+#include <QLineF>
 
 #include "../radial_distribution.h"
 #include "../point_spatial_hashmap.h"
@@ -12,6 +13,46 @@
 #include "reproduction_configuration.h"
 
 class AnalysisPoint;
+
+class StrengthCalculationTracker{
+public:
+    StrengthCalculationTracker(int count);
+    ~StrengthCalculationTracker();
+
+    void complete(float strength) const;
+
+    bool finished() const;
+
+    float strength() const;
+
+private:
+    const int _n_total;
+    mutable int _n_complete;
+    mutable float _strength;
+};
+
+//-----------------------------------------------------------
+
+class StrengthCalculationSpec{
+public:
+    StrengthCalculationSpec(const StrengthCalculationTracker & tracker, QLineF line, int r_min, int r_diff, int r_max,
+                            const RadialDistribution & radial_distribution, const AnalysisPoint & destination_point);
+    ~StrengthCalculationSpec();
+
+    void calculate();
+
+
+private:
+    const StrengthCalculationTracker & tracker;
+    QLineF line;
+    int r_min;
+    int r_diff;
+    int r_max;
+    const RadialDistribution & radial_distribution;
+    const AnalysisPoint & destination_point;
+};
+
+//-----------------------------------------------------------
 
 class RadialDistributionReproducer
 {
@@ -30,7 +71,7 @@ private:
                                  ReproductionConfiguration reproduction_config, AnalysisConfiguration analysis_configuration);
     void startPointGeneration();
     void two_point_initialize();
-    void matching_density_initialize();
+    int matching_density_initialize();
     std::map<int,std::vector<AnalysisPoint> >& getGeneratedPoints();
 
     void accelerated_point_validity_check(const AnalysisPoint & reference_point, bool & valid, bool & strength_calculation_necessary);
@@ -39,10 +80,12 @@ private:
     float calculate_strength(const AnalysisPoint & reference_point);
 
     void generate_points_through_births_and_deaths();
-    void generate_points_through_random_moves();
+    void generate_points_through_random_moves(int n_moves);
 
     void add_destination_point(const AnalysisPoint & point);
     void remove_destination_point(const AnalysisPoint & point, int destination_points_position);
+
+    bool requires_optimization(int category_id);
 
     void generate_points();
 

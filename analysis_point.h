@@ -7,6 +7,7 @@
 class AnalysisPoint{
 public:
     AnalysisPoint(int category_id, QPoint center, int radius = 1);
+    AnalysisPoint();
     virtual ~AnalysisPoint();
     bool operator==(const AnalysisPoint & other) const;
     bool operator!=(const AnalysisPoint & other) const;
@@ -14,10 +15,17 @@ public:
     virtual QPoint getCenter() const;
     virtual int getCategoryId() const;
 
+    bool coversMultipleCells() const;
+    bool setCoversMultipleCells(bool) const;
+    bool multiCellCoverageTestPerformed() const;
+
     void setCenter(QPoint center);
     void setRadius(int radius);
 
 private:
+    mutable bool covers_multiple_cells;
+    mutable bool milticell_coverage_test_performed;
+
     int r;
     QPoint center;
     int category_id;

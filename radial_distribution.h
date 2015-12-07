@@ -11,17 +11,21 @@ struct RadialDistributionHeader{
 
     unsigned int reference_id;
     unsigned int destination_id;
+    bool requires_optimization;
 
     RadialDistributionHeader(unsigned int reference_id,
-                             unsigned int destination_id) :
+                             unsigned int destination_id,
+                             bool requires_optimization) :
         reference_id(reference_id),
-        destination_id(destination_id) {}
+        destination_id(destination_id),
+        requires_optimization(requires_optimization){}
 
     RadialDistributionHeader() {}
 
     bool operator ==(const RadialDistributionHeader &other) const
     {
-        return (reference_id == other.reference_id && destination_id == other.destination_id);
+        return (reference_id == other.reference_id && destination_id == other.destination_id &&
+                requires_optimization == other.requires_optimization);
     }
 };
 

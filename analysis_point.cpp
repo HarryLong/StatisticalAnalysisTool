@@ -1,7 +1,12 @@
 #include "analysis_point.h"
 
 AnalysisPoint::AnalysisPoint(int category_id, QPoint center, int radius) :
-    center(center), category_id(category_id), r(radius)
+    center(center), category_id(category_id), r(radius), covers_multiple_cells(false), milticell_coverage_test_performed(false)
+{
+
+}
+
+AnalysisPoint::AnalysisPoint() : AnalysisPoint(-1, QPoint(-1,-1), -1)
 {
 
 }
@@ -9,6 +14,22 @@ AnalysisPoint::AnalysisPoint(int category_id, QPoint center, int radius) :
 AnalysisPoint::~AnalysisPoint()
 {
 
+}
+
+bool AnalysisPoint::coversMultipleCells() const
+{
+    return covers_multiple_cells;
+}
+
+bool AnalysisPoint::setCoversMultipleCells(bool multicell) const
+{
+    covers_multiple_cells = multicell;
+    milticell_coverage_test_performed = true;
+}
+
+bool AnalysisPoint::multiCellCoverageTestPerformed() const
+{
+    return milticell_coverage_test_performed;
 }
 
 bool AnalysisPoint::operator==(const AnalysisPoint & other) const

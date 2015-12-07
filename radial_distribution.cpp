@@ -75,7 +75,9 @@ void RadialDistribution::write(std::string filename) const
     file.write(header, RadialDistributionHeader::_SIGNATURE.length());
     file.write((char*) FileUtils::toBin(m_header.reference_id,4),4);
     file.write((char*) FileUtils::toBin(m_header.destination_id,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int) (m_header.requires_optimization ? 1 : 0),4),4);
 
+    // DATA
     file.write((char*) FileUtils::toBin(m_within_radius_distribution,4),4);
     file.write((char*) FileUtils::toBin(m_past_rmax_distribution,4),4);
 
@@ -130,6 +132,10 @@ bool RadialDistribution::load(std::string filename)
             file.read(memblock, 4);
             m_header.destination_id = FileUtils::readInt32((unsigned char*) memblock);
 
+            // Requires optimization
+            file.read(memblock, 4);
+            m_header.requires_optimization = (FileUtils::readInt32((unsigned char*) memblock) == 1 ? true : false);
+
             delete [] memblock;
         }
 
@@ -175,6 +181,7 @@ void RadialDistribution::printToConsole() const
     std::cout << "***********HEADER*****************" << std::endl;
     std::cout << "Reference id: " << m_header.reference_id << std::endl;
     std::cout << "Destination id: " << m_header.destination_id << std::endl;
+    std::cout << "Requires optimization: " << (m_header.requires_optimization ? "Yes" : "No") << std::endl;
     std::cout << "************DATA******************" << std::endl;
     std::cout << "Within radius: " << m_within_radius_distribution << std::endl;
     std::cout << "Past radius: " << m_past_rmax_distribution << std::endl;
@@ -193,6 +200,7 @@ void RadialDistribution::writeToCSV(std::string filename) const
         // First write the header
         file << "Reference id," << m_header.reference_id << "\n";
         file << "Destination id," << m_header.destination_id << "\n";
+        file << "Requires optimization, " << (m_header.requires_optimization ? "Yes" : "No") << "\n";
         file << "\n";
         file << "Within radius," << m_within_radius_distribution << "\n";
         file << "Past rmax," << m_past_rmax_distribution << "\n";
