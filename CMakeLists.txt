@@ -53,17 +53,17 @@ target_link_libraries(RadialDistributionReproducer ${LIB_LIBS})
 #INSTALL EXECUTABLE
 install(TARGETS RadialDistributionToolGUI
         RUNTIME DESTINATION bin
-        CONFIGURATIONS Release)
+        CONFIGURATIONS RELWITHDEBINFO)
 
 #INSTALL ANALYSIS LIB
 install(TARGETS RadialDistributionAnalyser
         LIBRARY DESTINATION lib
-        CONFIGURATIONS Release)
+        CONFIGURATIONS RELWITHDEBINFO)
 
 #INSTALL REPRODUCTION LIB
 install(TARGETS RadialDistributionReproducer
         LIBRARY DESTINATION lib
-        CONFIGURATIONS Release)
+        CONFIGURATIONS RELWITHDEBINFO)
 
 # INSTALL CORE HEADER FILES
 install(FILES ${CORE_HEADER_FILES}

@@ -181,10 +181,13 @@ void Analyzer::generate_pair_correlations()
         int reference_category_id(*reference_category);
         std::vector<AnalysisPoint> reference_category_points(m_points.find(reference_category_id)->second);
 
+//        std::cout << "Reference category: " << reference_category_id << std::endl;
+
         for(auto target_category(std::find(m_analysis_conf.priority_sorted_category_ids.begin(), m_analysis_conf.priority_sorted_category_ids.end(), reference_category_id));
                             target_category != m_analysis_conf.priority_sorted_category_ids.end(); target_category++)
         {
             int target_category_id(*target_category);
+//            std::cout << "Target category: " << target_category_id << std::endl;
             std::vector<AnalysisPoint> target_category_points(m_points.find(target_category_id)->second);
 
             RadialDistributionTracker * tracker = new RadialDistributionTracker(m_radial_distribution_dir,

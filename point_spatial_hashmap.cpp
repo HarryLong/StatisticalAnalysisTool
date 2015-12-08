@@ -5,9 +5,9 @@
 #define SPATIAL_HASHMAP_CELL_WIDTH 10
 #define SPATIAL_HASHMAP_CELL_HEIGHT 10
 PointSpatialHashmap::PointSpatialHashmap(int width, int height) :
-    SpatialHashMap<PointSpatialHashMapCell>(SPATIAL_HASHMAP_CELL_WIDTH, SPATIAL_HASHMAP_CELL_HEIGHT,
-                                            std::ceil(((float)width)/SPATIAL_HASHMAP_CELL_WIDTH),
-                                            std::ceil(((float)height)/SPATIAL_HASHMAP_CELL_HEIGHT))
+    SpatialHashMap<PointSpatialHashMapCell>(std::ceil(width/100.f), std::ceil(height/100.f),
+                                            std::ceil(((float)width)/std::ceil(width/100.f)),
+                                            std::ceil(((float)height)/std::ceil(height/100.f)))
 {
 
 }
@@ -39,7 +39,19 @@ void PointSpatialHashmap::removePoint(const AnalysisPoint & p)
 
 std::vector<QPoint> PointSpatialHashmap::get_points(const AnalysisPoint & p, int r_max)
 {
-    return SpatialHashMap<PointSpatialHashMapCell>::getPoints(p.getCenter(), r_max+p.getRadius(), false);
+    BoundingBox bb(SpatialHashMap::get_bounding_box(p.getCenter(), r_max));
+
+    std::vector<QPoint> ret;
+
+    for(int x (bb.min.x()); x < std::min(getHorizontalCellCount(), bb.max.x()+1); x++)
+    {
+        for(int y (bb.min.y()); y < std::min(getVerticalCellCount(), bb.max.y()+1); y++)
+        {
+            ret.push_back(QPoint(x,y));
+        }
+    }
+
+    return ret;
 }
 
 bool PointSpatialHashmap::coversMultipleCells(const AnalysisPoint & p)
@@ -61,8 +73,6 @@ std::vector<AnalysisPoint> PointSpatialHashmap::getPossibleReachablePoints(const
         {
             PointSpatialHashMapCell & cell (getCell(c, PointSpatialHashmap::Space::_HASHMAP));
 
-//            cell.points.insert(AnalysisPoint());
-
             for(const AnalysisPoint & destination_point : cell.points)
             {
                 if(reference_point != destination_point)
@@ -73,7 +83,6 @@ std::vector<AnalysisPoint> PointSpatialHashmap::getPossibleReachablePoints(const
                     if(!multi_cell_target_point ||
                             (processed_multicell_target_points.find(destination_point) == processed_multicell_target_points.end() ))
                     {
-                        ret.push_back(destination_point);
 
                         if(multi_cell_target_point)
                             processed_multicell_target_points[destination_point] = true;
