@@ -14,6 +14,7 @@ public:
     virtual int getRadius() const;
     virtual QPoint getCenter() const;
     virtual int getCategoryId() const;
+    void setLocation(const QPoint & center);
 
     bool coversMultipleCells() const;
     bool setCoversMultipleCells(bool) const;

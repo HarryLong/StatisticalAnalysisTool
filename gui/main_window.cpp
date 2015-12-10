@@ -156,11 +156,11 @@ void MainWindow::reproduce()
 {
     ReproductionConfiguration reproduction_config( m_reproduction_configuration_producer_dlg->getConfiguration() );
 
-    RadialDistributionReproducer::reproduce(reproduction_config);
+//    RadialDistributionReproducer::reproduce(reproduction_config);
 
-//    std::map<int,std::vector<AnalysisPoint> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
-//    ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputFile().toStdString(),
-//                                     reproduced_points, reproduction_config.width, reproduction_config.height);
+    std::map<int,std::vector<AnalysisPoint> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
+    ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputFile().toStdString(),
+                                     reproduced_points, reproduction_config.width, reproduction_config.height);
 
     // Open the file
 //    std::string cmd("eog ");

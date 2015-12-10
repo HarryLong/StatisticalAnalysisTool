@@ -70,6 +70,7 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
             std::cout << "Points processed: " << reference_points_processed << " / " << m_reference_points.size() << std::endl;
 
         std::vector<AnalysisPoint> possible_reachable_points(spatial_point_storage.getPossibleReachablePoints(reference_point, m_analysis_configuration.r_max));
+
         int processed_points(0);
 
         std::map<int,double> annular_shell_areas; // Caching
@@ -105,8 +106,8 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
                     else // Outside radius
                     {
                         int r_bracket(RadialDistributionUtils::getRBracket(distance, m_analysis_configuration.r_min, m_analysis_configuration.r_diff));
-                        if(annular_shell_areas.find(r_bracket) == annular_shell_areas.end())
-                        {
+//                        if(annular_shell_areas.find(r_bracket) == annular_shell_areas.end())
+//                        {
                             // Small circle
                             int small_circle_radius( reference_point.getRadius() + r_bracket );
                             double small_circle_area;
@@ -138,9 +139,9 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
                             }
                             double area(large_circle_area - small_circle_area);
 
-                            annular_shell_areas.insert(std::pair<int,double>(r_bracket, area));
-                        }
-                        results[r_bracket] += (constant_normalization_factor / annular_shell_areas[r_bracket]);
+//                            annular_shell_areas.insert(std::pair<int,double>(r_bracket, area));
+//                        }
+                        results[r_bracket] += (constant_normalization_factor / area);
                     }
                 }
             }
@@ -162,7 +163,7 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
             past_rmax_distribution += (m_target_points.size()-processed_points)*(constant_normalization_factor / past_radius_area);
         }
     }
-    // Exponential difference
+//    // Exponential difference
 //    std::cout << "***** ANALYSIS SUMMARY *****" << std::endl;
 //    std::cout << "# Reference points: " << reference_points.size() << std::endl;
 //    std::cout << "# target points: " << target_points.size() << std::endl;

@@ -39,6 +39,11 @@ bool AnalysisPoint::operator==(const AnalysisPoint & other) const
             this->center == other.center);
 }
 
+void AnalysisPoint::setLocation(const QPoint & center)
+{
+    this->center = center;
+}
+
 bool AnalysisPoint::operator!=(const AnalysisPoint & other) const
 {
     return !this->operator ==(other);

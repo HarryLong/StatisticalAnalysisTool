@@ -76,12 +76,13 @@ private:
 
     void accelerated_point_validity_check(const AnalysisPoint & reference_point, bool & valid, bool & strength_calculation_necessary);
     void accelerated_point_validity_check(const AnalysisPoint & reference_point, int queried_category, bool & valid, bool & strength_calculation_necessary);
-    float calculate_strength(const AnalysisPoint & reference_point, const std::vector<AnalysisPoint> & destination_points);
-    float calculate_strength(const AnalysisPoint & reference_point);
+    double calculate_strength(const AnalysisPoint & reference_point, const std::vector<AnalysisPoint> & destination_points);
+    double calculate_strength(const AnalysisPoint & reference_point);
 
     void generate_points_through_births_and_deaths();
     void generate_points_through_random_moves(int n_moves);
 
+    void move_point(AnalysisPoint & point, const QPoint & new_location);
     void add_destination_point(const AnalysisPoint & point);
     void remove_destination_point(const AnalysisPoint & point, int destination_points_position);
 

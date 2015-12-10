@@ -11,7 +11,7 @@
 #define OUTPUT_WIDTH_DEFAULT 500
 #define OUTPUT_HEIGHT_DEFAULT 500
 #define DEFAULT_OUTPUT_FILE "/home/harry/Pictures/radial_distribution_out.jpg"
-#define DEFAULT_ACTIVE_DIR "/home/harry/radial_distribution_app/"
+#define DEFAULT_ACTIVE_DIR "/home/harry/.ecotracker/"
 ReproductionConfigurationProducerDialog::ReproductionConfigurationProducerDialog()
 {
     setModal(true);

@@ -23,8 +23,8 @@ SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${OpenMP_C
 SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OpenMP_CXX_FLAGS} -O2 -std=c++11")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX_FLAGS} -O0 -g -std=c++11")
 #SET(CMAKE_BUILD_TYPE DEBUG)
-#SET(CMAKE_BUILD_TYPE RELEASE)
-SET(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+SET(CMAKE_BUILD_TYPE RELEASE)
+#SET(CMAKE_BUILD_TYPE RELWITHDEBINFO)
 
 SET(GUI_SRC_FILES gui/central_widget gui/dialogs gui/input_widget gui/main gui/main_window )
 SET(ANALYSER_SRC_FILES analyser/analysis_configuration analyser/analyzer analyser/category_analyzer analyser/dependency_analyzer analyser/radial_distribution_analyzer)
