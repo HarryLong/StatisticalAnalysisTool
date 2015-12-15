@@ -2,10 +2,10 @@
 #include "../analysis_point.h"
 #include <iostream>
 
-PointFactory::PointFactory(int max_width, int max_height) :
+PointFactory::PointFactory(int width, int height) :
     m_dice_roller(0,RAND_MAX), m_taken_points(),m_active_category_id(-1),
-    m_max_width(max_width),
-    m_max_height(max_height)
+    m_width(width),
+    m_height(height)
 {
 
 }
@@ -54,8 +54,8 @@ AnalysisPoint PointFactory::getPoint()
 
     QPoint position;
     do{
-        position = QPoint(m_dice_roller.generate()%m_max_width,
-                          m_dice_roller.generate()%m_max_height);
+        position = QPoint(m_dice_roller.generate()%(m_width-1),
+                          m_dice_roller.generate()%(m_height-1));
     }while(m_taken_points.containsPoint(position));
 
     int size;

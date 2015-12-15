@@ -13,7 +13,7 @@ class AnalysisPoint;
 class PointFactory
 {
 public:
-    PointFactory(int max_width, int max_height);
+    PointFactory(int width, int height);
     ~PointFactory();
 
     AnalysisPoint getPoint();
@@ -23,8 +23,8 @@ public:
 
 private:
     DiceRoller m_dice_roller;
-    int m_max_width;
-    int m_max_height;
+    int m_width;
+    int m_height;
     int m_point_size_diffs;
     int m_active_category_id;
     std::map<int,int> m_probability_to_bin_size_pairs;

@@ -54,7 +54,7 @@ void ImageUtils::printPointsToImg(std::string image_file, const std::map<int,std
 
     std::vector<int> ordered_category_ids;
     int i(0);
-    for(auto category_it( points.begin() ); category_it != points.end(); category_it++, i++) // Draw higher priority first to ensure no overlap
+    for(auto category_it( points.rbegin() ); category_it != points.rend(); category_it++, i++) // Draw higher priority first to ensure no overlap
     {
         std::cout << "Printing points of category " << category_it->first << std::endl;
         ordered_category_ids.push_back(category_it->first);

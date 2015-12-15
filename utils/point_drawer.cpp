@@ -18,7 +18,7 @@ void PointDrawer::drawPoint(const AnalysisPoint & p)
     QPainter painter(&m_image);
     painter.setPen(color);
     painter.setBrush( color );
-    painter.drawEllipse(p.getCenter(), p.getRadius(), p.getRadius());
+    painter.drawEllipse(p.getCenter(), std::max(1,p.getRadius()), std::max(1,p.getRadius()));
     painter.end();
 }
 

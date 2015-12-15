@@ -80,7 +80,7 @@ private:
     double calculate_strength(const AnalysisPoint & reference_point);
 
     void generate_points_through_births_and_deaths();
-    void generate_points_through_random_moves(int n_moves);
+    void generate_points_through_random_moves();
 
     void move_point(AnalysisPoint & point, const QPoint & new_location);
     void add_destination_point(const AnalysisPoint & point);

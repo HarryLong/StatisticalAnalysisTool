@@ -202,12 +202,8 @@ void RadialDistributionReproducer::startPointGeneration()
 
 void RadialDistributionReproducer::generate_points()
 {
-    int point_count(matching_density_initialize());
-
-//    if(requires_optimization(m_point_factory.getActiveCategoryId()))
-//    {
-        generate_points_through_random_moves(std::min(m_reproduction_configuration.n_iterations,point_count/10));
-//    }
+    matching_density_initialize();
+    generate_points_through_random_moves();
 }
 
 bool RadialDistributionReproducer::requires_optimization(int category_id)
@@ -222,7 +218,7 @@ bool RadialDistributionReproducer::requires_optimization(int category_id)
     return requires_optmization;
 }
 
-void RadialDistributionReproducer::generate_points_through_random_moves(int n_moves)
+void RadialDistributionReproducer::generate_points_through_random_moves()
 {
     DiceRoller dice_roller(0,1000);
 
@@ -237,7 +233,7 @@ void RadialDistributionReproducer::generate_points_through_random_moves(int n_mo
         QPoint heighest_scoring_dest_point;
         double heighest_strength(-1);
 
-        for(int i(0); i < 10; i++)
+        for(int i(0); i < 2; i++)
         {
             /*********************
              * DESTINATION POINT *
@@ -266,7 +262,7 @@ void RadialDistributionReproducer::generate_points_through_random_moves(int n_mo
         else
             n_refused_moves++;
 
-        if((points_processed++)%100 == 0)
+        if((points_processed++)%1000 == 0)
             std::cout << ((((float)points_processed)/m_active_category_points.size()) * 100) << "%" << std::endl;
     }
 
@@ -423,7 +419,9 @@ void RadialDistributionReproducer::accelerated_point_validity_check(const Analys
     const RadialDistribution distribution (get_radial_distribution(queried_category, reference_point.getCategoryId()));
     if(distribution.getMinimum() == 0)
     {
-        if(distribution.m_past_rmax_distribution == 0)
+        if(distribution.m_past_rmax_distribution == 0 ||
+                distribution.m_within_radius_distribution == 0 ||
+                    m_category_properties.find(reference_point.getCategoryId())->second.m_header.category_dependent_ids.size() > 0)
             return;
 
         for(auto it(distribution.m_data.begin()); it != distribution.m_data.end(); it++)
@@ -431,27 +429,28 @@ void RadialDistributionReproducer::accelerated_point_validity_check(const Analys
             if(it->second == 0)
                 return;
         }
-        if(distribution.m_within_radius_distribution == 0) // most probable, just attempt to find points
-        {
-            QLineF line;
-            line.setP1(reference_point.getCenter());
-            std::vector<AnalysisPoint> possible_reachable_points = m_spatial_point_storage.getPossibleReachablePoints(reference_point,0);
-            for(AnalysisPoint & p : possible_reachable_points)
-            {
-                if(p.getCategoryId() == queried_category)
-                {
-                    line.setP2(p.getCenter());
-                    float distance(line.length()-p.getRadius()); // Distance from the reference points circumference [remove the radius]
 
-                    if(distance < 0) // within radius
-                    {
-                        valid = false;
-                        strength_calculation_necessary = false;
-                        return;
-                    }
-                }
-            }
-        }
+//        if(distribution.m_within_radius_distribution == 0) // most probable, just attempt to find points
+//        {
+//            QLineF line;
+//            line.setP1(reference_point.getCenter());
+//            std::vector<AnalysisPoint> possible_reachable_points = m_spatial_point_storage.getPossibleReachablePoints(reference_point,0);
+//            for(AnalysisPoint & p : possible_reachable_points)
+//            {
+//                if(p.getCategoryId() == queried_category)
+//                {
+//                    line.setP2(p.getCenter());
+//                    float distance(line.length()-p.getRadius()); // Distance from the reference points circumference [remove the radius]
+
+//                    if(distance < 0) // within radius
+//                    {
+//                        valid = false;
+//                        strength_calculation_necessary = false;
+//                        return;
+//                    }
+//                }
+//            }
+//        }
     }
 
     // If we got here, point is valid

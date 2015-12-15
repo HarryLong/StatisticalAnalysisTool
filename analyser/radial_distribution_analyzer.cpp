@@ -66,7 +66,7 @@ void RadialDistributionAnalyzer::calculate_radial_distribution()
     int reference_points_processed(0);
     for(const AnalysisPoint & reference_point : m_reference_points)
     {
-        if(reference_points_processed++ % 100 == 0)
+        if(reference_points_processed++ % 1000 == 0)
             std::cout << "Points processed: " << reference_points_processed << " / " << m_reference_points.size() << std::endl;
 
         std::vector<AnalysisPoint> possible_reachable_points(spatial_point_storage.getPossibleReachablePoints(reference_point, m_analysis_configuration.r_max));

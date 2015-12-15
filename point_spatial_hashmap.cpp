@@ -41,22 +41,28 @@ std::vector<QPoint> PointSpatialHashmap::get_points(const AnalysisPoint & p, int
 {
     QPoint center(p.getCenter());
     BoundingBox min_bb, max_bb;
-    // MIN
+    if(p.getRadius() > 0)
     {
-        QPoint min(center.x()-p.getRadius(), center.y()-p.getRadius());
-        min_bb = SpatialHashMap::get_bounding_box(min, r_max);
+        // MIN
+        {
+            QPoint min(center.x()-p.getRadius(), center.y()-p.getRadius());
+            min_bb = SpatialHashMap::get_bounding_box(min, r_max);
+        }
+        // MAX
+        {
+            QPoint max(center.x()+p.getRadius(), center.y()+p.getRadius());
+            max_bb = SpatialHashMap::get_bounding_box(max, r_max);
+        }
     }
-    // MAX
-    {
-        QPoint max(center.x()+p.getRadius(), center.y()+p.getRadius());
-        max_bb = SpatialHashMap::get_bounding_box(max, r_max);
-    }
+    else
+        min_bb = max_bb = SpatialHashMap::get_bounding_box(p.getCenter(), r_max);
+
 
     std::vector<QPoint> ret;
 
-    for(int x (min_bb.min.x()); x < max_bb.max.x(); x++)
+    for(int x (min_bb.min.x()); x <= max_bb.max.x(); x++)
     {
-        for(int y (min_bb.min.y()); y < max_bb.max.y(); y++)
+        for(int y (min_bb.min.y()); y <= max_bb.max.y(); y++)
         {
             ret.push_back(QPoint(x,y));
         }

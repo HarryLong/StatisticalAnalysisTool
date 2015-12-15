@@ -152,6 +152,9 @@ void MainWindow::launch_reproduction_configuration_producer_dialog()
     m_reproduction_configuration_producer_dlg->exec();
 }
 
+#include "../analyser/analyzer.h"
+#include "../analyser/analysis_configuration.h"
+
 void MainWindow::reproduce()
 {
     ReproductionConfiguration reproduction_config( m_reproduction_configuration_producer_dlg->getConfiguration() );
@@ -161,6 +164,17 @@ void MainWindow::reproduce()
     std::map<int,std::vector<AnalysisPoint> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
     ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputFile().toStdString(),
                                      reproduced_points, reproduction_config.width, reproduction_config.height);
+
+    AnalysisConfiguration config(0, 200, 20, 10000, 10000);
+    std::vector<int> priority_sorted_cat;
+    priority_sorted_cat.push_back(9);
+    priority_sorted_cat.push_back(5);
+    priority_sorted_cat.push_back(6);
+
+    config.setPrioritySortedCategoryIds(priority_sorted_cat);
+
+    // Reanalyze
+    Analyzer::analyze("/home/harry/.ecotracker/reanalyzed/", reproduced_points, config);
 
     // Open the file
 //    std::string cmd("eog ");
