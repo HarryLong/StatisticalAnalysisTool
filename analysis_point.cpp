@@ -1,7 +1,14 @@
 #include "analysis_point.h"
 
 AnalysisPoint::AnalysisPoint(int category_id, QPoint center, int radius) :
-    center(center), category_id(category_id), r(radius), covers_multiple_cells(false), milticell_coverage_test_performed(false)
+    AnalysisPoint(category_id, center, radius, -1, -1 )
+{
+
+}
+
+AnalysisPoint::AnalysisPoint(int category_id, QPoint center, int canopy_radius, int root_width, int height) :
+    center(center), category_id(category_id), r(canopy_radius), root_width(root_width), height(height),
+    covers_multiple_cells(false), milticell_coverage_test_performed(false)
 {
 
 }
@@ -57,6 +64,16 @@ int AnalysisPoint::getRadius() const
 QPoint AnalysisPoint::getCenter() const
 {
     return center;
+}
+
+int AnalysisPoint::getHeight() const
+{
+    return height;
+}
+
+int AnalysisPoint::getRootWidth() const
+{
+    return root_width;
 }
 
 void AnalysisPoint::setCenter(QPoint center)

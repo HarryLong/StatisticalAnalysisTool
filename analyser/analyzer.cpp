@@ -131,6 +131,8 @@ Analyzer::~Analyzer()
 
 void Analyzer::analyze()
 {
+    std::cout << "Starting statistican analysis" << std::endl;
+
     std::chrono::high_resolution_clock::time_point start_time( std::chrono::high_resolution_clock::now() );
 
     // Generate the configuration file

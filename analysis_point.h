@@ -7,11 +7,15 @@
 class AnalysisPoint{
 public:
     AnalysisPoint(int category_id, QPoint center, int radius = 1);
+    AnalysisPoint(int category_id, QPoint center, int canopy_radius, int root_width, int height);
+
     AnalysisPoint();
     virtual ~AnalysisPoint();
     bool operator==(const AnalysisPoint & other) const;
     bool operator!=(const AnalysisPoint & other) const;
     virtual int getRadius() const;
+    virtual int getHeight() const;
+    virtual int getRootWidth() const;
     virtual QPoint getCenter() const;
     virtual int getCategoryId() const;
     void setLocation(const QPoint & center);
@@ -28,6 +32,8 @@ private:
     mutable bool milticell_coverage_test_performed;
 
     int r;
+    int root_width;
+    int height;
     QPoint center;
     int category_id;
 };

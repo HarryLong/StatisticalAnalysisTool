@@ -165,16 +165,16 @@ void MainWindow::reproduce()
     ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputFile().toStdString(),
                                      reproduced_points, reproduction_config.width, reproduction_config.height);
 
-    AnalysisConfiguration config(0, 200, 20, 10000, 10000);
-    std::vector<int> priority_sorted_cat;
-    priority_sorted_cat.push_back(9);
-    priority_sorted_cat.push_back(5);
-    priority_sorted_cat.push_back(6);
+//    AnalysisConfiguration config(0, 200, 20, 10000, 10000);
+//    std::vector<int> priority_sorted_cat;
+//    priority_sorted_cat.push_back(9);
+//    priority_sorted_cat.push_back(5);
+//    priority_sorted_cat.push_back(6);
 
-    config.setPrioritySortedCategoryIds(priority_sorted_cat);
+//    config.setPrioritySortedCategoryIds(priority_sorted_cat);
 
-    // Reanalyze
-    Analyzer::analyze("/home/harry/.ecotracker/reanalyzed/", reproduced_points, config);
+//    // Reanalyze
+//    Analyzer::analyze("/home/harry/.ecotracker/reanalyzed/", reproduced_points, config);
 
     // Open the file
 //    std::string cmd("eog ");

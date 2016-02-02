@@ -63,11 +63,11 @@ bool CategoryProperties::load_data(std::string filename)
 
             // Min
             file.read(memblock, 4);
-            m_header.min_size = FileUtils::readInt32((unsigned char*) memblock);
+            m_header.radius_range.first = FileUtils::readInt32((unsigned char*) memblock);
 
             // Max
             file.read(memblock, 4);
-            m_header.max_size = FileUtils::readInt32((unsigned char*) memblock);
+            m_header.radius_range.second = FileUtils::readInt32((unsigned char*) memblock);
 
             // Diff
             file.read(memblock, 4);
@@ -133,8 +133,8 @@ void CategoryProperties::write(std::string filename)
     std::string header (CATEGORY_PROPERTIES_SIGNATURE);
     file.write(header.c_str(), CATEGORY_PROPERTIES_SIGNATURE_LENGTH);
     file.write((char*) FileUtils::toBin((unsigned int)m_header.category_id,4),4);
-    file.write((char*) FileUtils::toBin((unsigned int)m_header.min_size,4),4);
-    file.write((char*) FileUtils::toBin((unsigned int)m_header.max_size,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.radius_range.first,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.radius_range.second,4),4);
     file.write((char*) FileUtils::toBin((unsigned int)m_header.bin_size,4),4);
     file.write((char*) FileUtils::toBin((unsigned int)m_header.n_points,4),4);
     file.write((char*) FileUtils::toBin((unsigned int)m_header.priority,4),4);
@@ -162,10 +162,19 @@ void CategoryProperties::writeToCSV(std::string filename)
     {
         // First write the header
         file << "Points id," << m_header.category_id << "\n";
-        file << "Min," << m_header.min_size << "\n";
-        file << "Max," << m_header.max_size << "\n";
         file << "diff," << m_header.bin_size << "\n";
         file << "# points," << m_header.n_points << "\n";
+        file << "Min radius," << m_header.radius_range.first << "\n";
+        file << "Max radius," << m_header.radius_range.second << "\n";
+        file << "Avg radius," << m_header.radius_avg << "\n";
+
+        file << "Min height," << m_header.height_range.first << "\n";
+        file << "Max height," << m_header.height_range.second << "\n";
+        file << "Avg height," << m_header.height_avg << "\n";
+
+        file << "Min root size," << m_header.root_size_range.first << "\n";
+        file << "Max root size," << m_header.root_size_range.second << "\n";
+        file << "Avg root size," << m_header.root_size_avg << "\n";
         // Dependent category ids
         file << "Dependent category ids, ";
         for(int category_dependent_id : m_header.category_dependent_ids)
