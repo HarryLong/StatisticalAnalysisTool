@@ -10,12 +10,15 @@
 #define RADIAL_DISTRIBUTION_FILE_EXTENSION ".rad"
 #define CATEGORY_PROPERTIES_FILE_EXTENSION ".category_properties"
 
+#define TIMESTAMP_FILENAME "timestamp"
+
 #define MAX_8_BITS 256
 #define MAX_16_BITS 65536
 
 const char * FileUtils::_CONFIGURATION_FILENAME = CONFIGURATION_FILE_NAME;
 const char * FileUtils::_RADIAL_DISTRIBUTION_EXT = RADIAL_DISTRIBUTION_FILE_EXTENSION;
 const char * FileUtils::_CATEGORY_PROPERTIES_EXT = CATEGORY_PROPERTIES_FILE_EXTENSION;
+const char * FileUtils::_TIMESTAMP_FILENAME = TIMESTAMP_FILENAME;
 
 /*************
  * BIN UTILS *
@@ -229,6 +232,16 @@ bool FileUtils::check_directory_structure(QString directory)
         if(!QFile(configuration_file).exists())
         {
             std::cout << "Configuration file: " << configuration_file.toStdString() << " doesn't exist!" << std::endl;
+            return false;
+        }
+    }
+    // Ensure the timestamp file exists
+    {
+        QString timestamp_file(directory);
+        timestamp_file.append(TIMESTAMP_FILENAME);
+        if(!QFile(timestamp_file).exists())
+        {
+            std::cout << "Timestamp file: " << timestamp_file.toStdString() << " doesn't exist!" << std::endl;
             return false;
         }
     }

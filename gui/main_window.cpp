@@ -4,6 +4,10 @@
 #include "../analysis_point.h"
 #include "../reproducer/reproducer.h"
 #include "../utils/utils.h"
+#include "central_widget.h"
+#include "dialogs.h"
+#include "reproduction_config_dialog.h"
+#include <QActionGroup>
 
 #define MAX_INPUT_WIDGET_DIMENSION 1000
 #define MIN_INPUT_WIDGET_DIMENSION 100

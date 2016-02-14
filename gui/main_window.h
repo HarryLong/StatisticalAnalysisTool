@@ -1,12 +1,14 @@
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
-#include "central_widget.h"
 #include "../reproducer/distribution_factory.h"
-#include "dialogs.h"
-
 #include <QMainWindow>
-#include <QActionGroup>
+
+class QActionGroup;
+class CentralWidget;
+class RandomDistributionProducerDialog;
+class ClusteredDistributionProducerDialog;
+class ReproductionConfigurationProducerDialog;
 
 class MainWindow : public QMainWindow
 {

@@ -9,6 +9,7 @@ class FileUtils
 {
 public:
     static const char * _CONFIGURATION_FILENAME;
+    static const char * _TIMESTAMP_FILENAME;
     static const char * _RADIAL_DISTRIBUTION_EXT;
     static const char * _CATEGORY_PROPERTIES_EXT;
 

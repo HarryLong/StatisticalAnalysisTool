@@ -9,6 +9,7 @@
 #include <iostream>
 #include <thread>
 #include <QProgressBar>
+#include <fstream>
 
 #include <chrono>
 
@@ -96,14 +97,18 @@ void CategoryPropertiesTracker::complete(CategoryProperties & category_propertie
 /************
  * ANALYZER *
  ************/
-void Analyzer::analyze(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration configuration, QProgressBar * progress_bar)
+unsigned long Analyzer::analyze(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration configuration,
+                                QProgressBar * progress_bar)
 {
-    Analyzer(base_directory, points, configuration, progress_bar).analyze();
+    unsigned long timestamp( std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+    Analyzer(base_directory, points, configuration, timestamp, progress_bar).analyze();
+
+    return timestamp;
 }
 
 Analyzer::Analyzer(QString base_directory, const std::map<int, std::vector<AnalysisPoint> > & points, AnalysisConfiguration analysis_configuration,
-                   QProgressBar * progress_bar) :
-    m_analysis_conf(analysis_configuration), m_points(points), m_progress_bar(progress_bar)
+                    unsigned long timestamp, QProgressBar * progress_bar) :
+    m_analysis_conf(analysis_configuration), m_points(points), m_progress_bar(progress_bar), m_timestamp(timestamp)
 {
     // Init the base directory
     if(!base_directory.endsWith("/"))
@@ -144,9 +149,23 @@ void Analyzer::analyze()
     // Generate the category properties
     generate_category_properties();
 
+    generate_timestamp();
+
     auto duration (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time).count());
 
     std::cout << "Duration: " << duration << " milliseconds." << std::endl;
+}
+
+void Analyzer::generate_timestamp()
+{
+    std::string filename(m_base_dir.append(FileUtils::_TIMESTAMP_FILENAME).toStdString());
+
+    // Write timestamp file
+    std::ofstream file;
+    file.open(filename);
+    if(file.is_open())
+        file << m_timestamp << "\n";
+    file.close();
 }
 
 void Analyzer::generate_configuration()

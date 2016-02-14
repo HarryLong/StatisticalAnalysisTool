@@ -8,12 +8,13 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 
+
 set(INCLUDE_DIRECTORIES ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS})
 
 include_directories(${INCLUDE_DIRECTORIES})
 
-set(GUI_LIBS Qt5::Widgets Qt5::Core Qt5::Gui)
-set(LIB_LIBS Qt5::Core Qt5::Gui)
+set(GUI_LIBS Qt5::Widgets Qt5::Core Qt5::Gui EcoDataTracker)
+set(LIB_LIBS Qt5::Core Qt5::Gui EcoDataTracker)
 
 add_subdirectory("test")
 
@@ -26,7 +27,7 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX_FLAGS} -O0 -g -
 SET(CMAKE_BUILD_TYPE RELEASE)
 #SET(CMAKE_BUILD_TYPE RELWITHDEBINFO)
 
-SET(GUI_SRC_FILES gui/central_widget gui/dialogs gui/input_widget gui/main gui/main_window )
+SET(GUI_SRC_FILES gui/central_widget gui/dialogs gui/input_widget gui/main gui/main_window gui/reproduction_config_dialog)
 SET(ANALYSER_SRC_FILES analyser/analysis_configuration analyser/analyzer analyser/category_analyzer analyser/dependency_analyzer analyser/radial_distribution_analyzer)
 set(UTILS_SRC_FILES utils/utils utils/dice_roller utils/file_utils utils/point_drawer)
 set(REPRODUCTION_SRC_FILES reproducer/distribution_factory reproducer/point_factory reproducer/reproducer reproducer/reproduction_configuration)
