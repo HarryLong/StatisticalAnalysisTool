@@ -166,7 +166,7 @@ void MainWindow::reproduce()
 //    RadialDistributionReproducer::reproduce(reproduction_config);
 
     std::map<int,std::vector<AnalysisPoint> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
-    ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputFile().toStdString(),
+    ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputFilename().toStdString(),
                                      reproduced_points, reproduction_config.width, reproduction_config.height);
 
 //    AnalysisConfiguration config(0, 200, 20, 10000, 10000);
