@@ -3,6 +3,10 @@
 #include <QDebug>
 #include <QApplication>
 
+
+//TMP
+#include "../plant_file/distrib.h"
+
 int main(int argc, char *argv[])
 {
     qWarning() << "Starting GUI...";

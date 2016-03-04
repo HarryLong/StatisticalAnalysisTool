@@ -46,7 +46,7 @@ void MySignaledLabel::mouseReleaseEvent(QMouseEvent *e)
  ****************/
 InputWidget::InputWidget(int width, int height, QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f), m_width(width), m_height(height),
     m_point_drawer(width, height), m_container_lbl(width, height),
-    m_point_size(1), m_active_category(1), m_points()
+    m_point_r(1), m_active_category(1), m_points()
 {
     connect(&m_container_lbl, SIGNAL(mousePressed(QMouseEvent*)), this, SLOT(mouse_pressed(QMouseEvent*)));
 
@@ -108,7 +108,7 @@ void InputWidget::refresh()
 void InputWidget::mouse_pressed(QMouseEvent * event)
 {
     if (event->button() == Qt::LeftButton)
-        addPoint(AnalysisPoint(m_active_category, event->pos(), m_point_size));
+        addPoint(AnalysisPoint(m_active_category, event->pos(), m_point_r, m_point_r, m_point_r));
 }
 
 void InputWidget::clear()
@@ -143,9 +143,9 @@ std::map<int,std::vector<AnalysisPoint> > & InputWidget::getPoints()
     return m_points;
 }
 
-void InputWidget::setPointSize(int size)
+void InputWidget::setPointRadius(int r)
 {
-    m_point_size = size;
+    m_point_r = r;
 }
 
 void InputWidget::setAciveCategoryId(int category_id)

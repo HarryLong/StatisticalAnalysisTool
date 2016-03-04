@@ -53,7 +53,7 @@ public:
 public slots:
     void setSize(int width, int height);
     void mouse_pressed(QMouseEvent * event);
-    void setPointSize(int size);
+    void setPointRadius(int height);
     void clear();
     void setAciveCategoryId(int category_id);
 
@@ -61,7 +61,7 @@ private:
     void refresh();
     void init_layout();
 
-    int m_point_size;
+    int m_point_r;
     int m_active_category;
     int m_width, m_height;
     PointDrawer m_point_drawer;

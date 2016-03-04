@@ -23,53 +23,57 @@ void CategoryAnalyzer::calculateCategoryProperties(bool asynchronous)
         calculate_category_properties();
 }
 
+#include <QDebug>
 void CategoryAnalyzer::calculate_category_properties()
 {
     CategoryProperties::Histogram data;
-    int radius_min(-1);
-    int radius_max(-1);
-    float radius_avg(.0f);
 
-    int height_min(-1);
-    int height_max(-1);
-    float height_avg(.0f);
+    SizeProperties radius_properties, height_properties, root_size_properties;
 
-    int root_size_min(-1);
-    int root_size_max(-1);
-    float root_size_avg(.0f);
+//    int radius_min(-1);
+//    int radius_max(-1);
+//    float radius_avg(.0f);
+
+//    int height_min(-1);
+//    int height_max(-1);
+//    float height_avg(.0f);
+
+//    int root_size_min(-1);
+//    int root_size_max(-1);
+//    float root_size_avg(.0f);
 
     float addition_value(1.0f/m_points.size());
 
     for(AnalysisPoint & p : m_points)
     {
         int radius(p.getRadius());
-        radius_avg+= radius;
+        radius_properties.avg += radius;
 
         int height(p.getHeight());
-        height_avg += height;
+        height_properties.avg += height;
 
         int root_size(p.getRootWidth());
-        root_size_avg += root_size;
+        root_size_properties.avg += root_size;
 
-        int bracket(CategoryAnalyzer::getBin(p.getRadius(), m_bin_size));
+        int bracket(CategoryAnalyzer::getBin(p.getHeight(), m_bin_size));
 
         // Radius --> Used for statistical analysis
-        if(radius_min == -1 || radius < radius_min)
-            radius_min = radius;
-        if (radius_max == -1 || radius > radius_max)
-            radius_max = radius;
+        if(radius_properties.min == -1 || radius < radius_properties.min)
+            radius_properties.min = radius;
+        if (radius_properties.max == -1 || radius > radius_properties.max)
+            radius_properties.max = radius;
 
         // Height
-        if(height_min == -1 || height < height_min)
-            height_min = height;
-        if (height_max == -1 || height > height_max)
-            height_max = height;
+        if(height_properties.min == -1 || height < height_properties.min)
+            height_properties.min = height;
+        if (height_properties.max == -1 || height > height_properties.max)
+            height_properties.max = height;
 
         // Root size
-        if(root_size_min == -1 || root_size < root_size_min)
-            root_size_min = root_size;
-        if (root_size_max == -1 || root_size > root_size_max)
-            root_size_max = root_size;
+        if(root_size_properties.min == -1 || root_size < root_size_properties.min)
+            root_size_properties.min = root_size;
+        if (root_size_properties.max == -1 || root_size > root_size_properties.max)
+            root_size_properties.max = root_size;
 
         if(data.find(bracket) == data.end())
             data.insert(std::pair<int,float>(bracket, .0f));
@@ -77,16 +81,35 @@ void CategoryAnalyzer::calculate_category_properties()
         data[bracket] += addition_value;
     }
 
-    // Averages
-    radius_avg /= m_points.size();
-    if(height_avg != -1)
-        height_avg /= m_points.size();
-    if(root_size_avg != -1)
-        root_size_avg /= m_points.size();
+    // Canopy width
+    if(radius_properties.min == -1)
+        radius_properties.min = 0;
+    if(radius_properties.max == -1)
+        radius_properties.max = 0;
 
-    CategoryPropertiesHeader header(m_category_id, m_priority, m_points.size(), m_bin_size, std::pair<int,int>(radius_min, radius_max),
-                                    std::pair<int,int>(height_min, height_max), std::pair<int,int>(root_size_min, root_size_max),
-                                    radius_avg, height_avg, root_size_avg);
+    // Height
+    if(height_properties.min == -1)
+        height_properties.min = 0;
+    if(height_properties.max == -1)
+        height_properties.max = 0;
+
+    // Root size
+    if(root_size_properties.min == -1)
+        root_size_properties.min = 0;
+    if(root_size_properties.max == -1)
+        root_size_properties.max = 0;
+
+    // Averages
+    if(m_points.size() > 0)
+        radius_properties.avg /= m_points.size();
+    height_properties.avg = std::max(.0f, height_properties.avg /= m_points.size());
+    root_size_properties.avg = std::max(.0f, root_size_properties.avg /= m_points.size());
+
+    float height_to_canopy_radius(std::max(.0f, ((float)radius_properties.max)/height_properties.max));
+    float height_to_root_size(std::max(.0f, ((float)root_size_properties.max)/height_properties.max));
+
+    CategoryPropertiesHeader header(m_category_id, m_priority, m_points.size(), m_bin_size, height_to_canopy_radius, height_to_root_size,
+                                    radius_properties, height_properties, root_size_properties);
 
     m_category_properties = CategoryProperties(header, data);
 

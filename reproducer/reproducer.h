@@ -58,21 +58,32 @@ class RadialDistributionReproducer
 {
 public:
 
+    struct SizeProperties
+    {
+        int minHeight;
+        int maxHeight;
+        float heightToCanopyRadius;
+    };
+
+
     typedef std::map<std::pair<int,int>, RadialDistribution> PairCorrelations;
     typedef std::map<int,CategoryProperties> CategoryPropertiesContainer;
+    typedef std::map<int, SizeProperties> GeneratedPointsProperties;
+    typedef std::map<int,std::vector<AnalysisPoint> > GeneratedPoints;
 
-    static std::map<int,std::vector<AnalysisPoint> > reproduce(ReproductionConfiguration reproduction_settings);
+    static GeneratedPoints reproduce(ReproductionConfiguration reproduction_settings, GeneratedPointsProperties * outGeneratedPointProperties);
 
     ~RadialDistributionReproducer();
 
 
 private:
     RadialDistributionReproducer(PairCorrelations pair_correlations, CategoryPropertiesContainer category_properties,
-                                 ReproductionConfiguration reproduction_config, AnalysisConfiguration analysis_configuration);
+                                 ReproductionConfiguration reproduction_config, AnalysisConfiguration analysis_configuration,
+                                 GeneratedPointsProperties * outGeneratedPointProperties);
     void startPointGeneration();
     void two_point_initialize();
     int matching_density_initialize();
-    std::map<int,std::vector<AnalysisPoint> >& getGeneratedPoints();
+    GeneratedPoints & getGeneratedPoints();
 
     void accelerated_point_validity_check(const AnalysisPoint & reference_point, bool & valid, bool & strength_calculation_necessary);
     void accelerated_point_validity_check(const AnalysisPoint & reference_point, int queried_category, bool & valid, bool & strength_calculation_necessary);
@@ -96,7 +107,8 @@ private:
     CategoryPropertiesContainer m_category_properties;
 
     std::vector<AnalysisPoint> m_active_category_points;
-    std::map<int,std::vector<AnalysisPoint> > m_all_generated_points;
+    GeneratedPoints m_all_generated_points;
+    GeneratedPointsProperties * m_generated_points_properties;
     ReproductionConfiguration m_reproduction_configuration;
     PointFactory m_point_factory;
     PointSpatialHashmap m_spatial_point_storage;

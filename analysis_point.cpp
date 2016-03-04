@@ -1,10 +1,10 @@
 #include "analysis_point.h"
 
-AnalysisPoint::AnalysisPoint(int category_id, QPoint center, int radius) :
-    AnalysisPoint(category_id, center, radius, -1, -1 )
-{
+//AnalysisPoint::AnalysisPoint(int category_id, QPoint center, int radius) :
+//    AnalysisPoint(category_id, center, radius, -1, -1 )
+//{
 
-}
+//}
 
 AnalysisPoint::AnalysisPoint(int category_id, QPoint center, int canopy_radius, int root_width, int height) :
     center(center), category_id(category_id), r(canopy_radius), root_width(root_width), height(height),
@@ -13,7 +13,7 @@ AnalysisPoint::AnalysisPoint(int category_id, QPoint center, int canopy_radius, 
 
 }
 
-AnalysisPoint::AnalysisPoint() : AnalysisPoint(-1, QPoint(-1,-1), -1)
+AnalysisPoint::AnalysisPoint() : AnalysisPoint(-1, QPoint(-1,-1), -1, -1, -1)
 {
 
 }
@@ -42,6 +42,8 @@ bool AnalysisPoint::multiCellCoverageTestPerformed() const
 bool AnalysisPoint::operator==(const AnalysisPoint & other) const
 {
     return (this->r == other.r &&
+            this->root_width == other.root_width &&
+            this->height == other.height &&
             this->category_id == other.category_id &&
             this->center == other.center);
 }

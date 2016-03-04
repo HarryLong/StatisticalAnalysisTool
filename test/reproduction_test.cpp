@@ -20,13 +20,14 @@ void ReproductionTest::setUp()
     {
         DistributionFactory factory;
         std::map<int, std::vector<AnalysisPoint> >analysis_points;
-        analysis_points[1] = (factory.generateRandomDistribution(1, 1000, 1000, 1000, 1, 10) );
+        analysis_points[1] = (factory.generateRandomDistribution(1, 1000, 1000, 1000, 1, 10, 1, 1) );
         Analyzer::analyze(m_production_test_dir, analysis_points, analysis_config);
     }
 
     // Reproduce
     ReproductionConfiguration reproduction_config(m_production_test_dir, 1000, 1000, 10000);
-    std::map<int,std::vector<AnalysisPoint> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
+    RadialDistributionReproducer::GeneratedPointsProperties point_properties;
+    std::map<int,std::vector<AnalysisPoint> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config, &point_properties));
     Analyzer::analyze(m_reproduction_test_dir, reproduced_points, analysis_config);
 }
 

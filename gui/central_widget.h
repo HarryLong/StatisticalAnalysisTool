@@ -27,8 +27,10 @@ private:
     void init_layout();
 
     InputWidget m_input_widget;
-    QSpinBox * m_point_size_sb;
+    QSpinBox * m_point_r_sb;
     QSpinBox * m_category_sb;
+    QLineEdit * m_height_to_canopy_r_le;
+    QLineEdit * m_height_to_root_size_le;
 
     QPushButton * m_analyze_btn;
 

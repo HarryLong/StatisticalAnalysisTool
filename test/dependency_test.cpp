@@ -19,10 +19,10 @@ void DependencyTest::tearDown()
 void DependencyTest::setup_dependent_points()
 {
     std::vector<AnalysisPoint> category_1_points;
-    category_1_points.push_back(AnalysisPoint(1, QPoint(250,250), 10));
-    category_1_points.push_back(AnalysisPoint(1, QPoint(200,200), 5));
-    category_1_points.push_back(AnalysisPoint(1, QPoint(80,80), 5));
-    category_1_points.push_back(AnalysisPoint(1, QPoint(20,20), 10));
+    category_1_points.push_back(AnalysisPoint(1, QPoint(250,250), 10, 10, 10));
+    category_1_points.push_back(AnalysisPoint(1, QPoint(200,200), 5, 5, 5));
+    category_1_points.push_back(AnalysisPoint(1, QPoint(80,80), 5, 5, 5));
+    category_1_points.push_back(AnalysisPoint(1, QPoint(20,20), 10, 10, 10));
 
     m_dependent_points.emplace(1, category_1_points);
 
@@ -30,11 +30,11 @@ void DependencyTest::setup_dependent_points()
     std::vector<AnalysisPoint> category_2_points;
     for(int i(1); i < 10; i++)
     {
-        category_2_points.push_back(AnalysisPoint(2, QPoint(250-i,250), 1));
-        category_2_points.push_back(AnalysisPoint(2, QPoint(250,250-i), 1));
+        category_2_points.push_back(AnalysisPoint(2, QPoint(250-i,250), 1, 1, 1));
+        category_2_points.push_back(AnalysisPoint(2, QPoint(250,250-i), 1, 1, 1));
 
-        category_2_points.push_back(AnalysisPoint(2, QPoint(250+i,250), 1));
-        category_2_points.push_back(AnalysisPoint(2, QPoint(250,250+i), 1));
+        category_2_points.push_back(AnalysisPoint(2, QPoint(250+i,250), 1, 1, 1));
+        category_2_points.push_back(AnalysisPoint(2, QPoint(250,250+i), 1, 1, 1));
     }
     m_dependent_points.emplace(2, category_2_points);
 }
@@ -42,8 +42,8 @@ void DependencyTest::setup_dependent_points()
 void DependencyTest::setup_independent_points()
 {
     DistributionFactory factory;
-    std::vector<AnalysisPoint> c1_points(factory.generateRandomDistribution(1, 500, 240, 500, 1, 10));
-    std::vector<AnalysisPoint> c2_points(factory.generateRandomDistribution(2, 500, 240, 500, 1, 10));
+    std::vector<AnalysisPoint> c1_points(factory.generateRandomDistribution(1, 500, 250, 500, 1, 10, 1.0f, 1.0f));
+    std::vector<AnalysisPoint> c2_points(factory.generateRandomDistribution(2, 500, 250, 500, 1, 10, 1.0f, 1.0f));
 
     //shift all c2 points by 250
     for(AnalysisPoint & p : c2_points)

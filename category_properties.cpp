@@ -61,14 +61,6 @@ bool CategoryProperties::load_data(std::string filename)
             file.read(memblock, 4);
             m_header.category_id = FileUtils::readInt32((unsigned char*) memblock);
 
-            // Min
-            file.read(memblock, 4);
-            m_header.radius_range.first = FileUtils::readInt32((unsigned char*) memblock);
-
-            // Max
-            file.read(memblock, 4);
-            m_header.radius_range.second = FileUtils::readInt32((unsigned char*) memblock);
-
             // Diff
             file.read(memblock, 4);
             m_header.bin_size = FileUtils::readInt32((unsigned char*) memblock);
@@ -80,6 +72,71 @@ bool CategoryProperties::load_data(std::string filename)
             // Priority
             file.read(memblock, 4);
             m_header.priority = FileUtils::readInt32((unsigned char*) memblock);
+
+            // Height to radius multiplier
+            file.read(memblock, 4);
+            m_header.height_to_radius_multiplier = FileUtils::readFloat32((unsigned char*) memblock);
+
+            // Height to root size multiplier
+            file.read(memblock, 4);
+            m_header.height_to_root_size_multiplier = FileUtils::readFloat32((unsigned char*) memblock);
+
+            /**********
+             * HEIGHT *
+             **********/
+            // Min
+            file.read(memblock, 4);
+            m_header.height_properties.min = FileUtils::readInt32((unsigned char*) memblock);
+
+            // Max
+            file.read(memblock, 4);
+            m_header.height_properties.max = FileUtils::readInt32((unsigned char*) memblock);
+
+            // Avg
+            file.read(memblock, 4);
+            m_header.height_properties.avg = FileUtils::readFloat32((unsigned char*) memblock);
+
+            // Standard Deviation
+            file.read(memblock, 4);
+            m_header.height_properties.standard_dev = FileUtils::readFloat32((unsigned char*) memblock);
+
+            /*****************
+             * CANOPY RADIUS *
+             *****************/
+            // Min
+            file.read(memblock, 4);
+            m_header.radius_properties.min = FileUtils::readInt32((unsigned char*) memblock);
+
+            // Max
+            file.read(memblock, 4);
+            m_header.radius_properties.max = FileUtils::readInt32((unsigned char*) memblock);
+
+            // Avg
+            file.read(memblock, 4);
+            m_header.radius_properties.avg = FileUtils::readFloat32((unsigned char*) memblock);
+
+            // Standard Deviation
+            file.read(memblock, 4);
+            m_header.radius_properties.standard_dev = FileUtils::readFloat32((unsigned char*) memblock);
+
+            /*************
+             * ROOT SIZE *
+             *************/
+            // Min
+            file.read(memblock, 4);
+            m_header.root_size_properties.min = FileUtils::readInt32((unsigned char*) memblock);
+
+            // Max
+            file.read(memblock, 4);
+            m_header.root_size_properties.max = FileUtils::readInt32((unsigned char*) memblock);
+
+            // Avg
+            file.read(memblock, 4);
+            m_header.root_size_properties.avg = FileUtils::readFloat32((unsigned char*) memblock);
+
+            // Standard Deviation
+            file.read(memblock, 4);
+            m_header.root_size_properties.standard_dev = FileUtils::readFloat32((unsigned char*) memblock);
 
             // Dependent category ids
             {
@@ -133,12 +190,35 @@ void CategoryProperties::write(std::string filename)
     std::string header (CATEGORY_PROPERTIES_SIGNATURE);
     file.write(header.c_str(), CATEGORY_PROPERTIES_SIGNATURE_LENGTH);
     file.write((char*) FileUtils::toBin((unsigned int)m_header.category_id,4),4);
-    file.write((char*) FileUtils::toBin((unsigned int)m_header.radius_range.first,4),4);
-    file.write((char*) FileUtils::toBin((unsigned int)m_header.radius_range.second,4),4);
+
     file.write((char*) FileUtils::toBin((unsigned int)m_header.bin_size,4),4);
     file.write((char*) FileUtils::toBin((unsigned int)m_header.n_points,4),4);
     file.write((char*) FileUtils::toBin((unsigned int)m_header.priority,4),4);
-
+    file.write((char*) FileUtils::toBin(m_header.height_to_radius_multiplier,4),4);
+    file.write((char*) FileUtils::toBin(m_header.height_to_root_size_multiplier,4),4);
+    //
+    /**********
+     * HEIGHT *
+     **********/
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.height_properties.min,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.height_properties.max,4),4);
+    file.write((char*) FileUtils::toBin(m_header.height_properties.avg,4),4);
+    file.write((char*) FileUtils::toBin(m_header.height_properties.standard_dev,4),4);
+    /*****************
+     * CANOPY RADIUS *
+     *****************/
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.radius_properties.min,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.radius_properties.max,4),4);
+    file.write((char*) FileUtils::toBin(m_header.radius_properties.avg,4),4);
+    file.write((char*) FileUtils::toBin(m_header.radius_properties.standard_dev,4),4);
+    /*************
+     * ROOT SIZE *
+     *************/
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.root_size_properties.min,4),4);
+    file.write((char*) FileUtils::toBin((unsigned int)m_header.root_size_properties.max,4),4);
+    file.write((char*) FileUtils::toBin(m_header.root_size_properties.avg,4),4);
+    file.write((char*) FileUtils::toBin(m_header.root_size_properties.standard_dev,4),4);
+    //
     // Dependent category ids
     file.write((char*) FileUtils::toBin((unsigned int)m_header.category_dependent_ids.size(),4),4);
     for(int category_dependent_id : m_header.category_dependent_ids)
@@ -162,19 +242,27 @@ void CategoryProperties::writeToCSV(std::string filename)
     {
         // First write the header
         file << "Points id," << m_header.category_id << "\n";
+        file << "priority," << m_header.priority<< "\n";
         file << "diff," << m_header.bin_size << "\n";
         file << "# points," << m_header.n_points << "\n";
-        file << "Min radius," << m_header.radius_range.first << "\n";
-        file << "Max radius," << m_header.radius_range.second << "\n";
-        file << "Avg radius," << m_header.radius_avg << "\n";
+        file << "height to canopy width multiplier," << m_header.height_to_radius_multiplier << "\n";
+        file << "height to root size multiplier," << m_header.height_to_root_size_multiplier << "\n";
+        //CANOPY
+        file << "Min radius," << m_header.radius_properties.min << "\n";
+        file << "Max radius," << m_header.radius_properties.max << "\n";
+        file << "Avg radius," << m_header.radius_properties.avg << "\n";
+        file << "Standard dev radius," << m_header.radius_properties.standard_dev << "\n";
+        // HEIGHT
+        file << "Min height," << m_header.height_properties.min << "\n";
+        file << "Max height," << m_header.height_properties.max << "\n";
+        file << "Avg height," << m_header.height_properties.avg << "\n";
+        file << "Standard dev height," << m_header.height_properties.standard_dev << "\n";
+        // ROOT SIZE
+        file << "Root size min," << m_header.root_size_properties.min << "\n";
+        file << "Root size max," << m_header.root_size_properties.max << "\n";
+        file << "Avg root size," << m_header.root_size_properties.avg << "\n";
+        file << "Standard dev root size," << m_header.root_size_properties.standard_dev << "\n";
 
-        file << "Min height," << m_header.height_range.first << "\n";
-        file << "Max height," << m_header.height_range.second << "\n";
-        file << "Avg height," << m_header.height_avg << "\n";
-
-        file << "Min root size," << m_header.root_size_range.first << "\n";
-        file << "Max root size," << m_header.root_size_range.second << "\n";
-        file << "Avg root size," << m_header.root_size_avg << "\n";
         // Dependent category ids
         file << "Dependent category ids, ";
         for(int category_dependent_id : m_header.category_dependent_ids)

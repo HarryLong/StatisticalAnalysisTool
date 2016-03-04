@@ -31,9 +31,10 @@ SET(GUI_SRC_FILES gui/central_widget gui/dialogs gui/input_widget gui/main gui/m
 SET(ANALYSER_SRC_FILES analyser/analysis_configuration analyser/analyzer analyser/category_analyzer analyser/dependency_analyzer analyser/radial_distribution_analyzer)
 set(UTILS_SRC_FILES utils/utils utils/dice_roller utils/file_utils utils/point_drawer)
 set(REPRODUCTION_SRC_FILES reproducer/distribution_factory reproducer/point_factory reproducer/reproducer reproducer/reproduction_configuration)
-set(CORE_SRC_FILES point_spatial_hashmap category_properties point_map analysis_point radial_distribution)
+set(CORE_SRC_FILES point_spatial_hashmap category_properties point_map analysis_point radial_distribution size_properties.h)
+set(PLANT_FILE_SRC_FILES plant_file/distrib plant_file/vecpnt)
 
-set(CORE_HEADER_FILES radial_distribution.h analysis_point.h category_properties.h)
+set(CORE_HEADER_FILES radial_distribution.h analysis_point.h category_properties.h size_properties.h)
 set(ANALYSIS_HEADER_FILES analyser/analysis_configuration.h analyser/analyzer.h analyser/radial_distribution_analyzer.h analyser/category_analyzer.h )
 set(REPRODUCER_HEADER_FILES reproducer/reproducer.h reproducer/reproduction_configuration.h )
 
@@ -42,7 +43,8 @@ ${GUI_SRC_FILES}
 ${ANALYSER_SRC_FILES}
 ${UTILS_SRC_FILES}
 ${REPRODUCTION_SRC_FILES}
-${CORE_SRC_FILES} )
+${CORE_SRC_FILES}
+${PLANT_FILE_SRC_FILES} )
 target_link_libraries(RadialDistributionToolGUI ${GUI_LIBS})
 
 add_library(RadialDistributionAnalyser SHARED ${ANALYSER_SRC_FILES} ${CORE_SRC_FILES} ${UTILS_SRC_FILES})

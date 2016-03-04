@@ -83,7 +83,7 @@ class FileChooserWidget : public QWidget
 {
 Q_OBJECT
 public:
-    FileChooserWidget(QString heading, QString filter = "", QWidget * parent = 0);
+    FileChooserWidget(QString heading, QString extension, QString filter = "", QWidget * parent = 0);
     ~FileChooserWidget();
     QString filename();
     bool valid();
@@ -99,6 +99,7 @@ private:
     QLineEdit * m_filename_te;
     QPushButton * m_filechooser_btn;
     QString m_filter;
+    QString m_extension;
     bool m_valid;
 };
 

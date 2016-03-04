@@ -5,30 +5,31 @@
 #include <string>
 #include <vector>
 #include <set>
+#include "size_properties.h"
 
 #define CATEGORY_PROPERTIES_SIGNATURE "CATEGORYPROPERTIESFILE"
 #define CATEGORY_PROPERTIES_SIGNATURE_LENGTH 22
 struct CategoryPropertiesHeader{
 public:
     CategoryPropertiesHeader() {}
-    CategoryPropertiesHeader(int category_id, int priority, int n_points, int bin_size, std::pair<int,int> radius_range, std::pair<int,int> height_range,
-                             std::pair<int,int> root_size_range, float radius_avg, float height_avg, float root_size_avg) :
-        category_id(category_id), priority(priority), n_points(n_points), bin_size(bin_size), radius_range(radius_range),
-        height_range(height_range), root_size_range(root_size_range), radius_avg(radius_avg), height_avg(height_avg), root_size_avg(root_size_avg)
+    CategoryPropertiesHeader(int category_id, int priority, int n_points, int bin_size, float height_to_radius_multiplier, float height_to_root_size_multiplier,
+                             SizeProperties radius_properties, SizeProperties height_properties, SizeProperties root_size_properties) :
+        category_id(category_id), priority(priority), n_points(n_points), bin_size(bin_size), height_to_radius_multiplier(height_to_radius_multiplier),
+        height_to_root_size_multiplier(height_to_root_size_multiplier), radius_properties(radius_properties), height_properties(height_properties),
+        root_size_properties(root_size_properties)
     {}
 
     bool operator ==(const CategoryPropertiesHeader &other) const
     {
         return (category_id == other.category_id &&
-                radius_range == other.radius_range &&
-                height_range == other.height_range &&
-                root_size_range == other.root_size_range &&
-                radius_avg == other.radius_avg &&
-                height_avg == other.height_avg &&
-                root_size_avg == other.root_size_avg &&
+                radius_properties == other.radius_properties &&
+                height_properties == other.height_properties &&
+                root_size_properties == other.root_size_properties &&
                 bin_size == other.bin_size &&
                 n_points == other.n_points &&
                 priority == other.priority &&
+                height_to_radius_multiplier == other.height_to_radius_multiplier &&
+                height_to_root_size_multiplier == other.height_to_root_size_multiplier &&
                 category_dependent_ids == other.category_dependent_ids);
     }
 
@@ -36,16 +37,11 @@ public:
     int bin_size;
     int n_points;
     int priority;
+    float height_to_radius_multiplier;
+    float height_to_root_size_multiplier;
     std::set<int> category_dependent_ids;
 
-    std::pair<int,int> radius_range;
-    float radius_avg;
-
-    std::pair<int,int> height_range;
-    float height_avg;
-
-    std::pair<int,int> root_size_range;
-    float root_size_avg;
+    SizeProperties radius_properties, height_properties, root_size_properties;
 };
 
 class CategoryProperties

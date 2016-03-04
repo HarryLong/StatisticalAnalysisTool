@@ -9,6 +9,7 @@
 #include <QPainter>
 #include <QDebug>
 
+
 /*****************************
  * RADIAL DISTRIBUTION UTILS *
  *****************************/

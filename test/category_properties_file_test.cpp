@@ -8,7 +8,7 @@ void CategoryPropertiesFileTest::setUp()
 {
     // Generate random points
     DistributionFactory distribution_factory;
-    std::vector<AnalysisPoint> points(distribution_factory.generateRandomDistribution(1, 1000, 500, 500));
+    std::vector<AnalysisPoint> points(distribution_factory.generateRandomDistribution(1, 1000, 500, 500, 1, 1, 1, 1));
 
     CategoryAnalyzer category_analyzer(points, 1, 1);
     category_analyzer.calculateCategoryProperties(false);

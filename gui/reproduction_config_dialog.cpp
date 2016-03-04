@@ -146,11 +146,12 @@ QString ExplicitSelectorTab::dir()
 /***********************
  * FILE CHOOSER WIDGET *
  ***********************/
-FileChooserWidget::FileChooserWidget(QString heading, QString filter, QWidget * parent) :
+FileChooserWidget::FileChooserWidget(QString heading,  QString extension, QString filter, QWidget * parent) :
     QWidget(parent),
     m_filename_te(new QLineEdit(this)),
     m_filechooser_btn( new QPushButton("...", this)),
-    m_filter(filter)
+    m_filter(filter),
+    m_extension(extension)
 {
     QBoxLayout * layout (new QHBoxLayout);
     layout->addWidget(new QLabel(heading, this));
@@ -177,6 +178,11 @@ void FileChooserWidget::change_file()
 
     if(output_file != QString::null)
     {
+        if(m_extension != QString::null && !m_extension.isEmpty() &&
+                !output_file.endsWith(m_extension))
+        {
+            output_file.append(m_extension);
+        }
         setValid(true);
         m_filename_te->setText(output_file);
         emit selected_file_changed();
@@ -219,8 +225,8 @@ ReproductionConfigurationProducerDialog::ReproductionConfigurationProducerDialog
     m_output_h_te(new QLineEdit),
     m_ok_btn(new QPushButton("Start")),
     m_cancel_btn(new QPushButton("Cancel")),
-    m_output_file_chooser(new FileChooserWidget("Output file: ", "Plantfiles (*.pf)", this)),
-    m_output_img_file_chooser(new FileChooserWidget("Image file: ", "Images (*.jpg)", this))
+    m_output_file_chooser(new FileChooserWidget("Output file: ", ".pdp", "PDP (*.pdp)", this)),
+    m_output_img_file_chooser(new FileChooserWidget("Image file: ", ".jpg", "Images (*.jpg)", this))
 {
     setModal(true);
 
@@ -233,8 +239,8 @@ ReproductionConfigurationProducerDialog::ReproductionConfigurationProducerDialog
 
     // OK button
     m_ok_btn->setEnabled(false);
-//    connect(m_ok_btn, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(m_ok_btn, SIGNAL(clicked()), this, SLOT(print_config()));
+    connect(m_ok_btn, SIGNAL(clicked()), this, SLOT(accept()));
+//    connect(m_ok_btn, SIGNAL(clicked()), this, SLOT(print_config()));
 
     // Cancel button
     connect(m_cancel_btn, SIGNAL(clicked()), this, SLOT(close()));
@@ -331,9 +337,20 @@ void ReproductionConfigurationProducerDialog::init_layout()
     setLayout(layout);
 }
 
+bool ReproductionConfigurationProducerDialog::genImage()
+{
+    return m_generate_img_checkbox->isChecked();
+}
+
+QString ReproductionConfigurationProducerDialog::getOutputImageFilename()
+{
+    return m_output_img_file_chooser->filename();
+}
+
 QString ReproductionConfigurationProducerDialog::getOutputFilename()
 {
-    return m_output_file_chooser->filename();
+    QString filename(m_output_file_chooser->filename());
+    return filename;
 }
 
 void ReproductionConfigurationProducerDialog::tab_changed()

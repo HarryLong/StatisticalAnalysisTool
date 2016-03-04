@@ -1,9 +1,10 @@
 #include "point_factory.h"
 #include "../analysis_point.h"
 #include <iostream>
+#include <QDebug>
 
 PointFactory::PointFactory(int width, int height) :
-    m_dice_roller(0,RAND_MAX), m_taken_points(),m_active_category_id(-1),
+    m_dice_roller(0,RAND_MAX), m_taken_points(),
     m_width(width),
     m_height(height)
 {
@@ -17,6 +18,7 @@ PointFactory::~PointFactory()
 
 void PointFactory::setCategoryProperties(CategoryProperties properties)
 {
+    m_active_cp = properties;
     int current_percentage(0);
     m_probability_to_bin_size_pairs.clear();
 
@@ -32,8 +34,8 @@ void PointFactory::setCategoryProperties(CategoryProperties properties)
             m_probability_to_bin_size_pairs.insert(std::pair<int,int>(current_percentage, size_percentage_pair.first));
         }
     }
-    m_point_size_diffs = properties.m_header.bin_size;
-    m_active_category_id = properties.m_header.category_id;
+//    m_point_size_diffs = properties.m_header.bin_size;
+//    m_active_category_id = properties.m_header.category_id;
 }
 
 void PointFactory::setPositionStatus(QPoint point, bool available)
@@ -44,9 +46,24 @@ void PointFactory::setPositionStatus(QPoint point, bool available)
         m_taken_points.insertPoint(point);
 }
 
+
 AnalysisPoint PointFactory::getPoint()
 {
-    if(m_active_category_id == -1)
+    int random_number(m_dice_roller.generate()%1000);
+    auto it(m_probability_to_bin_size_pairs.begin());
+    for(; it != m_probability_to_bin_size_pairs.end(); it++)
+    {
+        if(random_number < it->first)
+            return getPoint(it->second + (m_dice_roller.generate()%m_active_cp.m_header.bin_size));
+    }
+
+    qCritical() << "Bug!";
+    return AnalysisPoint();
+}
+
+AnalysisPoint PointFactory::getPoint(int height)
+{
+    if(m_active_cp.m_header.category_id == -1)
     {
         std::cerr << "Attempting to get point from Point Factory with no active category id" << std::endl;
         exit(1);
@@ -58,23 +75,22 @@ AnalysisPoint PointFactory::getPoint()
                           m_dice_roller.generate()%(m_height-1));
     }while(m_taken_points.containsPoint(position));
 
-    int size;
-    {
-        int random_number(m_dice_roller.generate()%1000);
-        auto it(m_probability_to_bin_size_pairs.begin());
-        for(; it != m_probability_to_bin_size_pairs.end(); it++)
-        {
-            if(random_number < it->first)
-                break;
-        }
-        size = (it->second + (m_dice_roller.generate()%m_point_size_diffs));
-    }
 
-    return AnalysisPoint(m_active_category_id, position, size);
+//    qCritical() << "--------------------------------------";
+//    qCritical() << "Category id: " << m_active_cp.m_header.category_id;
+//    qCritical() << "Height: " << height;
+//    qCritical() << "Canopy r: " << height*m_active_cp.m_header.height_to_radius_multiplier;
+//    qCritical() << "Root size: " << height*m_active_cp.m_header.height_to_root_size_multiplier;
+
+    return AnalysisPoint(m_active_cp.m_header.category_id, position, height*m_active_cp.m_header.height_to_radius_multiplier,
+                         height*m_active_cp.m_header.height_to_root_size_multiplier, height);
+
+//    AnalysisPoint(int category_id, QPoint center, int canopy_radius, int root_width, int height);
+
 }
 
 int PointFactory::getActiveCategoryId()
 {
-    return m_active_category_id;
+    return m_active_cp.m_header.category_id;
 }
 

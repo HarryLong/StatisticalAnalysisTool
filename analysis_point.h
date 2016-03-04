@@ -6,7 +6,7 @@
 
 class AnalysisPoint{
 public:
-    AnalysisPoint(int category_id, QPoint center, int radius = 1);
+//    AnalysisPoint(int category_id, QPoint center, int radius = 1);
     AnalysisPoint(int category_id, QPoint center, int canopy_radius, int root_width, int height);
 
     AnalysisPoint();

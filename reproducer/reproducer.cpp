@@ -9,6 +9,7 @@
 #include <chrono>
 #include <QStringList>
 #include <thread>
+#include <QDebug>
 
 StrengthCalculationTracker::StrengthCalculationTracker(int count) : _n_complete(0), _strength(1), _n_total(count)
 {
@@ -73,7 +74,8 @@ void StrengthCalculationSpec::calculate()
 
 //-----------------------------------------------------------
 
-std::map<int,std::vector<AnalysisPoint> > RadialDistributionReproducer::reproduce(ReproductionConfiguration reproduction_configuration)
+RadialDistributionReproducer::GeneratedPoints RadialDistributionReproducer::reproduce(ReproductionConfiguration reproduction_configuration,
+                                                                                      GeneratedPointsProperties * outGeneratedPointProperties)
 {
     if(!FileUtils::check_directory_structure(reproduction_configuration.active_directory))
     {
@@ -139,7 +141,7 @@ std::map<int,std::vector<AnalysisPoint> > RadialDistributionReproducer::reproduc
 
     // We're good to go
     RadialDistributionReproducer reproducer(loaded_pair_correlations, loaded_category_properties, reproduction_configuration,
-                                            analysis_configuration);
+                                            analysis_configuration, outGeneratedPointProperties);
 
     reproducer.startPointGeneration();
 
@@ -151,12 +153,22 @@ std::map<int,std::vector<AnalysisPoint> > RadialDistributionReproducer::reproduc
 #define SPATIAL_HASHMAP_CELL_HEIGHT 10
 /////////////////////////////////////////////////////////////////////////////////
 RadialDistributionReproducer::RadialDistributionReproducer(PairCorrelations pair_correlations, CategoryPropertiesContainer category_properties,
-                                                           ReproductionConfiguration reproduction_settings, AnalysisConfiguration analysis_configuration) :
+                                                           ReproductionConfiguration reproduction_settings, AnalysisConfiguration analysis_configuration,
+                                                           GeneratedPointsProperties * outGeneratedPointProperties) :
     m_pair_correlations(pair_correlations), m_category_properties(category_properties), m_reproduction_configuration(reproduction_settings),
     m_spatial_point_storage(m_reproduction_configuration.width, m_reproduction_configuration.height), m_analysis_configuration(analysis_configuration),
-    m_point_factory(reproduction_settings.width, reproduction_settings.height)
+    m_point_factory(reproduction_settings.width, reproduction_settings.height),
+    m_generated_points_properties(outGeneratedPointProperties)
 {
-
+    // Initialize the point properties tracker
+    SizeProperties size_properties;
+    for(auto it(category_properties.begin()); it != category_properties.end(); it++)
+    {
+        size_properties.heightToCanopyRadius = it->second.m_header.height_to_radius_multiplier;
+        size_properties.minHeight = -1;
+        size_properties.maxHeight = -1;
+        m_generated_points_properties->emplace(it->first, size_properties);
+    }
 }
 
 RadialDistributionReproducer::~RadialDistributionReproducer()
@@ -238,7 +250,7 @@ void RadialDistributionReproducer::generate_points_through_random_moves()
             /*********************
              * DESTINATION POINT *
              *********************/
-            AnalysisPoint random_dest_point = AnalysisPoint( m_point_factory.getPoint() );
+            AnalysisPoint random_dest_point = AnalysisPoint( m_point_factory.getPoint(selected_point.getHeight()) );
 
             // Calculate strength
             double destination_point_strength = calculate_strength(random_dest_point);
@@ -384,6 +396,14 @@ void RadialDistributionReproducer::add_destination_point(const AnalysisPoint & p
     m_point_factory.setPositionStatus(point.getCenter(), false); // Update the point factory
     m_active_category_points.push_back(point); // Update the active category points vector
     m_spatial_point_storage.addPoint(point);
+
+    // Check min/max
+    SizeProperties & props((*m_generated_points_properties)[point.getCategoryId()]);
+    int point_height(point.getHeight());
+    if(props.maxHeight == -1 || point.getHeight() > props.maxHeight)
+        props.maxHeight = point_height;
+    if(props.minHeight == -1 || point.getHeight() < props.minHeight)
+        props.minHeight = point_height;
 }
 
 void RadialDistributionReproducer::remove_destination_point(const AnalysisPoint & point, int this_category_points_index)
@@ -415,6 +435,10 @@ void RadialDistributionReproducer::accelerated_point_validity_check(const Analys
     // Start negative
     valid = false;
     strength_calculation_necessary = true;
+
+
+    if(m_category_properties.find(reference_point.getCategoryId())->second.m_header.category_dependent_ids.size() > 0) // dependent categories
+        return;
 
     const RadialDistribution distribution (get_radial_distribution(queried_category, reference_point.getCategoryId()));
     if(distribution.getMinimum() == 0)
@@ -464,7 +488,6 @@ double RadialDistributionReproducer::calculate_strength(const AnalysisPoint & re
 //    std::cout << "Reachable points: " << possible_reachable_points.size() << std::endl;
     return calculate_strength(reference_point, possible_reachable_points);
 }
-
 double RadialDistributionReproducer::calculate_strength(const AnalysisPoint & candidate_point, const std::vector<AnalysisPoint> & existing_points)
 {
     double strength(1.0f);
@@ -485,9 +508,10 @@ double RadialDistributionReproducer::calculate_strength(const AnalysisPoint & ca
             if(std::find(dependent_category_ids.begin(), dependent_category_ids.end(), existing_point.getCategoryId()) != dependent_category_ids.end());
             {
                 line.setP2(existing_point.getCenter());
-                float distance(line.length()-existing_point.getRadius()); // Distance from the reference points circumference [remove the radius]
-                if(distance < 0)
+                if(line.length() < existing_point.getRadius())
+                {
                     within_radius = true;
+                }
             }
         }
         if(!within_radius)
@@ -528,7 +552,7 @@ double RadialDistributionReproducer::calculate_strength(const AnalysisPoint & ca
     return strength;
 }
 
-std::map<int,std::vector<AnalysisPoint> >& RadialDistributionReproducer::getGeneratedPoints()
+RadialDistributionReproducer::GeneratedPoints & RadialDistributionReproducer::getGeneratedPoints()
 {
     return m_all_generated_points;
 }

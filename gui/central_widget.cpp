@@ -66,20 +66,20 @@ void CentralWidget::init_layout()
 
     // Point size & category
     {
-        m_point_size_sb = new QSpinBox;
-        m_point_size_sb->setRange(1,15);
+        m_point_r_sb = new QSpinBox;
+        m_point_r_sb->setRange(1,15);
         m_category_sb = new QSpinBox;
         m_category_sb->setRange(1,15);
         m_category_sb->setValue(1);
 
-        connect(m_point_size_sb, SIGNAL(valueChanged(int)), &m_input_widget, SLOT(setPointSize(int)));
+        connect(m_point_r_sb, SIGNAL(valueChanged(int)), &m_input_widget, SLOT(setPointRadius(int)));
         connect(m_category_sb, SIGNAL(valueChanged(int)), &m_input_widget, SLOT(setAciveCategoryId(int)));
 
         QHBoxLayout * ps_and_category_id_layout = new QHBoxLayout;
         ps_and_category_id_layout->addWidget(new QLabel(""),1,Qt::AlignCenter); // Padding
 
         ps_and_category_id_layout->addWidget(new QLabel("Point size: "), 0, Qt::AlignCenter);
-        ps_and_category_id_layout->addWidget(m_point_size_sb, 0, Qt::AlignCenter);
+        ps_and_category_id_layout->addWidget(m_point_r_sb, 0, Qt::AlignCenter);
         ps_and_category_id_layout->addWidget(new QLabel("Category: "), 0, Qt::AlignCenter);
         ps_and_category_id_layout->addWidget(m_category_sb, 0, Qt::AlignCenter);
 

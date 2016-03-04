@@ -8,6 +8,7 @@
 #include "dialogs.h"
 #include "reproduction_config_dialog.h"
 #include <QActionGroup>
+#include "../plant_file/distrib.h"
 
 #define MAX_INPUT_WIDGET_DIMENSION 1000
 #define MIN_INPUT_WIDGET_DIMENSION 100
@@ -119,9 +120,8 @@ void MainWindow::generate_random_distribution()
     int n_points(m_random_distribution_producer_dlg->getNPoints());
     int min_point_radius( m_random_distribution_producer_dlg->getMinimumRadius() );
     int max_point_radius( m_random_distribution_producer_dlg->getMaximumRadius() );
-
     std::vector<AnalysisPoint> generated_points( m_distribution_factory.generateRandomDistribution(m_central_widget->getActiveCategoryId(), n_points, m_input_widget_width, m_input_widget_height,
-                                                                                                    min_point_radius, max_point_radius) );
+                                                                                                    min_point_radius, max_point_radius, 1.0, 1.0) );
     m_central_widget->setInputWidgetPoints( generated_points );
 }
 
@@ -136,7 +136,7 @@ void MainWindow::generate_clustered_distribution()
 
     std::vector<AnalysisPoint> generated_points( m_distribution_factory.generateSeededDistribution(m_central_widget->getActiveCategoryId(), n_seed_points, n_seeding_iterations, max_seeding_distance,
                                                                                             m_input_widget_width, m_input_widget_height,
-                                                                                            min_point_radius, max_point_radius, equidistant_seeds)  );
+                                                                                            min_point_radius, max_point_radius, 1.0f, 1.0f, equidistant_seeds)  );
 
     m_central_widget->setInputWidgetPoints( generated_points );
 }
@@ -162,12 +162,55 @@ void MainWindow::launch_reproduction_configuration_producer_dialog()
 void MainWindow::reproduce()
 {
     ReproductionConfiguration reproduction_config( m_reproduction_configuration_producer_dlg->getConfiguration() );
-
+    RadialDistributionReproducer::GeneratedPointsProperties point_properties;
 //    RadialDistributionReproducer::reproduce(reproduction_config);
 
-    std::map<int,std::vector<AnalysisPoint> > reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config));
-    ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputFilename().toStdString(),
-                                     reproduced_points, reproduction_config.width, reproduction_config.height);
+    RadialDistributionReproducer::GeneratedPoints reproduced_points (RadialDistributionReproducer::reproduce(reproduction_config, &point_properties));
+    if(m_reproduction_configuration_producer_dlg->genImage())
+    {
+        ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputImageFilename().toStdString(),
+                                        reproduced_points, reproduction_config.width, reproduction_config.height);
+    }
+
+    // Convert to distrib format
+    std::vector<Distrib::SpeciesProperties> ecosystem;
+    Distrib::SpeciesProperties specie_prop; // used for adding
+    Distrib::PlantInstance plant_instance;
+    QPoint point_center;
+
+    for(auto specie_it(reproduced_points.begin()); specie_it != reproduced_points.end(); specie_it++)
+    {
+        int category_id(specie_it->first);
+        specie_prop.speciesName = std::to_string(category_id);
+        RadialDistributionReproducer::SizeProperties & specie_size_properties(point_properties[category_id]);
+        specie_prop.heightToCanopyRadius = specie_size_properties.heightToCanopyRadius;
+        specie_prop.minHeight = specie_size_properties.minHeight;
+        specie_prop.maxHeight = specie_size_properties.maxHeight;
+
+        specie_prop.instances.clear();
+        for(auto plant_it(specie_it->second.begin()); plant_it != specie_it->second.end(); plant_it++)
+        {
+            plant_instance.height = plant_it->getHeight();
+            point_center = plant_it->getCenter();
+            plant_instance.pos.x = point_center.x();
+            plant_instance.pos.y = point_center.y();
+            plant_instance.pos.z = 0;
+
+            specie_prop.instances.push_back(plant_instance);
+        }
+        ecosystem.push_back(specie_prop);
+
+        specie_prop.instances.clear(); // Clear for next round
+    }
+    Distrib distrib;
+    distrib.setEcosystem(ecosystem);
+    distrib.writePDB(m_reproduction_configuration_producer_dlg->getOutputFilename().toStdString());
+
+
+//    ImageUtils::printPointsToImg(m_reproduction_configuration_producer_dlg->getOutputFilename().toStdString(),
+//                                     reproduced_points, reproduction_config.width, reproduction_config.height);
+
+
 
 //    AnalysisConfiguration config(0, 200, 20, 10000, 10000);
 //    std::vector<int> priority_sorted_cat;
